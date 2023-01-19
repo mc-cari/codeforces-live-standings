@@ -1,5 +1,5 @@
-import { useState} from 'react';
-import Router from 'next/router'
+import { useState } from 'react';
+import { useRouter } from 'next/router'
 
 const sleep = (ms : number) => new Promise(
   resolve => setTimeout(resolve, ms)
@@ -7,16 +7,15 @@ const sleep = (ms : number) => new Promise(
 
 export default function Home() {
 
-  const [config, setConfig] = useState<boolean>(true);
   const [handleText, setHandleText] = useState<string>('');
   const [contestId, setContestId] = useState<number>();
   const [users, setUsers] = useState<string[]>([]);
   const [contestType, setContestType] = useState<string>('');
 
+  const Router = useRouter()
+
   const handleStart = () => {
     if(contestId && users && users.length > 0 && contestType) {
-      setConfig(false)
-      //fetchSubmissions(0);
 
       Router.push({
         pathname: `/contests/${contestId}/standings`,

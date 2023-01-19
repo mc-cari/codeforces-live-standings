@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react';
 import SubmissionLive from '../../../components/SubmissionsLive';
 import StandingsList from '../../../components/StandingsList';
-import Router from 'next/router'
+import { useRouter } from 'next/router'
 
 const sleep = (ms : number) => new Promise(
   resolve => setTimeout(resolve, ms)
@@ -14,6 +14,7 @@ export default function Standings() {
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
   const [globalStandings, setGlobalStandings] = useState<Standings>();
 
+  const Router = useRouter()
   const { contestId, handles, contestType } = Router.query
 
   useEffect(() => {

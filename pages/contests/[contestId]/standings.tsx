@@ -89,7 +89,7 @@ export default function Standings() {
         setNewSubmissions(aux.reverse().slice(0, 15));
         setSubIndex(aux.length - ind);
   
-        await sleep(1700);       
+        await sleep(500);       
         fetchSubmissions(aux.length, users)
         
       } catch(error) {
@@ -98,7 +98,7 @@ export default function Standings() {
     }
 
     if(contestId && handles && contestType) {
-      // check if handles is a string or an array
+
       if(typeof handles === 'string') fetchSubmissions(0, [handles])
       else fetchSubmissions(0, handles)
       

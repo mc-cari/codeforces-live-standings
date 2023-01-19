@@ -50,7 +50,7 @@ export default function StandingsList({localStandings, globalStandings, contestT
               }
             </div>  
           </div>
-          <div className='flex-1 text-lg flex items-center justify-center'>
+          <div className='flex-1 text-xl flex items-center justify-center'>
             {problemsSolved.get(row.party.teamName ? row.party.teamName : row.party.members[0].handle)}
           </div>
           <div className='flex-1 text-lg flex items-center justify-center'>{contestType === 'normal' ? row.points : row.penalty}</div>

@@ -1,6 +1,5 @@
 export default function Position ({position, userCount} : {position : number, userCount : number})  {
 
-  console.log(position, userCount)
   let bgPosition = ''
 
   if(position / userCount < 0.1 || position === 1)

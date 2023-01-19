@@ -14,7 +14,7 @@ export default function Submission({submission, isNew, userCount}
         />
       </div>  
       
-      <div className='grow flex items-center text-base p-2'>
+      <div className='grow flex items-center text-lg p-2'>
         {submission.author.teamName ? 
           submission.author.teamName :
           submission.author.members[0].handle

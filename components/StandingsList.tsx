@@ -1,8 +1,10 @@
 import ProblemStatusEdu from "./ProblemStatusEdu";
 import ProblemStatusNormal from "./ProblemStatusNormal";
 import Position from "./Position";
+import getName from "../utils/getName";
 
-export default function StandingsList({localStandings, globalStandings, contestType} : {localStandings: Map<string, number>, globalStandings: Standings, contestType: string}) {
+export default function StandingsList({localStandings, globalStandings, contestType} :
+   {localStandings: Map<string, number>, globalStandings: Standings, contestType: string}) {
 
   const problemsSolved : Map<string, number> = new Map<string, number>()
 
@@ -11,14 +13,8 @@ export default function StandingsList({localStandings, globalStandings, contestT
     for(const problem of row.problemResults) {
       if(problem.points > 0) solved++;
     }
-    if(row.party.teamName) {
-      problemsSolved.set(row.party.teamName, solved)
-    }
-    else {
-      problemsSolved.set(row.party.members[0].handle, solved)
-    }
+    problemsSolved.set(getName(row.party), solved)
   }
-
 
   return (
     <div className='flex flex-col h-full w-full'>
@@ -36,22 +32,19 @@ export default function StandingsList({localStandings, globalStandings, contestT
       </div>
 
       {globalStandings.rows.map(row => (
-        <div className='flex flex-row h-12 w-full' key={row.party.teamName ? row.party.teamName : row.party.members[0].handle}>
+        <div className='flex flex-row h-12 w-full' key={getName(row.party)}>
           <div className='flex flex-row w-1/3'>
             <div className='w-1/5 text-xl'>
-              <Position position={localStandings.get(row.party.teamName ? row.party.teamName : row.party.members[0].handle) as number} 
-                userCount={localStandings.size}
+              <Position position={localStandings.get(getName(row.party)) as number} 
+                userCount={globalStandings.rows.length}
               />
             </div>  
             <div className='w-4/5 text-lg flex items-center px-3'>
-              {row.party.teamName ?
-                row.party.teamName :
-                row.party.members[0].handle
-              }
+              {getName(row.party)}
             </div>  
           </div>
           <div className='flex-1 text-xl flex items-center justify-center'>
-            {problemsSolved.get(row.party.teamName ? row.party.teamName : row.party.members[0].handle)}
+            {problemsSolved.get(getName(row.party))}
           </div>
           <div className='flex-1 text-lg flex items-center justify-center'>{contestType === 'normal' ? row.points : row.penalty}</div>
 

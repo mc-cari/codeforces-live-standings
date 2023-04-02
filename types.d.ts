@@ -44,7 +44,7 @@ declare global {
     timeConsumedMillis: number;
     memoryConsumedBytes: number;
     points: number;
-    numberOfProblems: number;
+    numberOfProblems: number ;
   }
 
   type Contest = {

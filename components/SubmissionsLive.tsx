@@ -1,5 +1,6 @@
 import VeredictLive from "./VeredictLive"
 import Position from "./Position"
+import getName from "../utils/getName"
 
 export default function Submission({submission, isNew, userCount} 
   : {submission: Submission, isNew : boolean, userCount : number}) {
@@ -15,10 +16,7 @@ export default function Submission({submission, isNew, userCount}
       </div>  
       
       <div className='grow flex items-center text-lg p-2'>
-        {submission.author.teamName ? 
-          submission.author.teamName :
-          submission.author.members[0].handle
-        }  
+        {getName(submission.author)}  
       </div>
       <div className='w-1/12 flex items-center justify-center text-xl'>{submission.numberOfProblems}</div>
       <div className='w-1/12 flex items-center justify-center text-xl'>{submission.problem.index}</div>

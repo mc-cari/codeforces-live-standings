@@ -74,7 +74,7 @@ export default function Home() {
         <div className='flex flex-col w-2/3 bg-slate-600 h-full p-3 justify-center border-8 border-zinc-800 rounded'>
           
           <div className='flex flex-col h-1/3 justify-center'>
-            <label className='my-2' htmlFor='contest'>ContestId:</label>
+            <label className='my-2' htmlFor='contest'>Contest Id (url number):</label>
             <div className='flex flex-row'>
               <input className='w-1/2 p-1 bg-zinc-800 rounded' type='text' id='contest' name='contest'
                 onChange={(e) => setContestId(parseInt(e.target.value))}

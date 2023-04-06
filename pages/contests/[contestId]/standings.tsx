@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
-import SubmissionLive from '../../../components/SubmissionsLive';
+import SubmissionsList from '../../../components/LiveSubmission';
 import StandingsList from '../../../components/StandingsList';
+import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
+import LiveSubmission from '../../../components/LiveSubmission';
 import { useRouter } from 'next/router'
 import useInterval from '../../../hooks/useInterval'
 import getName from "../../../utils/getName";
@@ -9,7 +11,7 @@ export default function Standings() {
 
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
-  const [localStandings, setLocalStandings] = useState<Map<string, number>>();
+  const [localStandings, setLocalStandings] = useState<Map<string, number>>(new Map<string, number>());
   const [globalStandings, setGlobalStandings] = useState<Standings>();
   const [delay, setDelay] = useState<number>(100);
   const [isPaused, setIsPaused] = useState<boolean>(false);
@@ -30,8 +32,9 @@ export default function Standings() {
         standingForUser.set(user, users.length)
       }
 
-      const standingsRes = await fetch(process.env.CF_API + `contest.standings?contestId=${contestId}&handles=${users.join(';')}`
-      , {mode: 'cors'});
+      const standingsRes = await fetch(process.env.CF_API + `contest.standings?contestId=${contestId}&handles=${users.join(';')}
+      &showUnofficial=true`,
+      {mode: 'cors'});
       
       if(!standingsRes.ok) {
         throw new Error('Failed to fetch standings data');
@@ -40,14 +43,17 @@ export default function Standings() {
       const standings = await standingsRes.json()
       
       var prevRank = -1, prevPosition = -1
+      const userWithStandingSet = new Set<string>()
       for(const [i, row] of standings.result.rows.entries()){
 
         var position = i+1;
         if(row.rank === prevRank) {
           position = prevPosition
         }
-        
-        standingForUser.set(getName(row.party), position)
+        if (!userWithStandingSet.has(getName(row.party))) {
+          standingForUser.set(getName(row.party), position)
+          userWithStandingSet.add(getName(row.party))
+        }
 
         prevRank = row.rank
         prevPosition = position
@@ -62,7 +68,6 @@ export default function Standings() {
       data.result.reverse()
 
       const oldSubmissions : Submission[] = submissions.slice(0).reverse();
-      console.log("oldSubmissions", oldSubmissions.length)
       let oldId = 0, newSubmissionsCountUpdate = 0;
       for (const submission of data.result) {
         
@@ -73,7 +78,7 @@ export default function Standings() {
           if (oldId === oldSubmissions.length) {
             newSubmissionsCountUpdate++;
             oldSubmissions.push(submission);
-            console.log("added")
+            //console.log("added")
           }
           else
             oldSubmissions[oldId] = submission;
@@ -98,7 +103,6 @@ export default function Standings() {
       setGlobalStandings(standings.result)
       setLocalStandings(standingForUser)
 
-      console.log('done')
       
     } catch(error) {
       console.log('Error while processing Submissions.', error);
@@ -116,7 +120,6 @@ export default function Standings() {
   useInterval(async () => {
 
     setIsPaused(true)
-    console.log('fetching')
     
     if(contestId && handles && contestType) {
       await fetchSubmissions()
@@ -128,17 +131,13 @@ export default function Standings() {
  
   return (
     <div className='flex flex-row bg-black text-white'>
-      <div className='flex flex-col-reverse overflow-y-hidden h-screen w-2/5 p-5'>
-      {submissions.map((submission, index) => (
-        <div key={submission.id} className='h-6'>
-          <SubmissionLive submission={submission} isNew={index < newSubmissionsCount} userCount={globalStandings?.rows.length as number}/>
-        </div>
-      ))}
+      <div className='flex h-screen w-2/5 p-5'>
+        <LiveSubmissionsList submissions={submissions} newSubmissionsCount={newSubmissionsCount} globalStandings={globalStandings}/>
       </div>
       {(localStandings && globalStandings) ? (
-      <div className='h-screen w-3/5 p-5'>
-        <StandingsList localStandings={localStandings} globalStandings={globalStandings} contestType={(contestType as string)}/>
-      </div>
+        <div className='h-screen w-3/5 p-5'>
+          <StandingsList localStandings={localStandings} globalStandings={globalStandings} contestType={(contestType as string)}/>
+        </div>
       ) : (
         <div className='h-screen w-3/5 p-5'>
           <div className="flex items-center justify-center h-screen">

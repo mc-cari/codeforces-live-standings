@@ -1,42 +1,80 @@
 
-export default function Veredict({veredict} : {veredict: string}) {
+export default function Veredict({veredict, test} : {veredict: string, test: number}) {
   
+  var bgColor = '';
+  var text = '';
+
   switch (veredict) {
     case 'FAILED':
-      return <p className="text-red-500">FAILED</p>
+      bgColor = 'bg-red-500';
+      text = 'FA';
+      break;
     case 'OK':
-      return <p className="text-green-500">OK</p>
+      bgColor = 'bg-green-500';
+      text = 'AC';
+      break;
     case 'PARTIAL':
-      return <p className="text-yellow-500">PARTIAL</p>
+      bgColor = 'bg-yellow-500';
+      text = 'PT';
+      break;
     case 'COMPILATION_ERROR':
-      return <p className="text-red-500">COMPILATION ERROR</p>
+      bgColor = 'bg-red-500';
+      text = 'CE';
+      break;
     case 'RUNTIME_ERROR':
-      return <p className="text-red-500">RUNTIME ERROR</p>
+      bgColor = 'bg-red-500';
+      text = 'RE';
+      break;
     case 'WRONG_ANSWER':
-      return <p className="text-red-500">WRONG ANSWER</p>
+      bgColor = 'bg-red-500';
+      text = 'WA';
+      break;
     case 'PRESENTATION_ERROR':
-      return <p className="text-yellow-500">PRESENTATION ERROR</p>
+      bgColor = 'bg-yellow-500';
+      text = 'PE'
     case 'TIME_LIMIT_EXCEEDED':
-      return <p className="text-blue-500">TIME LIMIT EXCEEDED</p>
+      bgColor = 'bg-blue-500';
+      text = 'TLE';
+      break;
     case 'MEMORY_LIMIT_EXCEEDED':
-      return <p className="text-blue-500">MEMORY LIMIT EXCEEDED</p>
+      bgColor = 'bg-blue-500';
+      text = 'MLE';
+      break;
     case 'IDLENESS_LIMIT_EXCEEDED':
-      return <p className="text-red-500">IDLENESS LIMIT EXCEEDED</p>
+      bgColor = 'bg-blue-500';
+      text = 'ILE';
+      break;
     case 'SECURITY_VIOLATED':
-      return <p className="text-red-500">SECURITY VIOLATED</p>
+      bgColor = 'bg-red-500';
+      text = 'SV';
+      break;
     case 'CRASHED':
-      return <p className="text-red-500">CRASHED</p>
+      bgColor = 'bg-red-500';
+      text = 'CRSH';
+      break;
     case 'INPUT_PREPARATION_CRASHED':
-      return <p className="text-red-500">INPUT PREPARATION CRASHED</p>
+      bgColor = 'bg-red-500';
+      text = 'IPC'
     case 'CHALLENGED':
-      return <p className="text-red-500">CHALLENGED</p>
+      bgColor = 'bg-red-500';
+      text = 'CH';
+      break;
     case 'SKIPPED':
-      return <p className="text-gray-500">SKIPPED</p>
+      bgColor = 'bg-gray-500';
+      text = 'SKP'
     case 'TESTING':
-      return <p className="text-gray-500">TESTING</p>
+      bgColor = 'bg-gray-500';
+      text = 'T' + test.toString();
+      break;
     case 'REJECTED':
-      return <p className="text-red-500">REJECTED</p>
+      bgColor = 'bg-red-500';
+      text = 'RJC';
+      break;
     default:
-      return <p className="text-gray-500">UNKNOWN</p>
+      bgColor = 'bg-gray-500';
+      text = 'UNW'
   }
+
+  return <div className={`${bgColor} w-full h-full flex items-center justify-center`}> {text} </div>
+
 }

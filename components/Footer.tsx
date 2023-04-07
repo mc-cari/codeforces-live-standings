@@ -1,8 +1,9 @@
-// create footer
-export default function Footer () {
+import React from 'react';
+
+export default function Footer() {
   return (
 
-      <p>footer</p>
+    <p>footer</p>
 
-  )
+  );
 }

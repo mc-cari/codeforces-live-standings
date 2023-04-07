@@ -1,4 +1,4 @@
-export default function getName(party : Party) {
+export default function getName(party : Party) : string {
   if(party.teamName) {
     return party.teamName
   }

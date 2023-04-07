@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
-import SubmissionsList from '../../../components/LiveSubmission';
 import StandingsList from '../../../components/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
-import LiveSubmission from '../../../components/LiveSubmission';
 import { useRouter } from 'next/router'
 import useInterval from '../../../hooks/useInterval'
 import getName from "../../../utils/getName";
@@ -11,6 +9,7 @@ export default function Standings() {
 
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
+  const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>(new Map<string, number>());
   const [globalStandings, setGlobalStandings] = useState<Standings>();
   const [delay, setDelay] = useState<number>(100);
@@ -18,7 +17,16 @@ export default function Standings() {
   
   const Router = useRouter()
   const { contestId, handles, contestType } = Router.query
-  const users : string[] = typeof handles === 'string' ? [handles] : handles? handles : []
+  const userHandles : string[] = typeof handles === 'string' ? [handles] : handles? handles : []
+
+  const isSubmissionAuthorInUsers = (author : Party) : Boolean => {
+    for (const user of author.members) {
+      if(userHandles.includes(user.handle)) {
+        return true
+      }
+    }
+    return false
+  }
 
   const fetchSubmissions = async () => {
 
@@ -27,24 +35,25 @@ export default function Standings() {
 
     try {
 
-      for (const user of users) {
-        problemsForUser.set(user, new Set<string>())
-        standingForUser.set(user, users.length)
+      for (const user of userHandles) {
+        standingForUser.set(user, userHandles.length)
       }
 
-      const standingsRes = await fetch(process.env.CF_API + `contest.standings?contestId=${contestId}&handles=${users.join(';')}
-      &showUnofficial=true`,
-      {mode: 'cors'});
+      const standingsResponse = await fetch(process.env.CF_API + `contest.standings?contestId=${contestId}&handles=${userHandles.join(';')}
+        &showUnofficial=true`,
+        {mode: 'cors'}
+      );
       
-      if(!standingsRes.ok) {
+      if(!standingsResponse.ok) {
         throw new Error('Failed to fetch standings data');
       }
 
-      const standings = await standingsRes.json()
+      const standingsPromise = await standingsResponse.json()
+      const standings : Standings = standingsPromise.result
       
       var prevRank = -1, prevPosition = -1
       const userWithStandingSet = new Set<string>()
-      for(const [i, row] of standings.result.rows.entries()){
+      for(const [i, row] of standings.rows.entries()){
 
         var position = i+1;
         if(row.rank === prevRank) {
@@ -59,19 +68,21 @@ export default function Standings() {
         prevPosition = position
       }
 
-      const res = await fetch(process.env.CF_API + `contest.status?contestId=${contestId}`, {mode: 'cors'});     
+      const submissionsResponse = await fetch(process.env.CF_API + `contest.status?contestId=${contestId}`, {mode: 'cors'});     
 
-      if (!res.ok) {
+      if (!submissionsResponse.ok) {
         throw new Error('Failed to fetch submissions data');
       }
-      const data = await res.json()
-      data.result.reverse()
+      const submissionsPromise = await submissionsResponse.json()
+      const newSubmissions : Submission[] = submissionsPromise.result.reverse()
+
 
       const oldSubmissions : Submission[] = submissions.slice(0).reverse();
       let oldId = 0, newSubmissionsCountUpdate = 0;
-      for (const submission of data.result) {
+      for (const submission of newSubmissions) {
         
-        if(users.includes(getName(submission.author))) {
+        if(isSubmissionAuthorInUsers(submission.author)) {
+
           while (oldId < oldSubmissions.length && oldSubmissions[oldId].id !== submission.id) {
             oldId++;
           }
@@ -87,11 +98,15 @@ export default function Standings() {
       
       for(const submission of oldSubmissions){
         
-        if(users.includes(getName(submission.author))) {
+        if(isSubmissionAuthorInUsers(submission.author)) {
+
+          if(!problemsForUser.has(getName(submission.author)))
+            problemsForUser.set(getName(submission.author), new Set<string>())
 
           if(submission.verdict === 'OK'){
             problemsForUser.get(getName(submission.author))?.add(submission.problem.index)
           }
+
           submission.numberOfProblems = problemsForUser.get(getName(submission.author))?.size as number
           submission.author.rank = standingForUser.get(getName(submission.author)) as number
         }
@@ -100,12 +115,12 @@ export default function Standings() {
       
       setSubmissions(() => oldSubmissions.reverse().slice(0));
 
-      setGlobalStandings(standings.result)
+      setGlobalStandings(standings)
       setLocalStandings(standingForUser)
 
       
     } catch(error) {
-      console.log('Error while processing Submissions.', error);
+      console.log(error);
     }
     
   }
@@ -114,8 +129,36 @@ export default function Standings() {
     let timer = setTimeout(() => {
       setDelay(1000)
     }, 1000)
+
+    const fetchUsersRank = async () => {
+      try {
+        const usersInfoResponse = await fetch(process.env.CF_API + `user.info?handles=${userHandles.join(';')}`,
+          {mode: 'cors'}
+        );
+        
+        if(!usersInfoResponse.ok) {
+          throw new Error('Failed to fetch standings data');
+        }
+
+        const usersInfoPromise = await usersInfoResponse.json()
+        const usersInfo : User[] = usersInfoPromise.result
+
+        const userRankMap = new Map<string, string>()
+        for(const user of usersInfo) {
+          userRankMap.set(user.handle, user.rank)
+        }
+        setUserRank(userRankMap)
+      
+      } catch(error) {
+        console.log(error);
+      }
+    }
+    if (handles) {
+      fetchUsersRank()
+    }
+
     return () => clearTimeout(timer)
-  }, [])
+  }, [handles])
 
   useInterval(async () => {
 
@@ -132,11 +175,13 @@ export default function Standings() {
   return (
     <div className='flex flex-row bg-black text-white'>
       <div className='flex h-screen w-2/5 p-5'>
-        <LiveSubmissionsList submissions={submissions} newSubmissionsCount={newSubmissionsCount} globalStandings={globalStandings}/>
+        <LiveSubmissionsList submissions={submissions} newSubmissionsCount={newSubmissionsCount} globalStandings={globalStandings}
+          userRank={userRank}/>
       </div>
       {(localStandings && globalStandings) ? (
         <div className='h-screen w-3/5 p-5'>
-          <StandingsList localStandings={localStandings} globalStandings={globalStandings} contestType={(contestType as string)}/>
+          <StandingsList localStandings={localStandings} globalStandings={globalStandings} contestType={(contestType as string)}
+            userRank={userRank}/>
         </div>
       ) : (
         <div className='h-screen w-3/5 p-5'>

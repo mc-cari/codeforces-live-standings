@@ -1,8 +1,6 @@
-import Navbar from './Navbar'
-import Footer from './Footer'
-// import react node
-import { ReactNode } from 'react'
-
+import React, { ReactNode } from 'react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 interface IProps {
   children: ReactNode;
@@ -15,5 +13,5 @@ export default function Layout({ children } : IProps) {
       <main>{children}</main>
       <Footer />
     </>
-  )
+  );
 }

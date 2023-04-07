@@ -1,3 +1,16 @@
 {
-  "extends": "next/core-web-vitals"
+  "extends": [
+  "next/core-web-vitals",
+  "airbnb",
+  "airbnb-typescript"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "ignorePatterns": ["_app.tsx"],
+  "rules": {
+    "jsx-a11y/label-has-associated-control": "off",
+    "no-param-reassign": "off"
+  }
+
 }

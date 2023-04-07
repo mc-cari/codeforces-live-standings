@@ -46,7 +46,7 @@ export default function Home() {
       <div className='flex w-1/2 h-1/2 items-center justify-center'>
         <div className='flex w-2/3 flex-col bg-slate-600 h-full p-3 justify-center border-8 border-zinc-800 rounded'>
           
-          <label className='my-2' htmlFor='handles'>Add comma separated handles:</label>
+          <label className='my-2' htmlFor='handles'>Add comma separated user handles:</label>
           <div className='flex flex-row my-1'>
             <input className='w-1/2 p-1 bg-zinc-800 rounded' type='text' id='handles' name='handles' value={handleText}
               onChange={(e) => setHandleText(e.target.value)} placeholder='handle1,handle2,...'

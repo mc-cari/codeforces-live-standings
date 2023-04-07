@@ -1,42 +1,49 @@
+import React from 'react';
 
-export default function Veredict({veredict} : {veredict: string}) {
-  
-  switch (veredict) {
-    case 'FAILED':
-      return <p className="text-red-500">FAILED</p>
-    case 'OK':
-      return <p className="text-green-500">OK</p>
-    case 'PARTIAL':
-      return <p className="text-yellow-500">PARTIAL</p>
-    case 'COMPILATION_ERROR':
-      return <p className="text-red-500">COMPILATION ERROR</p>
-    case 'RUNTIME_ERROR':
-      return <p className="text-red-500">RUNTIME ERROR</p>
-    case 'WRONG_ANSWER':
-      return <p className="text-red-500">WRONG ANSWER</p>
-    case 'PRESENTATION_ERROR':
-      return <p className="text-yellow-500">PRESENTATION ERROR</p>
-    case 'TIME_LIMIT_EXCEEDED':
-      return <p className="text-blue-500">TIME LIMIT EXCEEDED</p>
-    case 'MEMORY_LIMIT_EXCEEDED':
-      return <p className="text-blue-500">MEMORY LIMIT EXCEEDED</p>
-    case 'IDLENESS_LIMIT_EXCEEDED':
-      return <p className="text-red-500">IDLENESS LIMIT EXCEEDED</p>
-    case 'SECURITY_VIOLATED':
-      return <p className="text-red-500">SECURITY VIOLATED</p>
-    case 'CRASHED':
-      return <p className="text-red-500">CRASHED</p>
-    case 'INPUT_PREPARATION_CRASHED':
-      return <p className="text-red-500">INPUT PREPARATION CRASHED</p>
-    case 'CHALLENGED':
-      return <p className="text-red-500">CHALLENGED</p>
-    case 'SKIPPED':
-      return <p className="text-gray-500">SKIPPED</p>
-    case 'TESTING':
-      return <p className="text-gray-500">TESTING</p>
-    case 'REJECTED':
-      return <p className="text-red-500">REJECTED</p>
-    default:
-      return <p className="text-gray-500">UNKNOWN</p>
-  }
+interface VeredictInfo {
+  bgColor: string;
+  text: string;
+}
+
+export default function Veredict({ veredict, test } : { veredict: string, test: number }) {
+  const VeredictsInfo = new Map<string, VeredictInfo>([
+    ['FAILED', { bgColor: 'bg-red-500', text: 'FA' }],
+    ['OK', { bgColor: 'bg-green-500', text: 'AC' }],
+    ['PARTIAL', { bgColor: 'bg-yellow-500', text: 'PRT' }],
+    ['COMPILATION_ERROR', { bgColor: 'bg-red-500', text: 'CE' }],
+    ['RUNTIME_ERROR', { bgColor: 'bg-red-500', text: 'RE' }],
+    ['WRONG_ANSWER', { bgColor: 'bg-red-500', text: 'WA' }],
+    ['PRESENTATION_ERROR', { bgColor: 'bg-yellow-500', text: 'PE' }],
+    ['TIME_LIMIT_EXCEEDED', { bgColor: 'bg-blue-500', text: 'TLE' }],
+    ['MEMORY_LIMIT_EXCEEDED', { bgColor: 'bg-blue-500', text: 'MLE' }],
+    ['IDLENESS_LIMIT_EXCEEDED', { bgColor: 'bg-blue-500', text: 'ILE' }],
+    ['SECURITY_VIOLATED', { bgColor: 'bg-red-500', text: 'SV' }],
+    ['CRASHED', { bgColor: 'bg-red-500', text: 'CRSH' }],
+    ['INPUT_PREPARATION_CRASHED', { bgColor: 'bg-red-500', text: 'IPC' }],
+    ['CHALLENGED', { bgColor: 'bg-red-500', text: 'CH' }],
+    ['SKIPPED', { bgColor: 'bg-gray-500', text: 'SKP' }],
+    ['TESTING', { bgColor: 'bg-gray-500', text: 'T' }],
+    ['REJECTED', { bgColor: 'bg-red-500', text: 'RJC' }],
+    ['UNDEFINED', { bgColor: 'bg-gray-500', text: 'UNW' }],
+  ]);
+
+  const getVeredictInfo = () : VeredictInfo => {
+    if (VeredictsInfo.has(veredict)) {
+      return VeredictsInfo.get(veredict) as VeredictInfo;
+    }
+    if (veredict === 'TESTING') {
+      return { bgColor: 'bg-gray-500', text: `T${test.toString()}` };
+    }
+    return { bgColor: 'bg-gray-500', text: 'UNW' };
+  };
+
+  const veredictInfo = getVeredictInfo();
+
+  return (
+    <div className={`${veredictInfo.bgColor} w-full h-full flex items-center justify-center`}>
+      {' '}
+      {veredictInfo.text}
+      {' '}
+    </div>
+  );
 }

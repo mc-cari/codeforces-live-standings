@@ -22,11 +22,11 @@ declare global {
     contestId: number;
     members: Member[];
     participantType: string;
-    teamId: number;
-    teamName: string;
+    teamId: number | undefined;
+    teamName: string | undefined;
     ghost: boolean;
-    room: number;
-    startTimeSeconds: number;
+    room: number | undefined;
+    startTimeSeconds: number | undefined;
     rank: number;
   }
 
@@ -44,7 +44,7 @@ declare global {
     timeConsumedMillis: number;
     memoryConsumedBytes: number;
     points: number;
-    numberOfProblems: number;
+    numberOfProblems: number ;
   }
 
   type Contest = {
@@ -90,6 +90,28 @@ declare global {
     contest: Contest,
     problems: Problem[],
     rows: RanklistRow[]
+  }
+
+  type User = {
+    handle: string;
+    email: string;
+    vkId: string | undefined;
+    openId: string | undefined;
+    firstName: string | undefined;
+    lastName: string | undefined;
+    country: string | undefined;
+    city: string | undefined;
+    organization: string | undefined;
+    contribution: number;
+    rank: string;
+    rating: number;
+    maxRank: string;
+    maxRating: number;
+    lastOnlineTimeSeconds: number;
+    registrationTimeSeconds: number;
+    friendOfCount: number;
+    avatar: string;
+    titlePhoto: string;
   }
 
   interface Dictionary {

@@ -1,0 +1,33 @@
+name: ESLint
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '20 22 * * 6'
+
+jobs:
+  eslint:
+    name: Run eslint scanning
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    steps:
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run EsLint
+        run: npm run lint

@@ -22,7 +22,6 @@ export default function Veredict({ veredict, test } : { veredict: string, test: 
     ['INPUT_PREPARATION_CRASHED', { bgColor: 'bg-red-500', text: 'IPC' }],
     ['CHALLENGED', { bgColor: 'bg-red-500', text: 'CH' }],
     ['SKIPPED', { bgColor: 'bg-gray-500', text: 'SKP' }],
-    ['TESTING', { bgColor: 'bg-gray-500', text: 'T' }],
     ['REJECTED', { bgColor: 'bg-red-500', text: 'RJC' }],
     ['UNDEFINED', { bgColor: 'bg-gray-500', text: 'UNW' }],
   ]);

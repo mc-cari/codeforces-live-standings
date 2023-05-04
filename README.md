@@ -5,7 +5,7 @@ Website for a dynamic visualization for live standings of [Codeforces](https://c
 
 [Contest 1797](https://codeforces-live-standings.vercel.app/contests/1797/standings?contestType=normal&handles=Maruzensky&handles=shell_wataru&handles=noahhb&handles=FedeNQ&handles=julianferres&handles=martins&handles=CodigoL&handles=Cegax&handles=MateoCV&handles=Graphter&handles=MrNachoX&handles=mc._cari&handles=Xc4l16r3&handles=gabmei) example.
 
-Website link: [Codeforces Live Standings](codeforces-live-standings.vercel.app)
+Website link: [Codeforces Live Standings](codeforces-live-standings.vercel.app).
 
 It has support for:
 
@@ -15,6 +15,6 @@ It has support for:
 
 The website works with old contests and live contests.
 
-Codeforces blog post: [Codeforces Live Standings](https://codeforces.com/blog/entry/114892)
+[Codeforces blog post](https://codeforces.com/blog/entry/114892).
 
 The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are bbeign updated at the same tie, so the API responses are merged with the local status.

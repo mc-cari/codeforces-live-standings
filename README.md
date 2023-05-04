@@ -17,4 +17,4 @@ The website works with old contests and live contests and also shows the practic
 
 [Codeforces blog post](https://codeforces.com/blog/entry/114892).
 
-The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are beign updated at the same tie, so the API responses are merged with the local status.
+The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are beign updated at the same time, so the API responses are merged with the local status.

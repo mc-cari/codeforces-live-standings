@@ -5,7 +5,7 @@ Website for a dynamic visualization for live standings of [Codeforces](https://c
 
 [Contest 1797](https://codeforces-live-standings.vercel.app/contests/1797/standings?contestType=normal&handles=Maruzensky&handles=shell_wataru&handles=noahhb&handles=FedeNQ&handles=julianferres&handles=martins&handles=CodigoL&handles=Cegax&handles=MateoCV&handles=Graphter&handles=MrNachoX&handles=mc._cari&handles=Xc4l16r3&handles=gabmei) example.
 
-Website link: [Codeforces Live Standings](codeforces-live-standings.vercel.app).
+Website link: [Codeforces Live Standings](https://codeforces-live-standings.vercel.app).
 
 It has support for:
 
@@ -13,7 +13,7 @@ It has support for:
   - Educational Rounds
   - Gym Contests (Teams are recognized by one of its members, due to the Codeforces API design)
 
-The website works with old contests and live contests.
+The website works with old contests and live contests and also shows the practice submissions.
 
 [Codeforces blog post](https://codeforces.com/blog/entry/114892).
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import StandingsList from '../../../components/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
@@ -16,7 +16,7 @@ export default function Standings() {
 
   const Router = useRouter();
   const { contestId, handles, contestType } = Router.query;
-  const userHandles : string[] = typeof handles === 'string' ? [handles] : handles || [];
+  const userHandles : string[] = useMemo(() => (typeof handles === 'string' ? [handles] : handles || []), [handles]);
 
   const isSubmissionAuthorInUsers = (author : Party) :
   Boolean => author.members.reduce((inUsers, user) => inUsers
@@ -80,7 +80,6 @@ export default function Standings() {
           if (oldId === oldSubmissions.length) {
             newSubmissionsCountUpdate += 1;
             oldSubmissions.push(submission);
-            // console.log("added")
           } else { oldSubmissions[oldId] = submission; }
         }
       });
@@ -107,6 +106,7 @@ export default function Standings() {
       setGlobalStandings(standings);
       setLocalStandings(standingForUser);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.log(error);
     }
   };
@@ -136,6 +136,7 @@ export default function Standings() {
         });
         setUserRank(userRankMap);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.log(error);
       }
     };
@@ -144,7 +145,7 @@ export default function Standings() {
     }
 
     return () => clearTimeout(timer);
-  }, [handles]);
+  }, [handles, userHandles]);
 
   useInterval(async () => {
     setIsPaused(true);

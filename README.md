@@ -12,7 +12,8 @@ It has support for:
   - Normal Rounds
   - Educational Rounds
   - Gym Contests (Teams are recognized by one of its members, due to the Codeforces API design)
-  - The website works with old contests and live contests.
+
+The website works with old contests and live contests.
 
 Codeforces blog post: [Codeforces Live Standings](https://codeforces.com/blog/entry/114892)
 

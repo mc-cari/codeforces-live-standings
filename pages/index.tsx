@@ -108,14 +108,28 @@ export default function Home() {
             <div className="flex flex-row">
               <label className="w-2/5 text-sm" htmlFor="normal">Normal Round</label>
               <div className="w-3/5">
-                <input className="bg-zinc-800" type="radio" id="normal" name="contestType" value="normal" onClick={() => setContestType('normal')} />
+                <input
+                  className="bg-zinc-800"
+                  type="radio"
+                  id="normal"
+                  name="contestType"
+                  value="normal"
+                  onClick={() => setContestType('normal')}
+                />
               </div>
             </div>
 
             <div className="flex flex-row text-sm">
               <label className="w-2/5" htmlFor="educational">Educational/ICPC</label>
               <div className="w-3/5">
-                <input className="bg-zinc-800" type="radio" name="contestType" id="educational" value="educational" onClick={() => setContestType('educational')} />
+                <input
+                  className="bg-zinc-800"
+                  type="radio"
+                  name="contestType"
+                  id="educational"
+                  value="educational"
+                  onClick={() => setContestType('educational')}
+                />
               </div>
             </div>
           </div>

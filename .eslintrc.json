@@ -10,7 +10,7 @@
   "ignorePatterns": ["_app.tsx"],
   "rules": {
     "jsx-a11y/label-has-associated-control": "off",
-    "no-param-reassign": "off"
+    "no-param-reassign": "off",
+    "max-len": ["error", { "code": 120 }]
   }
-
 }

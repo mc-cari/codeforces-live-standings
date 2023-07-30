@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
-import StandingsList from '../../../components/StandingsList';
+import StandingsList from '../../../components/standings/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
 import useInterval from '../../../hooks/useInterval';
 import getName from '../../../utils/getName';
@@ -61,7 +61,10 @@ export default function Standings() {
         prevPosition = position;
       });
 
-      const submissionsResponse = await fetch(`${process.env.CF_API}contest.status?contestId=${contestId}`, { mode: 'cors' });
+      const submissionsResponse = await fetch(
+        `${process.env.CF_API}contest.status?contestId=${contestId}`,
+        { mode: 'cors' },
+      );
 
       if (!submissionsResponse.ok) {
         throw new Error('Failed to fetch submissions data');
@@ -133,6 +136,7 @@ export default function Standings() {
         const userRankMap = new Map<string, string>();
         usersInfo.forEach((user) => {
           userRankMap.set(user.handle, user.rank);
+          userRankMap.set(`${user.handle} (practice)`, user.rank);
         });
         setUserRank(userRankMap);
       } catch (error) {

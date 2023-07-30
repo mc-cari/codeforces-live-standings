@@ -25,7 +25,7 @@ export default function userHandle({ author, userRank }
   return (
     <p className={`${rankColor}`}>
       {' '}
-      {getName(author) + ((author.participantType === 'PRACTICE') ? ' (practice)' : '') }
+      {getName(author)}
       {' '}
     </p>
   );

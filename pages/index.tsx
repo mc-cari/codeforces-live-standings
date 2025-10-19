@@ -67,7 +67,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div className="flex flex-col min-h-screen bg-black">
       <div className="flex-grow">
         <div className="relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20" />
@@ -200,7 +200,9 @@ export default function Home() {
                 </div>
                 <h3 className="mb-4 text-xl font-semibold text-white">ICPC Broadcast Overlay Design</h3>
                 <p className="text-gray-400">
-                  Visualization inspired by ICPC World Finals broadcast overlay
+                  Visualization inspired by ICPC World Finals broadcast overlay that includes a
+                  {' '}
+                  submission queue and a standings table
                 </p>
               </div>
 

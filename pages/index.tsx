@@ -105,8 +105,10 @@ export default function Home() {
                 <a
                   href={
                     'https://codeforces-live-standings.vercel.app/contests/1797/standings'
-                    + '?contestType=normal&handles=Maruzensky&handles=shell_wataru'
-                    + '&handles=noahhb&handles=FedeNQ'
+                    + '?contestType=normal&&handles=Maruzensky&handles=shell_wataru&handles=noahhb'
+                    + '&handles=FedeNQ&handles=julianferres&handles=martins&handles=CodigoL&handles=Cegax'
+                    + '&handles=MateoCV&handles=Graphter&handles=MrNachoX'
+                    + '&handles=mc._cari&handles=Xc4l16r3&handles=gabmei'
                   }
                   target="_blank"
                   rel="noopener noreferrer"

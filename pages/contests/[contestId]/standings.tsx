@@ -162,28 +162,47 @@ export default function Standings() {
   }, isPaused ? null : delay);
 
   return (
-    <div className="flex flex-row bg-black text-white">
-      <div className="flex h-screen w-2/5 p-5">
-        <LiveSubmissionsList
-          submissions={submissions}
-          newSubmissionsCount={newSubmissionsCount}
-          globalStandings={globalStandings}
-          userRank={userRank}
-        />
-      </div>
-      {(localStandings && globalStandings) ? (
-        <div className="h-screen w-3/5 p-5">
-          <StandingsList
-            localStandings={localStandings}
+    <div className="flex flex-row bg-black text-white min-h-screen">
+      <div className="flex h-screen w-2/5 p-4">
+        <div className="w-full bg-gray-900/50 rounded-lg border border-gray-800 shadow-xl overflow-hidden">
+          <LiveSubmissionsList
+            submissions={submissions}
+            newSubmissionsCount={newSubmissionsCount}
             globalStandings={globalStandings}
-            contestType={(contestType as string)}
             userRank={userRank}
           />
         </div>
+      </div>
+      {(localStandings && globalStandings) ? (
+        <div className="h-screen w-3/5 p-4">
+          <div className="w-full h-full bg-gray-900/50 rounded-lg border border-gray-800 shadow-xl overflow-hidden">
+            <StandingsList
+              localStandings={localStandings}
+              globalStandings={globalStandings}
+              contestType={(contestType as string)}
+              userRank={userRank}
+            />
+          </div>
+        </div>
       ) : (
-        <div className="h-screen w-3/5 p-5">
-          <div className="flex items-center justify-center h-screen">
-            <h1 className="text-4xl animate-pulse">Loading...</h1>
+        <div className="h-screen w-3/5 p-4">
+          <div
+            className={
+              'flex items-center justify-center h-full bg-gray-900/50 rounded-lg '
+              + 'border border-gray-800 shadow-xl'
+            }
+          >
+            <div className="text-center">
+              <div
+                className={
+                  'inline-block animate-spin rounded-full h-16 w-16 border-t-2 '
+                  + 'border-b-2 border-blue-500 mb-4'
+                }
+              />
+              <h1 className="text-3xl font-semibold text-gray-300">
+                Loading Contest Data...
+              </h1>
+            </div>
           </div>
         </div>
       )}

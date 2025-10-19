@@ -31,7 +31,7 @@ export default function StandingsList({
       <div className="flex flex-col grow w-full overflow-y-auto scrollbar-hide">
         {globalStandings.rows.map((row) => (
           <div
-            className="flex flex-row h-12 w-full"
+            className="flex flex-row h-12 w-full hover:bg-gray-800/40 transition-colors border-b border-gray-800/50"
             key={getName(row.party)}
           >
             <div className="flex flex-row w-1/3">

@@ -88,8 +88,6 @@ export default function Home() {
                 with ICPC broadcast overlay design.
                 {' '}
                 Track your current contest with selected participants in real-time or check any past contest.
-                {' '}
-                with automatic updates.
               </p>
               <div className="flex flex-col justify-center gap-4 sm:flex-row">
                 <button

@@ -66,6 +66,17 @@ const filterSubmissions = (body: string, handles: string | null): string => {
   });
 };
 
+const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
+  let query = toCodeforcesQuery(parameters);
+  if (method !== 'contest.standings') {
+    const apiSignature = createSignature(method, parameters);
+    query = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
+  }
+
+  const response = await fetch(`${CODEFORCES_API_URL}${method}?${query}`);
+  return { body: await response.text(), status: response.status };
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -96,6 +107,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   try {
     const handles = method === 'contest.status' ? parameters.get('handles') : null;
+    parameters.delete('handles');
     const query = toCodeforcesQuery(parameters);
     const cacheKey = `${method}?${query}`;
     const cachedResponse = responseCache.get(cacheKey);
@@ -105,15 +117,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (cachedResponse && cachedResponse.expiresAt > Date.now()) {
       ({ body, status } = cachedResponse);
     } else {
-      let signedQuery = query;
-      if (method !== 'contest.standings') {
-        const apiSignature = createSignature(method, parameters);
-        signedQuery = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
-      }
-
-      const response = await fetch(`${CODEFORCES_API_URL}${method}?${signedQuery}`);
-      body = await response.text();
-      status = response.status;
+      ({ body, status } = await fetchCodeforces(method, parameters));
       responseCache.set(cacheKey, {
         body,
         status,

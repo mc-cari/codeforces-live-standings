@@ -18,3 +18,25 @@ The website works with old contests and live contests and also shows the practic
 [Codeforces blog post](https://codeforces.com/blog/entry/114892).
 
 The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are beign updated at the same time, so the API responses are merged with the local status.
+
+### Codeforces API credentials
+
+Create `.env` from `.env.example` and set `CF_API_KEY` and `CF_API_SECRET` to a
+Codeforces API key pair. 
+
+You can get an API key from https://codeforces.com/settings/api.
+
+### Development
+
+Setup the proyect with:
+
+```sh
+corepack enable
+pnpm install
+```
+
+Init the proycect with:
+
+``sh
+pnpm dev
+``

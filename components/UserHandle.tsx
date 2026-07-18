@@ -25,7 +25,15 @@ export default function userHandle({ author, userRank }
   return (
     <p className={`${rankColor}`}>
       {' '}
-      {getName(author)}
+      <a
+        href={`https://codeforces.com/profile/${encodeURIComponent(author.members[0].handle)}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="no-underline"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {getName(author)}
+      </a>
       {' '}
     </p>
   );

@@ -2,12 +2,14 @@ import React from 'react';
 import Veredict from './Veredict';
 
 export default function Submission({ submission } : { submission: Submission }) {
+  const submissionUrl = `https://codeforces.com/contest/${submission.contestId}/submission/${submission.id}`;
+
   return (
     <div className="flex flox-row m-2 border-solid border-2 border-sky-500">
-      <p>
+      <a href={submissionUrl} target="_blank" rel="noopener noreferrer" className="no-underline">
         Id:
         {submission.id}
-      </p>
+      </a>
       <p>
         Index:
         {submission.problem.index}

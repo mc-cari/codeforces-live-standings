@@ -1,9 +1,18 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {
+  useState, useEffect, useMemo, useRef,
+} from 'react';
+import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import StandingsList from '../../../components/standings/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
+import ContestLoading from '../../../components/ContestLoading';
 import useInterval from '../../../hooks/useInterval';
 import getName from '../../../utils/getName';
+import codeforcesFetch from '../../../utils/codeforcesFetch';
+import {
+  LIVE_POLLING, LOADING_PROGRESS, MAX_SUBMISSIONS_IN_MEMORY,
+} from '../../../utils/constants';
+import { getHandlesFromQuery } from '../../../utils/handlesQuery';
 
 export default function Standings() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
@@ -11,12 +20,18 @@ export default function Standings() {
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
   const [globalStandings, setGlobalStandings] = useState<Standings>();
-  const [delay, setDelay] = useState<number>(100);
+  const [delay, setDelay] = useState<number>(LIVE_POLLING.initialDelayMilliseconds);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(8);
+  const [loadingStage, setLoadingStage] = useState('Preparing live standings...');
+  const hasLoadedInitialData = useRef(false);
 
   const Router = useRouter();
-  const { contestId, handles, contestType } = Router.query;
-  const userHandles : string[] = useMemo(() => (typeof handles === 'string' ? [handles] : handles || []), [handles]);
+  const {
+    contestId, handles, contestType, h,
+  } = Router.query;
+  const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
 
   const isSubmissionAuthorInUsers = (author : Party) :
   Boolean => author.members.reduce((inUsers, user) => inUsers
@@ -25,24 +40,48 @@ export default function Standings() {
   const fetchSubmissions = async () => {
     const problemsForUser = new Map<string, Set<string>>();
     const standingForUser = new Map<string, number>();
+    const isInitialLoad = !hasLoadedInitialData.current;
 
     try {
+      if (isInitialLoad) setLoadingStage('Loading contest data...');
       userHandles.forEach((user) => {
         standingForUser.set(user, userHandles.length);
       });
 
-      const standingsResponse = await fetch(
-        `${process.env.CF_API}contest.standings?contestId=${contestId}&handles=${userHandles.join(';')}
-        &showUnofficial=true`,
-        { mode: 'cors' },
-      );
+      const standingsRequest = codeforcesFetch('contest.standings', {
+        contestId: contestId as string,
+      }).then((response) => {
+        if (isInitialLoad) {
+          setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.standingsLoaded));
+          setLoadingStage('Loading live submissions...');
+        }
+        return response;
+      });
+      const submissionsRequest = codeforcesFetch('contest.status', {
+        contestId: contestId as string,
+        handles: userHandles.join(';'),
+      }).then((response) => {
+        if (isInitialLoad) {
+          setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.submissionsLoaded));
+          setLoadingStage('Preparing live standings...');
+        }
+        return response;
+      });
+      const [standingsResponse, submissionsResponse] = await Promise.all([
+        standingsRequest, submissionsRequest,
+      ]);
 
       if (!standingsResponse.ok) {
         throw new Error('Failed to fetch standings data');
       }
 
       const standingsPromise = await standingsResponse.json();
-      const standings : Standings = standingsPromise.result;
+      const standings : Standings = {
+        ...standingsPromise.result,
+        rows: standingsPromise.result.rows.filter((row: RanklistRow) => (
+          isSubmissionAuthorInUsers(row.party)
+        )),
+      };
 
       let prevRank = -1; let
         prevPosition = -1;
@@ -60,11 +99,6 @@ export default function Standings() {
         prevRank = row.rank;
         prevPosition = position;
       });
-
-      const submissionsResponse = await fetch(
-        `${process.env.CF_API}contest.status?contestId=${contestId}`,
-        { mode: 'cors' },
-      );
 
       if (!submissionsResponse.ok) {
         throw new Error('Failed to fetch submissions data');
@@ -102,29 +136,48 @@ export default function Standings() {
           submission.author.rank = standingForUser.get(getName(submission.author)) as number;
         }
       });
-      setNewSubmissionsCount(() => newSubmissionsCountUpdate);
+      setNewSubmissionsCount(() => Math.min(newSubmissionsCountUpdate, MAX_SUBMISSIONS_IN_MEMORY));
 
-      setSubmissions(() => oldSubmissions.reverse().slice(0));
+      setSubmissions(() => oldSubmissions.reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY));
 
       setGlobalStandings(standings);
       setLocalStandings(standingForUser);
+      if (isInitialLoad) {
+        hasLoadedInitialData.current = true;
+        setLoadingProgress(LOADING_PROGRESS.complete);
+        window.setTimeout(() => setIsLoading(false), LOADING_PROGRESS.completionDelayMilliseconds);
+      }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.log(error);
+      if (isInitialLoad) setLoadingStage('Unable to load contest data');
     }
   };
 
   useEffect(() => {
+    if (!isLoading) return undefined;
+    const progressTimer = window.setInterval(() => {
+      setLoadingProgress((current) => {
+        if (current >= LOADING_PROGRESS.estimatedMaximum) return current;
+        return Math.min(
+          LOADING_PROGRESS.estimatedMaximum,
+          current + (current < LOADING_PROGRESS.submissionsLoaded
+            ? LOADING_PROGRESS.fastIncrement : LOADING_PROGRESS.slowIncrement),
+        );
+      });
+    }, LOADING_PROGRESS.tickMilliseconds);
+    return () => window.clearInterval(progressTimer);
+  }, [isLoading]);
+
+  useEffect(() => {
     const timer = setTimeout(() => {
-      setDelay(1000);
-    }, 1000);
+      setDelay(LIVE_POLLING.refreshDelayMilliseconds);
+    }, LIVE_POLLING.refreshDelayMilliseconds);
 
     const fetchUsersRank = async () => {
       try {
-        const usersInfoResponse = await fetch(
-          `${process.env.CF_API}user.info?handles=${userHandles.join(';')}`,
-          { mode: 'cors' },
-        );
+        const usersInfoResponse = await codeforcesFetch('user.info', {
+          handles: userHandles.join(';'),
+        });
 
         if (!usersInfoResponse.ok) {
           throw new Error('Failed to fetch standings data');
@@ -140,26 +193,29 @@ export default function Standings() {
         });
         setUserRank(userRankMap);
       } catch (error) {
-        // eslint-disable-next-line no-console
         console.log(error);
       }
     };
-    if (handles) {
+    if (userHandles.length > 0) {
       fetchUsersRank();
     }
 
     return () => clearTimeout(timer);
-  }, [handles, userHandles]);
+  }, [userHandles]);
 
   useInterval(async () => {
     setIsPaused(true);
 
-    if (contestId && handles && contestType) {
+    if (contestId && userHandles.length > 0 && contestType) {
       await fetchSubmissions();
     }
 
     setIsPaused(false);
   }, isPaused ? null : delay);
+
+  if (isLoading) {
+    return <ContestLoading progress={loadingProgress} stage={loadingStage} />;
+  }
 
   return (
     <div className="flex flex-row bg-black text-white min-h-screen">
@@ -209,3 +265,5 @@ export default function Standings() {
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });

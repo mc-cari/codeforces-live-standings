@@ -1,11 +1,19 @@
-const toBase64Url = (value: string) => btoa(value)
+const encodeBase64 = (value: string) => (
+  typeof window === 'undefined' ? Buffer.from(value, 'utf8').toString('base64') : btoa(value)
+);
+
+const decodeBase64 = (value: string) => (
+  typeof window === 'undefined' ? Buffer.from(value, 'base64').toString('utf8') : atob(value)
+);
+
+const toBase64Url = (value: string) => encodeBase64(value)
   .replace(/\+/g, '-')
   .replace(/\//g, '_')
   .replace(/=+$/g, '');
 
 const fromBase64Url = (value: string) => {
   const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
-  return atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
+  return decodeBase64(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
 };
 
 export const encodeHandles = (handles: string[]) => (

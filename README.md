@@ -22,21 +22,21 @@ The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the 
 ### Codeforces API credentials
 
 Create `.env` from `.env.example` and set `CF_API_KEY` and `CF_API_SECRET` to a
-Codeforces API key pair. 
+Codeforces API key pair.
 
 You can get an API key from https://codeforces.com/settings/api.
 
 ### Development
 
-Setup the proyect with:
+Set up the project with:
 
 ```sh
 corepack enable
 pnpm install
 ```
 
-Init the proycect with:
+Start the development server with:
 
-``sh
+```sh
 pnpm dev
-``
+```

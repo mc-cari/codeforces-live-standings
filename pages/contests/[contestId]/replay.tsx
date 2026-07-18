@@ -114,7 +114,11 @@ export default function Replay() {
           setLoadingProgress((current) => Math.max(current, progress));
           setLoadingStage(stage);
         };
-        const standingsRequest = codeforcesFetch('contest.standings', { contestId: contestId as string })
+        const standingsRequest = codeforcesFetch('contest.standings', {
+          contestId: contestId as string,
+          handles: userHandles.join(';'),
+          showUnofficial: 'true',
+        })
           .then((response) => {
             markLoaded(LOADING_PROGRESS.standingsLoaded, 'Loading contest submissions...');
             return response;

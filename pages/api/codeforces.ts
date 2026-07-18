@@ -4,7 +4,7 @@ import { createHash, randomBytes } from 'crypto';
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
 const allowedParameters: Record<string, Set<string>> = {
-  'contest.standings': new Set(['contestId']),
+  'contest.standings': new Set(['contestId', 'handles', 'from', 'count', 'showUnofficial']),
   'contest.status': new Set(['contestId', 'handles']),
   'user.info': new Set(['handles']),
 };
@@ -89,14 +89,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ status: 'FAILED', comment: 'contestId is required' });
     return;
   }
-  if (method === 'user.info' && !parameters.get('handles')) {
+  if ((method === 'user.info' || method === 'contest.status') && !parameters.get('handles')) {
     res.status(400).json({ status: 'FAILED', comment: 'handles is required' });
     return;
   }
 
   try {
     const handles = method === 'contest.status' ? parameters.get('handles') : null;
-    parameters.delete('handles');
     const query = toCodeforcesQuery(parameters);
     const cacheKey = `${method}?${query}`;
     const cachedResponse = responseCache.get(cacheKey);
@@ -109,7 +108,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let signedQuery = query;
       if (method !== 'contest.standings') {
         const apiSignature = createSignature(method, parameters);
-        signedQuery = `${query}&apiSig=${apiSignature}`;
+        signedQuery = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
       }
 
       const response = await fetch(`${CODEFORCES_API_URL}${method}?${signedQuery}`);

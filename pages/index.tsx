@@ -66,6 +66,8 @@ export default function Home() {
 
       const standingsResponse = await codeforcesFetch('contest.standings', {
         contestId,
+        count: '100000',
+        showUnofficial: 'true',
       });
 
       if (!standingsResponse.ok) {

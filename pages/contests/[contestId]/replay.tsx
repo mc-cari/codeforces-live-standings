@@ -116,8 +116,6 @@ export default function Replay() {
         };
         const standingsRequest = codeforcesFetch('contest.standings', {
           contestId: contestId as string,
-          handles: userHandles.join(';'),
-          showUnofficial: 'true',
         })
           .then((response) => {
             markLoaded(LOADING_PROGRESS.standingsLoaded, 'Loading contest submissions...');

@@ -4,7 +4,7 @@ import { createHash, randomBytes } from 'crypto';
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
 const allowedParameters: Record<string, Set<string>> = {
-  'contest.standings': new Set(['contestId', 'handles', 'from', 'count', 'showUnofficial']),
+  'contest.standings': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles']),
   'user.info': new Set(['handles']),
 };

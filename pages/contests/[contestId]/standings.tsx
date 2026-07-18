@@ -50,8 +50,6 @@ export default function Standings() {
 
       const standingsRequest = codeforcesFetch('contest.standings', {
         contestId: contestId as string,
-        handles: userHandles.join(';'),
-        showUnofficial: 'true',
       }).then((response) => {
         if (isInitialLoad) {
           setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.standingsLoaded));

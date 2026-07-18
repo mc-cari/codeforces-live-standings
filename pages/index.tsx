@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import getName from '../utils/getName';
+import codeforcesFetch from '../utils/codeforcesFetch';
+import { encodeHandles } from '../utils/handlesQuery';
+
+type ParticipantSelection = 'top' | 'random';
+
+const demoHandles = [
+  'Maruzensky', 'shell_wataru', 'noahhb', 'FedeNQ', 'julianferres', 'martins', 'CodigoL',
+  'Cegax', 'MateoCV', 'Graphter', 'MrNachoX', 'mc._cari', 'Xc4l16r3', 'gabmei',
+];
 
 export default function Home() {
   const [handleText, setHandleText] = useState<string>('');
@@ -8,16 +17,22 @@ export default function Home() {
   const [usersHandles, setUsersHandles] = useState<string[]>([]);
   const [contestType, setContestType] = useState<string>('');
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [participantCountInput, setParticipantCountInput] = useState('15');
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [importError, setImportError] = useState<string>('');
 
   const Router = useRouter();
+  const participantCount = Number(participantCountInput);
+  const hasValidParticipantCount = participantCountInput !== ''
+    && Number.isInteger(participantCount) && participantCount > 0;
 
-  const handleStart = () => {
+  const handleStart = (mode: 'standings' | 'replay') => {
     if (contestId && usersHandles && usersHandles.length > 0 && contestType) {
       Router.push({
-        pathname: `/contests/${contestId}/standings`,
+        pathname: `/contests/${contestId}/${mode}`,
         query: {
           contestType,
-          handles: usersHandles,
+          h: encodeHandles(usersHandles),
         },
       });
     }
@@ -39,16 +54,22 @@ export default function Home() {
     setHandleText('');
   };
 
-  const importHandles = async () => {
+  const importHandles = async (selection: ParticipantSelection) => {
     try {
       if (!contestId) {
         throw new Error('Contest Id not set');
       }
 
-      const standingsResponse = await fetch(
-        `${process.env.CF_API}contest.standings?contestId=${contestId}&count=65&showUnofficial=true`,
-        { mode: 'cors' },
-      );
+      if (!hasValidParticipantCount) {
+        throw new Error('Participant count must be at least 1');
+      }
+
+      setIsImporting(true);
+      setImportError('');
+
+      const standingsResponse = await codeforcesFetch('contest.standings', {
+        contestId,
+      });
 
       if (!standingsResponse.ok) {
         throw new Error('Failed to fetch standings data');
@@ -57,12 +78,20 @@ export default function Home() {
       const standingsPromise = await standingsResponse.json();
       const standings : Standings = standingsPromise.result;
 
-      const contestHandles : string[] = standings.rows.map((row) => getName(row.party));
+      const contestHandles = Array.from(new Set(standings.rows.map((row) => getName(row.party))));
+      const selectedHandles = selection === 'top'
+        ? contestHandles.slice(0, participantCount)
+        : contestHandles
+          .map((handle) => ({ handle, sortOrder: Math.random() }))
+          .sort((first, second) => first.sortOrder - second.sortOrder)
+          .slice(0, participantCount)
+          .map(({ handle }) => handle);
 
-      addHandles(contestHandles);
+      addHandles(selectedHandles);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.log(error);
+      setImportError(error instanceof Error ? error.message : 'Unable to import participants');
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -104,11 +133,9 @@ export default function Home() {
                 </button>
                 <a
                   href={
-                    'https://codeforces-live-standings.vercel.app/contests/1797/standings'
-                    + '?contestType=normal&&handles=Maruzensky&handles=shell_wataru&handles=noahhb'
-                    + '&handles=FedeNQ&handles=julianferres&handles=martins&handles=CodigoL&handles=Cegax'
-                    + '&handles=MateoCV&handles=Graphter&handles=MrNachoX'
-                    + '&handles=mc._cari&handles=Xc4l16r3&handles=gabmei'
+                    '/contests/1797/replay'
+                    + '?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true'
+                    + `&h=${encodeHandles(demoHandles)}`
                   }
                   target="_blank"
                   rel="noopener noreferrer"
@@ -297,6 +324,51 @@ export default function Home() {
                     </button>
                   </div>
 
+                  <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
+                    <label className="block mb-2 text-sm text-white" htmlFor="participant-count">
+                      Import participants
+                    </label>
+                    <input
+                      className={
+                        'w-full p-3 mb-3 bg-gray-900 border border-gray-600 rounded-lg '
+                        + 'text-white focus:border-blue-500 focus:outline-none'
+                      }
+                      id="participant-count"
+                      min="1"
+                      type="number"
+                      value={participantCountInput}
+                      onChange={(event) => setParticipantCountInput(event.target.value)}
+                    />
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button
+                        className={
+                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                          + 'bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-700'
+                        }
+                        disabled={!contestId || isImporting || !hasValidParticipantCount}
+                        onClick={() => importHandles('top')}
+                        type="button"
+                      >
+                        {isImporting ? 'Importing…' : `Add Top ${participantCountInput || 'N'}`}
+                      </button>
+                      <button
+                        className={
+                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                          + 'bg-purple-600 hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-700'
+                        }
+                        disabled={!contestId || isImporting || !hasValidParticipantCount}
+                        onClick={() => importHandles('random')}
+                        type="button"
+                      >
+                        {isImporting ? 'Importing…' : `Add Random ${participantCountInput || 'N'}`}
+                      </button>
+                    </div>
+                    <p className="mt-3 text-xs text-gray-400">
+                      Top uses the contest standings order. Random selects from all listed participants.
+                    </p>
+                    {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
+                  </div>
+
                   <div className="p-4 overflow-y-auto bg-gray-800 rounded-lg max-h-60">
                     {usersHandles.length === 0 ? (
                       <p className="py-4 text-center text-gray-500">No participants added yet</p>
@@ -332,7 +404,7 @@ export default function Home() {
                       From URL: https://codeforces.com/contest/
                       <strong>1797</strong>
                     </p>
-                    <div className="flex gap-2">
+                    <div className="mb-3">
                       <input
                         className={
                           'flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg '
@@ -344,16 +416,8 @@ export default function Home() {
                         placeholder="1797"
                         onChange={(e) => setContestId(parseInt(e.target.value, 10))}
                       />
-                      {contestId && (
-                        <button
-                          className="px-6 py-3 text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700"
-                          onClick={importHandles}
-                          type="button"
-                        >
-                          Import Participants
-                        </button>
-                      )}
                     </div>
+
                   </div>
 
                   <div className="mb-6">
@@ -382,20 +446,36 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <button
-                    className={
-                      `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <button
+                      className={
+                        `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
                         contestId && usersHandles.length > 0 && contestType
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white '
                           + 'hover:from-blue-700 hover:to-purple-700 transform hover:scale-105'
                           : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
-                    }
-                    onClick={handleStart}
-                    disabled={!contestId || usersHandles.length === 0 || !contestType}
-                    type="button"
-                  >
-                    Start Live Tracking
-                  </button>
+                      }
+                      onClick={() => handleStart('standings')}
+                      disabled={!contestId || usersHandles.length === 0 || !contestType}
+                      type="button"
+                    >
+                      Start Live Tracking
+                    </button>
+                    <button
+                      className={
+                        `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
+                        contestId && usersHandles.length > 0 && contestType
+                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white '
+                          + 'hover:from-orange-700 hover:to-red-700 transform hover:scale-105'
+                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
+                      }
+                      onClick={() => handleStart('replay')}
+                      disabled={!contestId || usersHandles.length === 0 || !contestType}
+                      type="button"
+                    >
+                      Start Replay
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -19,15 +19,19 @@ export default function Header({
       {contestType === 'normal' ? <NormalPointsHeader /> : <EducationalPointsHeader /> }
 
       {globalStandings.problems.map((problem) => (
-        <div
+        <a
+          href={`https://codeforces.com/contest/${globalStandings.contest.id}/problem/${problem.index}`}
+          target="_blank"
+          rel="noopener noreferrer"
           className={
             'flex-1 text-xl flex items-center justify-center font-semibold '
             + 'bg-gray-800/30 hover:bg-gray-700/30 transition-colors'
           }
           key={problem.index}
+          aria-label={`Open problem ${problem.index}: ${problem.name}`}
         >
           {problem.index}
-        </div>
+        </a>
       ))}
     </div>
   );

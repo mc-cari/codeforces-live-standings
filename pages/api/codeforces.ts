@@ -1,11 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createHash, randomBytes } from 'crypto';
+import getName from '../../utils/getName';
+import { selectParticipantHandles } from '../../utils/participantImport';
+import type { ParticipantSelection } from '../../utils/participantImport';
 
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
 const allowedParameters: Record<string, Set<string>> = {
   'contest.standings': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles']),
+  'participant.import': new Set(['contestId', 'count', 'selection']),
   'user.info': new Set(['handles']),
 };
 
@@ -77,6 +81,21 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
   return { body: await response.text(), status: response.status };
 };
 
+const getCodeforcesResponse = async (method: string, parameters: URLSearchParams) => {
+  const query = toCodeforcesQuery(parameters);
+  const cacheKey = `${method}?${query}`;
+  const cachedResponse = responseCache.get(cacheKey);
+
+  if (cachedResponse && cachedResponse.expiresAt > Date.now()) return cachedResponse;
+
+  const response = await fetchCodeforces(method, parameters);
+  responseCache.set(cacheKey, {
+    ...response,
+    expiresAt: Date.now() + cacheDuration(method),
+  });
+  return response;
+};
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
@@ -96,7 +115,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (value) parameters.set(parameter, value);
   });
 
-  if (!parameters.get('contestId') && method.startsWith('contest.')) {
+  if (!parameters.get('contestId')
+    && (method.startsWith('contest.') || method === 'participant.import')) {
     res.status(400).json({ status: 'FAILED', comment: 'contestId is required' });
     return;
   }
@@ -106,24 +126,45 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
+    if (method === 'participant.import') {
+      const count = Number(parameters.get('count'));
+      const selection = parameters.get('selection');
+      if (!Number.isSafeInteger(count) || count <= 0) {
+        res.status(400).json({ status: 'FAILED', comment: 'count must be a positive integer' });
+        return;
+      }
+      if (selection !== 'top' && selection !== 'random') {
+        res.status(400).json({ status: 'FAILED', comment: 'selection must be top or random' });
+        return;
+      }
+
+      const standingsParameters = new URLSearchParams({
+        contestId: parameters.get('contestId') as string,
+      });
+      const { body, status } = await getCodeforcesResponse(
+        'contest.standings',
+        standingsParameters,
+      );
+      if (status !== 200) {
+        res.status(status).send(body);
+        return;
+      }
+
+      const standingsResponse = JSON.parse(body) as { result: Standings };
+      const handles = selectParticipantHandles(
+        standingsResponse.result.rows,
+        count,
+        selection as ParticipantSelection,
+        getName,
+      );
+      res.setHeader('Cache-Control', 'no-store');
+      res.status(200).json({ status: 'OK', result: handles });
+      return;
+    }
+
     const handles = method === 'contest.status' ? parameters.get('handles') : null;
     if (method === 'contest.status') parameters.delete('handles');
-    const query = toCodeforcesQuery(parameters);
-    const cacheKey = `${method}?${query}`;
-    const cachedResponse = responseCache.get(cacheKey);
-    let body: string;
-    let status: number;
-
-    if (cachedResponse && cachedResponse.expiresAt > Date.now()) {
-      ({ body, status } = cachedResponse);
-    } else {
-      ({ body, status } = await fetchCodeforces(method, parameters));
-      responseCache.set(cacheKey, {
-        body,
-        status,
-        expiresAt: Date.now() + cacheDuration(method),
-      });
-    }
+    const { body, status } = await getCodeforcesResponse(method, parameters);
 
     res.setHeader('Cache-Control', 'no-store');
     res.status(status).send(method === 'contest.status' ? filterSubmissions(body, handles) : body);

@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import getName from '../utils/getName';
 import codeforcesFetch from '../utils/codeforcesFetch';
 import { encodeHandles } from '../utils/handlesQuery';
-
-type ParticipantSelection = 'top' | 'random';
+import type { ParticipantSelection } from '../utils/participantImport';
 
 const demoHandles = [
   'Maruzensky', 'shell_wataru', 'noahhb', 'FedeNQ', 'julianferres', 'martins', 'CodigoL',
@@ -67,25 +65,18 @@ export default function Home() {
       setIsImporting(true);
       setImportError('');
 
-      const standingsResponse = await codeforcesFetch('contest.standings', {
+      const participantsResponse = await codeforcesFetch('participant.import', {
         contestId,
+        count: participantCount,
+        selection,
       });
 
-      if (!standingsResponse.ok) {
-        throw new Error('Failed to fetch standings data');
+      if (!participantsResponse.ok) {
+        throw new Error('Failed to import participants');
       }
 
-      const standingsPromise = await standingsResponse.json();
-      const standings : Standings = standingsPromise.result;
-
-      const contestHandles = Array.from(new Set(standings.rows.map((row) => getName(row.party))));
-      const selectedHandles = selection === 'top'
-        ? contestHandles.slice(0, participantCount)
-        : contestHandles
-          .map((handle) => ({ handle, sortOrder: Math.random() }))
-          .sort((first, second) => first.sortOrder - second.sortOrder)
-          .slice(0, participantCount)
-          .map(({ handle }) => handle);
+      const participantsPayload = await participantsResponse.json();
+      const selectedHandles = participantsPayload.result as string[];
 
       addHandles(selectedHandles);
     } catch (error) {

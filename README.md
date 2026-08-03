@@ -40,3 +40,9 @@ Start the development server with:
 ```sh
 pnpm dev
 ```
+
+### API behavior and caching
+
+Cached response bodies are bounded to 100 MiB per server instance and use
+expiry plus least-recently-used eviction, so old contest responses do not
+accumulate indefinitely.

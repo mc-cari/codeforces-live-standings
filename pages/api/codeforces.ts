@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createHash, randomBytes } from 'crypto';
+import ExpiringCache from '../../utils/expiringCache';
 import getName from '../../utils/getName';
 import { selectParticipantHandles } from '../../utils/participantImport';
 import type { ParticipantSelection } from '../../utils/participantImport';
@@ -16,10 +17,12 @@ const allowedParameters: Record<string, Set<string>> = {
 type CachedResponse = {
   body: string;
   status: number;
-  expiresAt: number;
 };
 
-const responseCache = new Map<string, CachedResponse>();
+const responseCache = new ExpiringCache<CachedResponse>(Date.now, {
+  maximumWeight: 100 * 1024 * 1024,
+  getWeight: (response) => Buffer.byteLength(response.body, 'utf8'),
+});
 
 const cacheDuration = (method: string): number => {
   if (method === 'user.info') return 60 * 60 * 1000;
@@ -82,17 +85,12 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
 };
 
 const getCodeforcesResponse = async (method: string, parameters: URLSearchParams) => {
-  const query = toCodeforcesQuery(parameters);
-  const cacheKey = `${method}?${query}`;
+  const cacheKey = `${method}?${toCodeforcesQuery(parameters)}`;
   const cachedResponse = responseCache.get(cacheKey);
-
-  if (cachedResponse && cachedResponse.expiresAt > Date.now()) return cachedResponse;
+  if (cachedResponse) return cachedResponse;
 
   const response = await fetchCodeforces(method, parameters);
-  responseCache.set(cacheKey, {
-    ...response,
-    expiresAt: Date.now() + cacheDuration(method),
-  });
+  responseCache.set(cacheKey, response, cacheDuration(method));
   return response;
 };
 

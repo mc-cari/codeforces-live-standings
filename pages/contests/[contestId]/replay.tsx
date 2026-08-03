@@ -8,6 +8,7 @@ import StandingsList from '../../../components/standings/StandingsList';
 import ContestLoading from '../../../components/ContestLoading';
 import codeforcesFetch from '../../../utils/codeforcesFetch';
 import getName from '../../../utils/getName';
+import { addMissingParticipantRows } from '../../../utils/participantStandings';
 import { buildReplaySnapshot } from '../../../utils/replay';
 import {
   LOADING_PROGRESS,
@@ -114,13 +115,6 @@ export default function Replay() {
           setLoadingProgress((current) => Math.max(current, progress));
           setLoadingStage(stage);
         };
-        const standingsRequest = codeforcesFetch('contest.standings', {
-          contestId: contestId as string,
-        })
-          .then((response) => {
-            markLoaded(LOADING_PROGRESS.standingsLoaded, 'Loading contest submissions...');
-            return response;
-          });
         const statusRequest = codeforcesFetch('contest.status', {
           contestId: contestId as string,
           handles: userHandles.join(';'),
@@ -128,6 +122,13 @@ export default function Replay() {
           markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing replay timeline...');
           return response;
         });
+        const standingsRequest = codeforcesFetch('contest.standings', {
+          contestId: contestId as string,
+        })
+          .then((response) => {
+            markLoaded(LOADING_PROGRESS.standingsLoaded, 'Loading contest submissions...');
+            return response;
+          });
         const usersRequest = codeforcesFetch('user.info', { handles: userHandles.join(';') });
         const [standingsResponse, statusResponse, usersResponse] = await Promise.all([
           standingsRequest, statusRequest, usersRequest,
@@ -136,26 +137,30 @@ export default function Replay() {
         const standingsData : Standings = (await standingsResponse.json()).result;
         const isSelectedParticipant = (party: Party) => party.members
           .some((member) => userHandles.includes(member.handle));
-        const selectedStandings: Standings = {
+        const officialStandings: Standings = {
           ...standingsData,
           rows: standingsData.rows.filter((row) => isSelectedParticipant(row.party)),
         };
 
         if (!statusResponse.ok) throw new Error('Unable to load contest submissions');
         const allSelectedEvents: Submission[] = (await statusResponse.json()).result;
-        const officialEvents = allSelectedEvents
+        const replayEvents = allSelectedEvents
           .filter((submission) => (
-            submission.author.participantType === 'CONTESTANT'
-            && submission.relativeTimeSeconds >= 0
-            && submission.relativeTimeSeconds <= selectedStandings.contest.durationSeconds
+            submission.relativeTimeSeconds >= 0
+            && submission.relativeTimeSeconds <= officialStandings.contest.durationSeconds
           ))
           .sort((first, second) => (
             first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
           ));
-        setIsTruncated(officialEvents.length > MAX_SUBMISSIONS_IN_MEMORY);
-        setEvents(officialEvents.slice(-MAX_SUBMISSIONS_IN_MEMORY));
-        const replayStart = officialEvents.length > MAX_SUBMISSIONS_IN_MEMORY
-          ? officialEvents[officialEvents.length - MAX_SUBMISSIONS_IN_MEMORY].relativeTimeSeconds : 0;
+        const selectedStandings = addMissingParticipantRows(
+          officialStandings,
+          replayEvents,
+          getName,
+        );
+        setIsTruncated(replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY);
+        setEvents(replayEvents.slice(-MAX_SUBMISSIONS_IN_MEMORY));
+        const replayStart = replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY
+          ? replayEvents[replayEvents.length - MAX_SUBMISSIONS_IN_MEMORY].relativeTimeSeconds : 0;
         setElapsedSeconds(getStartTime(
           getQueryValue(startTime) || getQueryValue(startMinute),
           selectedStandings.contest.durationSeconds,

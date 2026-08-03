@@ -14,7 +14,7 @@ export const LOADING_PROGRESS = {
 
 export const LIVE_POLLING = {
   initialDelayMilliseconds: 100,
-  refreshDelayMilliseconds: 1_000,
+  refreshDelayMilliseconds: 2_500,
 };
 
 export const REPLAY_SPEED_OPTIONS = [1, 2, 5, 10, 15, 20, 30, 60, 120, 600];

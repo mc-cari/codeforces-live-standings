@@ -43,6 +43,12 @@ pnpm dev
 
 ### API behavior and caching
 
-Cached response bodies are bounded to 100 MiB per server instance and use
-expiry plus least-recently-used eviction, so old contest responses do not
-accumulate indefinitely.
+The browser calls the app's `/api/codeforces` backend. That backend uses one bulk
+`contest.status` response and filters it locally for the requested handles. Within
+each server instance, identical in-flight requests are shared and upstream requests
+start at least 2.0 seconds apart. Cache hits do not enter that queue.
+
+The limiter is process-local: separate Vercel instances cannot coordinate without a
+shared service such as Redis or a database. Cached response bodies are bounded to
+100 MiB per instance and use expiry plus least-recently-used eviction, so old contest
+responses do not accumulate indefinitely.

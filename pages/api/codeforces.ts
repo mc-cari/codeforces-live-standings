@@ -1,9 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { createHash, randomBytes } from 'crypto';
+import { Agent, fetch as undiciFetch } from 'undici';
 import ExpiringCache from '../../utils/expiringCache';
 import getName from '../../utils/getName';
 import { selectParticipantHandles } from '../../utils/participantImport';
 import type { ParticipantSelection } from '../../utils/participantImport';
+import RequestCoordinator from '../../utils/requestCoordinator';
 
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
@@ -14,6 +16,8 @@ const allowedParameters: Record<string, Set<string>> = {
   'user.info': new Set(['handles']),
 };
 
+const freshConnectionMethods = new Set(['contest.standings', 'contest.status']);
+
 type CachedResponse = {
   body: string;
   status: number;
@@ -23,6 +27,7 @@ const responseCache = new ExpiringCache<CachedResponse>(Date.now, {
   maximumWeight: 100 * 1024 * 1024,
   getWeight: (response) => Buffer.byteLength(response.body, 'utf8'),
 });
+const requestCoordinator = new RequestCoordinator();
 
 const cacheDuration = (method: string): number => {
   if (method === 'user.info') return 60 * 60 * 1000;
@@ -80,8 +85,19 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
     query = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
   }
 
-  const response = await fetch(`${CODEFORCES_API_URL}${method}?${query}`);
-  return { body: await response.text(), status: response.status };
+  const url = `${CODEFORCES_API_URL}${method}?${query}`;
+  if (!freshConnectionMethods.has(method)) {
+    const response = await fetch(url);
+    return { body: await response.text(), status: response.status };
+  }
+
+  const dispatcher = new Agent({ connections: 1, pipelining: 0 });
+  try {
+    const response = await undiciFetch(url, { dispatcher });
+    return { body: await response.text(), status: response.status };
+  } finally {
+    await dispatcher.close();
+  }
 };
 
 const getCodeforcesResponse = async (method: string, parameters: URLSearchParams) => {
@@ -89,9 +105,11 @@ const getCodeforcesResponse = async (method: string, parameters: URLSearchParams
   const cachedResponse = responseCache.get(cacheKey);
   if (cachedResponse) return cachedResponse;
 
-  const response = await fetchCodeforces(method, parameters);
-  responseCache.set(cacheKey, response, cacheDuration(method));
-  return response;
+  return requestCoordinator.run(cacheKey, async () => {
+    const response = await fetchCodeforces(method, new URLSearchParams(parameters));
+    responseCache.set(cacheKey, response, cacheDuration(method));
+    return response;
+  });
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {

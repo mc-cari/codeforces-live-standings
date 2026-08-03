@@ -63,7 +63,7 @@ const getStartTime = (value: string | undefined, durationSeconds: number, replay
 export default function Replay() {
   const router = useRouter();
   const {
-    contestId, contestType, handles, h, startMinute, startTime, playbackSpeed, autoplay,
+    contestId, contestType, handles, h, startMinute, startTime, playbackSpeed, autoplay, demo,
   } = router.query;
   const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
   const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
@@ -115,6 +115,31 @@ export default function Replay() {
           setLoadingProgress((current) => Math.max(current, progress));
           setLoadingStage(stage);
         };
+        if (contestId === '1797' && getQueryValue(demo) === 'true') {
+          const response = await fetch('/demo/1797-v1.json');
+          if (!response.ok) throw new Error('Unable to load demo replay');
+          const snapshot = await response.json() as {
+            standings: Standings;
+            submissions: Submission[];
+            userRanks: Record<string, string>;
+          };
+          const demoEvents = snapshot.submissions.sort((first, second) => (
+            first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
+          ));
+          setFinalStandings(snapshot.standings);
+          setEvents(demoEvents);
+          setUserRank(new Map(Object.entries(snapshot.userRanks)));
+          setElapsedSeconds(getStartTime(
+            getQueryValue(startTime) || getQueryValue(startMinute),
+            snapshot.standings.contest.durationSeconds,
+            demoEvents[0]?.relativeTimeSeconds || 0,
+          ));
+          setSpeed(requestedSpeed);
+          setIsPlaying(getQueryValue(autoplay) === 'true');
+          setIsTruncated(false);
+          markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing demo replay...');
+          return;
+        }
         const statusRequest = codeforcesFetch('contest.status', {
           contestId: contestId as string,
           handles: userHandles.join(';'),
@@ -199,7 +224,7 @@ export default function Replay() {
       window.clearInterval(progressTimer);
       if (finishTimer) window.clearTimeout(finishTimer);
     };
-  }, [autoplay, contestId, contestType, requestedSpeed, startMinute, startTime, userHandles]);
+  }, [autoplay, contestId, contestType, demo, requestedSpeed, startMinute, startTime, userHandles]);
 
   useEffect(() => {
     if (!isPlaying || !finalStandings) return undefined;

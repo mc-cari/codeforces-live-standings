@@ -10,6 +10,7 @@ import RequestCoordinator from '../../utils/requestCoordinator';
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
 const allowedParameters: Record<string, Set<string>> = {
+  'contest.list': new Set(['gym']),
   'contest.info': new Set(['contestId']),
   'contest.standings': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles']),
@@ -34,6 +35,7 @@ const requestCoordinator = new RequestCoordinator();
 const cacheDuration = (method: string): number => {
   if (method === 'user.info') return 60 * 60 * 1000;
   if (method === 'contest.standings') return 10 * 1000;
+  if (method === 'contest.list') return 5 * 60 * 1000;
   return 2 * 1000;
 };
 
@@ -134,7 +136,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   });
 
   if (!parameters.get('contestId')
-    && (method.startsWith('contest.') || method === 'participant.import')) {
+    && ((method.startsWith('contest.') && method !== 'contest.list')
+      || method === 'participant.import')) {
     res.status(400).json({ status: 'FAILED', comment: 'contestId is required' });
     return;
   }
@@ -203,7 +206,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (method === 'contest.status') parameters.delete('handles');
     const { body, status } = await getCodeforcesResponse(method, parameters);
 
-    res.setHeader('Cache-Control', 'no-store');
+    if (method === 'contest.list' && status === 200) {
+      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    } else {
+      res.setHeader('Cache-Control', 'no-store');
+    }
     res.status(status).send(method === 'contest.status' ? filterSubmissions(body, handles) : body);
   } catch (error) {
     const comment = error instanceof Error ? error.message : 'Unable to contact Codeforces';

@@ -1,6 +1,6 @@
 import getName from './getName';
 import { MAX_SUBMISSIONS_IN_MEMORY } from './constants';
-import calculateReplayPenalty from './replayScoring';
+import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring';
 
 type ReplaySnapshot = {
   localStandings: Map<string, number>;
@@ -61,7 +61,10 @@ export const buildReplaySnapshot = (
         result.bestSubmissionTimeSeconds = finalResult.bestSubmissionTimeSeconds;
       }
     } else if (!solved.has(event.problem.index)) {
-      result.rejectedAttemptCount += 1;
+      result.rejectedAttemptCount = countRejectedAttempt(
+        result.rejectedAttemptCount,
+        finalResult?.rejectedAttemptCount,
+      );
     }
 
     releasedSubmissions.push({

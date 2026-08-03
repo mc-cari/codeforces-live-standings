@@ -19,10 +19,13 @@ export default function UpcomingContest({ contests = [], onSelect }: UpcomingCon
     return () => window.clearInterval(timer);
   }, []);
 
-  const futureContests = contests.filter(
-    (contest) => secondsUntilContest(contest, nowMilliseconds) > 0,
+  const displayedContests = contests.filter(
+    (contest) => contest.phase === 'CODING'
+      || secondsUntilContest(contest, nowMilliseconds) > 0,
   );
-  if (futureContests.length === 0) return null;
+  if (displayedContests.length === 0) return null;
+
+  const hasLiveContest = displayedContests.some((contest) => contest.phase === 'CODING');
 
   return (
     <section
@@ -34,55 +37,78 @@ export default function UpcomingContest({ contests = [], onSelect }: UpcomingCon
           id="upcoming-contests-title"
           className="font-mono text-xs tracking-[0.2em] text-blue-300 uppercase"
         >
-          Upcoming contests
+          {hasLiveContest ? 'Live & upcoming contests' : 'Upcoming contests'}
         </h2>
         <div className="h-px grow bg-blue-400/20" />
       </div>
       <div className="grid gap-4 md:grid-cols-3">
-        {futureContests.map((contest, index) => (
-          <article
-            key={contest.id}
-            className={
-              'relative flex flex-col min-w-0 p-5 overflow-hidden border '
-              + 'border-blue-400/30 rounded-xl bg-gray-950/80 shadow-xl shadow-blue-950/20'
-            }
-          >
-            <div className="absolute inset-y-0 left-0 w-1 bg-blue-400" />
-            <p className="mb-2 font-mono text-xs tracking-[0.18em] text-blue-300 uppercase">
-              {String(index + 1).padStart(2, '0')}
-              {' · '}
-              Contest #{contest.id}
-            </p>
-            <h3 className="text-lg font-semibold leading-snug text-white grow">
-              {contest.name}
-            </h3>
-            <p className="mt-3 text-sm text-gray-400">
-              {formatStartTime(contest.startTimeSeconds)}
-            </p>
-            <div className="flex items-end justify-between gap-3 pt-4 mt-4 border-t border-gray-800">
-              <div>
-                <p className="mb-1 text-[0.65rem] font-medium tracking-wider text-gray-500 uppercase">
-                  Starts in
-                </p>
-                <p className="font-mono text-xl font-semibold tabular-nums text-blue-300">
-                  {formatCountdown(secondsUntilContest(contest, nowMilliseconds))}
-                </p>
-              </div>
-              <button
+        {displayedContests.map((contest, index) => {
+          const isLive = contest.phase === 'CODING';
+
+          return (
+            <article
+              key={contest.id}
+              className={
+                'relative flex flex-col min-w-0 p-5 overflow-hidden border '
+                + `${isLive ? 'border-emerald-400/40' : 'border-blue-400/30'} `
+                + 'rounded-xl bg-gray-950/80 shadow-xl shadow-blue-950/20'
+              }
+            >
+              <div
                 className={
-                  'text-sm font-semibold text-white underline decoration-blue-400 '
-                  + 'underline-offset-4 transition-colors hover:text-blue-300 '
-                  + 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 '
-                  + 'focus-visible:outline-blue-400'
+                  `absolute inset-y-0 left-0 w-1 ${isLive ? 'bg-emerald-400' : 'bg-blue-400'}`
                 }
-                onClick={() => onSelect(contest)}
-                type="button"
+              />
+              <p
+                className={
+                  'mb-2 font-mono text-xs tracking-[0.18em] uppercase '
+                  + (isLive ? 'text-emerald-300' : 'text-blue-300')
+                }
               >
-                Set up
-              </button>
-            </div>
-          </article>
-        ))}
+                {String(index + 1).padStart(2, '0')}
+                {' · '}
+                {isLive ? 'Live now · ' : ''}
+                Contest #{contest.id}
+              </p>
+              <h3 className="text-lg font-semibold leading-snug text-white grow">
+                {contest.name}
+              </h3>
+              <p className="mt-3 text-sm text-gray-400">
+                {isLive ? 'Started ' : ''}
+                {formatStartTime(contest.startTimeSeconds)}
+              </p>
+              <div className="flex items-end justify-between gap-3 pt-4 mt-4 border-t border-gray-800">
+                <div>
+                  <p className="mb-1 text-[0.65rem] font-medium tracking-wider text-gray-500 uppercase">
+                    {isLive ? 'Status' : 'Starts in'}
+                  </p>
+                  <p
+                    className={
+                      'font-mono text-xl font-semibold tabular-nums '
+                      + (isLive ? 'text-emerald-300' : 'text-blue-300')
+                    }
+                  >
+                    {isLive
+                      ? 'In progress'
+                      : formatCountdown(secondsUntilContest(contest, nowMilliseconds))}
+                  </p>
+                </div>
+                <button
+                  className={
+                    'text-sm font-semibold text-white underline decoration-blue-400 '
+                    + 'underline-offset-4 transition-colors hover:text-blue-300 '
+                    + 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 '
+                    + 'focus-visible:outline-blue-400'
+                  }
+                  onClick={() => onSelect(contest)}
+                  type="button"
+                >
+                  Set up
+                </button>
+              </div>
+            </article>
+          );
+        })}
       </div>
     </section>
   );

@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import calculateReplayPenalty from './replayScoring.ts';
+import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring.ts';
+
+test('does not count more rejected events than the final standings row', () => {
+  assert.equal(countRejectedAttempt(0, 1), 1);
+  assert.equal(countRejectedAttempt(1, 1), 1);
+  assert.equal(countRejectedAttempt(0, 0), 0);
+  assert.equal(countRejectedAttempt(1), 2);
+});
 
 test('educational replay reconstructs ICPC penalty', () => {
   const penalty = calculateReplayPenalty('ICPC', [

@@ -9,8 +9,9 @@ import UpcomingContest from '../components/UpcomingContest';
 import UpcomingContestsLoading from '../components/UpcomingContestsLoading';
 
 const demoHandles = [
-  'Maruzensky', 'shell_wataru', 'noahhb', 'FedeNQ', 'julianferres', 'martins', 'CodigoL',
-  'Cegax', 'MateoCV', 'Graphter', 'MrNachoX', 'mc._cari', 'Xc4l16r3', 'gabmei',
+  'MateoCV', 'mc._cari', 'dmga44', 'Marckess', 'julianferres', 'pacha2880', 'Giga_Cronos',
+  'martins', 'martinius', 'Mateo', 'MesSimonFallon19', 'Scano', 'Agaric',
+  'estoy-re-sebado', 'Tainel', 'Marceantasy', 'AngrySeal',
 ];
 
 export default function Home() {
@@ -199,7 +200,7 @@ export default function Home() {
                 </button>
                 <a
                   href={
-                    '/contests/1797/replay'
+                    '/contests/1735/replay'
                     + '?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true'
                     + `&demo=true&h=${encodeHandles(demoHandles)}`
                   }
@@ -476,7 +477,7 @@ export default function Home() {
                     </label>
                     <p className="mb-3 text-sm text-gray-400">
                       From URL: https://codeforces.com/contest/
-                      <strong>1797</strong>
+                      <strong>1735</strong>
                     </p>
                     <div className="mb-3">
                       <input
@@ -487,7 +488,7 @@ export default function Home() {
                         }
                         type="text"
                         id="contest"
-                        placeholder="1797"
+                        placeholder="1735"
                         value={contestIdInput}
                         onChange={(e) => {
                           setContestIdInput(e.target.value);

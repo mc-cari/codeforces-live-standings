@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import codeforcesFetch from '../utils/codeforcesFetch';
 import { encodeHandles } from '../utils/handlesQuery';
 import type { ParticipantSelection } from '../utils/participantImport';
+import { getContestConfiguration } from '../utils/contestConfiguration';
 
 const demoHandles = [
   'Maruzensky', 'shell_wataru', 'noahhb', 'FedeNQ', 'julianferres', 'martins', 'CodigoL',
@@ -11,25 +12,59 @@ const demoHandles = [
 
 export default function Home() {
   const [handleText, setHandleText] = useState<string>('');
-  const [contestId, setContestId] = useState<number>();
+  const [contestIdInput, setContestIdInput] = useState('');
+  const [contestInfo, setContestInfo] = useState<Contest>();
+  const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [contestLookupError, setContestLookupError] = useState('');
   const [usersHandles, setUsersHandles] = useState<string[]>([]);
-  const [contestType, setContestType] = useState<string>('');
   const [showForm, setShowForm] = useState<boolean>(false);
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importError, setImportError] = useState<string>('');
 
   const Router = useRouter();
+  const contestId = Number(contestIdInput);
+  const contestConfiguration = useMemo(
+    () => (contestInfo ? getContestConfiguration(contestInfo) : undefined),
+    [contestInfo],
+  );
   const participantCount = Number(participantCountInput);
   const hasValidParticipantCount = participantCountInput !== ''
     && Number.isInteger(participantCount) && participantCount > 0;
 
-  const handleStart = (mode: 'standings' | 'replay') => {
-    if (contestId && usersHandles && usersHandles.length > 0 && contestType) {
+  useEffect(() => {
+    if (!Number.isInteger(contestId) || contestId <= 0) {
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        setContestLookupState('loading');
+        const response = await codeforcesFetch('contest.info', { contestId }, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error('Contest not found');
+        const payload = await response.json();
+        setContestInfo(payload.result as Contest);
+        setContestLookupState('idle');
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setContestLookupError(error instanceof Error ? error.message : 'Unable to detect contest');
+        setContestLookupState('error');
+      }
+    }, 2_000);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [contestId]);
+
+  const handleStart = () => {
+    if (contestInfo && usersHandles.length > 0 && contestConfiguration?.contestType) {
       Router.push({
-        pathname: `/contests/${contestId}/${mode}`,
+        pathname: `/contests/${contestInfo.id}/${contestConfiguration.route}`,
         query: {
-          contestType,
+          contestType: contestConfiguration.contestType,
           h: encodeHandles(usersHandles),
         },
       });
@@ -54,8 +89,12 @@ export default function Home() {
 
   const importHandles = async (selection: ParticipantSelection) => {
     try {
-      if (!contestId) {
+      if (!contestInfo) {
         throw new Error('Contest Id not set');
+      }
+
+      if (contestInfo.phase === 'BEFORE') {
+        throw new Error('Participant imports become available when the contest starts');
       }
 
       if (!hasValidParticipantCount) {
@@ -66,7 +105,7 @@ export default function Home() {
       setImportError('');
 
       const participantsResponse = await codeforcesFetch('participant.import', {
-        contestId,
+        contestId: contestInfo.id,
         count: participantCount,
         selection,
       });
@@ -336,7 +375,8 @@ export default function Home() {
                           'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
                           + 'bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-700'
                         }
-                        disabled={!contestId || isImporting || !hasValidParticipantCount}
+                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
+                          || isImporting || !hasValidParticipantCount}
                         onClick={() => importHandles('top')}
                         type="button"
                       >
@@ -347,7 +387,8 @@ export default function Home() {
                           'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
                           + 'bg-purple-600 hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-700'
                         }
-                        disabled={!contestId || isImporting || !hasValidParticipantCount}
+                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
+                          || isImporting || !hasValidParticipantCount}
                         onClick={() => importHandles('random')}
                         type="button"
                       >
@@ -355,7 +396,9 @@ export default function Home() {
                       </button>
                     </div>
                     <p className="mt-3 text-xs text-gray-400">
-                      Top uses the contest standings order. Random selects from all listed participants.
+                      {contestInfo?.phase === 'BEFORE'
+                        ? 'Imports become available when the contest starts. You can still add handles manually.'
+                        : 'Unofficial participants should be added manually.'}
                     </p>
                     {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
                   </div>
@@ -405,66 +448,61 @@ export default function Home() {
                         type="text"
                         id="contest"
                         placeholder="1797"
-                        onChange={(e) => setContestId(parseInt(e.target.value, 10))}
+                        value={contestIdInput}
+                        onChange={(e) => {
+                          setContestIdInput(e.target.value);
+                          setContestInfo(undefined);
+                          setContestLookupError('');
+                          setContestLookupState('idle');
+                          setImportError('');
+                        }}
                       />
                     </div>
-
+                    {contestLookupState === 'loading' && (
+                      <p className="text-sm text-blue-300">Detecting contest…</p>
+                    )}
+                    {contestLookupError && <p className="text-sm text-red-400">{contestLookupError}</p>}
                   </div>
 
-                  <div className="mb-6">
-                    <label className="block mb-3 text-white">Contest Type</label>
-                    <div className="space-y-3">
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contestType"
-                          value="normal"
-                          onChange={() => setContestType('normal')}
-                          className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 focus:ring-blue-500"
-                        />
-                        <span className="text-white">Normal Round</span>
-                      </label>
-                      <label className="flex items-center space-x-3 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="contestType"
-                          value="educational"
-                          onChange={() => setContestType('educational')}
-                          className="w-4 h-4 text-blue-600 bg-gray-800 border-gray-600 focus:ring-blue-500"
-                        />
-                        <span className="text-white">Educational/ICPC</span>
-                      </label>
+                  {contestInfo && contestConfiguration && (
+                    <div className="p-4 mb-6 border border-gray-700 rounded-lg bg-gray-800/80">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="font-medium text-white">{contestInfo.name}</p>
+                          <p className="mt-1 text-sm text-gray-400">
+                            {contestInfo.type === 'ICPC' ? 'ICPC scoring' : `${contestInfo.type} scoring`}
+                            {' · '}
+                            {contestInfo.phase.replaceAll('_', ' ')}
+                          </p>
+                        </div>
+                        <span className="px-2 py-1 text-xs text-blue-200 rounded-full bg-blue-900/60">
+                          Detected
+                        </span>
+                      </div>
+                      {contestConfiguration.unsupportedReason && (
+                        <p className="mt-3 text-sm text-amber-300">
+                          {contestConfiguration.unsupportedReason}
+                        </p>
+                      )}
                     </div>
-                  </div>
+                  )}
 
-                  <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
                     <button
                       className={
                         `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
-                        contestId && usersHandles.length > 0 && contestType
+                        contestInfo && usersHandles.length > 0
+                          && contestConfiguration?.contestType
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white '
                           + 'hover:from-blue-700 hover:to-purple-700 transform hover:scale-105'
                           : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
                       }
-                      onClick={() => handleStart('standings')}
-                      disabled={!contestId || usersHandles.length === 0 || !contestType}
+                      onClick={handleStart}
+                      disabled={!contestInfo || usersHandles.length === 0
+                        || !contestConfiguration?.contestType}
                       type="button"
                     >
-                      Start Live Tracking
-                    </button>
-                    <button
-                      className={
-                        `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
-                        contestId && usersHandles.length > 0 && contestType
-                          ? 'bg-gradient-to-r from-orange-600 to-red-600 text-white '
-                          + 'hover:from-orange-700 hover:to-red-700 transform hover:scale-105'
-                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
-                      }
-                      onClick={() => handleStart('replay')}
-                      disabled={!contestId || usersHandles.length === 0 || !contestType}
-                      type="button"
-                    >
-                      Start Replay
+                      {contestConfiguration?.actionLabel || 'Select a contest'}
                     </button>
                   </div>
                 </div>

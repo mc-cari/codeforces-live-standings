@@ -10,12 +10,14 @@ import RequestCoordinator from '../../utils/requestCoordinator';
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
 
 const allowedParameters: Record<string, Set<string>> = {
+  'contest.info': new Set(['contestId']),
   'contest.standings': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles']),
   'participant.import': new Set(['contestId', 'count', 'selection']),
   'user.info': new Set(['handles']),
 };
 
+const anonymousMethods = new Set(['contest.list', 'contest.standings']);
 const freshConnectionMethods = new Set(['contest.standings', 'contest.status']);
 
 type CachedResponse = {
@@ -80,7 +82,7 @@ const filterSubmissions = (body: string, handles: string | null): string => {
 
 const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
   let query = toCodeforcesQuery(parameters);
-  if (method !== 'contest.standings') {
+  if (!anonymousMethods.has(method)) {
     const apiSignature = createSignature(method, parameters);
     query = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
   }
@@ -175,6 +177,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
       res.setHeader('Cache-Control', 'no-store');
       res.status(200).json({ status: 'OK', result: handles });
+      return;
+    }
+
+    if (method === 'contest.info') {
+      const contestId = Number(parameters.get('contestId'));
+      const listParameters = new URLSearchParams({ gym: String(contestId >= 100_000) });
+      const { body, status } = await getCodeforcesResponse('contest.list', listParameters);
+      if (status !== 200) {
+        res.status(status).send(body);
+        return;
+      }
+      const listResponse = JSON.parse(body) as { status: string; result?: Contest[] };
+      const contest = listResponse.result?.find((candidate) => candidate.id === contestId);
+      res.setHeader('Cache-Control', 'no-store');
+      if (!contest) {
+        res.status(404).json({ status: 'FAILED', comment: 'Contest not found' });
+        return;
+      }
+      res.status(200).json({ status: 'OK', result: contest });
       return;
     }
 

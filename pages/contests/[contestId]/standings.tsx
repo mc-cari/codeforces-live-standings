@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import StandingsList from '../../../components/standings/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
 import ContestLoading from '../../../components/ContestLoading';
+import ContestCountdown from '../../../components/ContestCountdown';
 import useInterval from '../../../hooks/useInterval';
 import getName from '../../../utils/getName';
 import codeforcesFetch from '../../../utils/codeforcesFetch';
@@ -25,6 +26,9 @@ export default function Standings() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(8);
   const [loadingStage, setLoadingStage] = useState('Preparing live standings...');
+  const [contestInfo, setContestInfo] = useState<Contest>();
+  const [isContestReady, setIsContestReady] = useState(false);
+  const [isContestFinished, setIsContestFinished] = useState(false);
   const hasLoadedInitialData = useRef(false);
 
   const Router = useRouter();
@@ -82,6 +86,7 @@ export default function Standings() {
           isSubmissionAuthorInUsers(row.party)
         )),
       };
+      if (standings.contest.phase === 'FINISHED') setIsContestFinished(true);
 
       let prevRank = -1; let
         prevPosition = -1;
@@ -154,6 +159,26 @@ export default function Standings() {
   };
 
   useEffect(() => {
+    if (!contestId) return undefined;
+    let active = true;
+    const fetchContestInfo = async () => {
+      try {
+        const response = await codeforcesFetch('contest.info', { contestId: contestId as string });
+        if (!response.ok) throw new Error('Unable to load contest information');
+        const payload = await response.json();
+        if (!active) return;
+        const detectedContest = payload.result as Contest;
+        setContestInfo(detectedContest);
+        setIsContestReady(detectedContest.phase !== 'BEFORE');
+      } catch (error) {
+        if (active) setLoadingStage(error instanceof Error ? error.message : 'Unable to load contest');
+      }
+    };
+    fetchContestInfo();
+    return () => { active = false; };
+  }, [contestId]);
+
+  useEffect(() => {
     if (!isLoading) return undefined;
     const progressTimer = window.setInterval(() => {
       setLoadingProgress((current) => {
@@ -211,7 +236,16 @@ export default function Standings() {
     }
 
     setIsPaused(false);
-  }, isPaused ? null : delay);
+  }, isPaused || !isContestReady || isContestFinished ? null : delay);
+
+  if (contestInfo?.phase === 'BEFORE' && !isContestReady) {
+    return (
+      <ContestCountdown
+        contest={contestInfo}
+        onComplete={() => setIsContestReady(true)}
+      />
+    );
+  }
 
   if (isLoading) {
     return <ContestLoading progress={loadingProgress} stage={loadingStage} />;

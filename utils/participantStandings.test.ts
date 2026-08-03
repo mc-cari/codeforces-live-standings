@@ -53,6 +53,36 @@ test('reconstructs CF points when accepted submissions omit points', () => {
   assert.equal(result.rows[0].points, 440);
 });
 
+test('uses Codeforces scoring without scaling penalties by contest duration', () => {
+  const contestStandings = standings('CF');
+  contestStandings.contest.durationSeconds = 8_100;
+  contestStandings.problems = [500, 750, 1_250, 1_750, 2_250]
+    .map((points, index) => ({ index: 'ABCDE'[index], points } as Problem));
+  const contestSubmission = (
+    id: number,
+    problemIndex: string,
+    relativeTimeSeconds: number,
+  ) => ({
+    ...submission(id, 'MateoCV', 'OUT_OF_COMPETITION', 'OK', relativeTimeSeconds),
+    problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as Problem,
+    points: undefined,
+  } as unknown as Submission);
+
+  const result = addMissingParticipantRows(contestStandings, [
+    contestSubmission(1, 'A', 144),
+    contestSubmission(2, 'B', 1_029),
+    contestSubmission(3, 'C', 1_940),
+    contestSubmission(4, 'D', 2_697),
+    contestSubmission(5, 'E', 6_707),
+  ], getHandle);
+
+  assert.deepEqual(
+    result.rows[0].problemResults.map((problem) => problem.points),
+    [496, 699, 1_090, 1_442, 1_251],
+  );
+  assert.equal(result.rows[0].points, 4_978);
+});
+
 test('reconstructs all jiangly solves from contest 1797 submissions', () => {
   const contestStandings = standings('CF');
   contestStandings.problems = [500, 1000, 1500, 1750, 2250, 3000]

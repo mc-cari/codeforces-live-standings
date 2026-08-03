@@ -23,21 +23,23 @@ const contest = (overrides: Partial<Contest>): Contest => ({
   ...overrides,
 });
 
-test('returns up to three future contests in chronological order', () => {
+test('prioritizes live contests before future contests within the three slots', () => {
   const result = findUpcomingContests([
     contest({ id: 5, startTimeSeconds: 6_000 }),
     contest({ id: 2, startTimeSeconds: 3_000 }),
     contest({ id: 4, startTimeSeconds: 5_000 }),
     contest({ id: 3, startTimeSeconds: 4_000 }),
+    contest({ id: 6, phase: 'CODING', startTimeSeconds: 500 }),
   ], 1_000);
 
-  assert.deepEqual(result.map(({ id }) => id), [2, 3, 4]);
+  assert.deepEqual(result.map(({ id }) => id), [6, 2, 3]);
 });
 
-test('ignores contests that started or are not in the before phase', () => {
+test('ignores stale before contests and contests that are no longer running', () => {
   const result = findUpcomingContests([
     contest({ id: 1, startTimeSeconds: 1_000 }),
-    contest({ id: 2, phase: 'CODING', startTimeSeconds: 3_000 }),
+    contest({ id: 2, phase: 'FINISHED', startTimeSeconds: 500 }),
+    contest({ id: 3, phase: 'SYSTEM_TEST', startTimeSeconds: 500 }),
   ], 1_000);
 
   assert.deepEqual(result, []);

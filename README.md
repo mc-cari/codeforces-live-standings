@@ -3,9 +3,9 @@
 
 Website for a dynamic visualization for live standings of [Codeforces](https://codeforces.com) competitions for a custom selection of users, the subissions and standings are updated automatically. The style of the website is the one used for ICPC competitions ([ICPC World Finals Dhaka Standings](https://www.youtube.com/live/15Wyj_-PG9I?feature=share&t=10935)) because it has an interesting design.
 
-[Contest 1797](https://codeforces-live-standings.vercel.app/contests/1797/standings?contestType=normal&handles=Maruzensky&handles=shell_wataru&handles=noahhb&handles=FedeNQ&handles=julianferres&handles=martins&handles=CodigoL&handles=Cegax&handles=MateoCV&handles=Graphter&handles=MrNachoX&handles=mc._cari&handles=Xc4l16r3&handles=gabmei) example.
+[Contest 1735 replay demo](https://codeforces-live-standings.mccari.us//contests/1735/replay?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true&demo=true&h=TWF0ZW9DVjttYy5fY2FyaTtkbWdhNDQ7TWFyY2tlc3M7anVsaWFuZmVycmVzO3BhY2hhMjg4MDtHaWdhX0Nyb25vczttYXJ0aW5zO21hcnRpbml1cztNYXRlbztNZXNTaW1vbkZhbGxvbjE5O1NjYW5vO0FnYXJpYztlc3RveS1yZS1zZWJhZG87VGFpbmVsO01hcmNlYW50YXN5O0FuZ3J5U2VhbA).
 
-Website link: [Codeforces Live Standings](https://codeforces-live-standings.vercel.app).
+Website link: [Codeforces Live Standings](https://codeforces-live-standings.mccari.us/).
 
 It has support for:
 
@@ -45,18 +45,17 @@ pnpm dev
 
 The browser calls the app's `/api/codeforces` backend. That backend uses one bulk
 `contest.status` response and filters it locally for the requested handles. Within
-each server instance, identical in-flight requests are shared and upstream requests
+each server instance, identical requests are shared and upstream requests
 start at least 2.0 seconds apart. Cache hits do not enter that queue.
 
 The limiter is process-local: separate Vercel instances cannot coordinate without a
 shared service such as Redis or a database. Cached response bodies are bounded to
-100 MiB per instance and use expiry plus least-recently-used eviction, so old contest
+100 MiB per instance and use expiry plus LRU eviction, so old contest
 responses do not accumulate indefinitely.
 
 The demo replay is served from the versioned, immutable
-`public/demo/1797-v1.json` snapshot and makes no Codeforces API requests. It is not
-generated during a build or server startup. To intentionally refresh and commit it,
-run:
+`public/demo/1735-v1.json` snapshot and makes no Codeforces API requests. 
+Run:
 
 ```sh
 pnpm generate-demo

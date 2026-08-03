@@ -4,6 +4,10 @@ type ReplayProblemResult = {
   bestSubmissionTimeSeconds: number;
 };
 
+export const countRejectedAttempt = (currentCount: number, finalCount?: number) => (
+  finalCount === undefined ? currentCount + 1 : Math.min(currentCount + 1, finalCount)
+);
+
 export default function calculateReplayPenalty(
   contestType: string,
   problemResults: ReplayProblemResult[],

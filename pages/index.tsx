@@ -4,6 +4,9 @@ import codeforcesFetch from '../utils/codeforcesFetch';
 import { encodeHandles } from '../utils/handlesQuery';
 import type { ParticipantSelection } from '../utils/participantImport';
 import { getContestConfiguration } from '../utils/contestConfiguration';
+import { findUpcomingContests } from '../utils/upcomingContest';
+import UpcomingContest from '../components/UpcomingContest';
+import UpcomingContestsLoading from '../components/UpcomingContestsLoading';
 
 const demoHandles = [
   'Maruzensky', 'shell_wataru', 'noahhb', 'FedeNQ', 'julianferres', 'martins', 'CodigoL',
@@ -21,6 +24,8 @@ export default function Home() {
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importError, setImportError] = useState<string>('');
+  const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
+  const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
 
   const Router = useRouter();
   const contestId = Number(contestIdInput);
@@ -31,6 +36,28 @@ export default function Home() {
   const participantCount = Number(participantCountInput);
   const hasValidParticipantCount = participantCountInput !== ''
     && Number.isInteger(participantCount) && participantCount > 0;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadUpcomingContest = async () => {
+      try {
+        const response = await codeforcesFetch('contest.list', { gym: false }, {
+          signal: controller.signal,
+        });
+        if (!response.ok) throw new Error('Unable to load upcoming contests');
+        const payload = await response.json();
+        setUpcomingContests(findUpcomingContests(payload.result as Contest[]));
+      } catch (error) {
+        if (!controller.signal.aborted) setUpcomingContests([]);
+      } finally {
+        if (!controller.signal.aborted) setIsLoadingUpcomingContests(false);
+      }
+    };
+
+    loadUpcomingContest();
+    return () => controller.abort();
+  }, []);
 
   useEffect(() => {
     if (!Number.isInteger(contestId) || contestId <= 0) {
@@ -69,6 +96,15 @@ export default function Home() {
         },
       });
     }
+  };
+
+  const selectUpcomingContest = (contest: Contest) => {
+    setContestIdInput(String(contest.id));
+    setContestInfo(contest);
+    setContestLookupError('');
+    setContestLookupState('idle');
+    setImportError('');
+    setShowForm(true);
   };
 
   const addHandles = (newHandles : string[]) => {
@@ -178,6 +214,10 @@ export default function Home() {
                   View Demo
                 </a>
               </div>
+              {isLoadingUpcomingContests && <UpcomingContestsLoading />}
+              {!isLoadingUpcomingContests && upcomingContests.length > 0 && (
+                <UpcomingContest contests={upcomingContests} onSelect={selectUpcomingContest} />
+              )}
             </div>
           </div>
         </div>

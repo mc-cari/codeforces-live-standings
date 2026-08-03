@@ -13,7 +13,7 @@ const allowedParameters: Record<string, Set<string>> = {
   'contest.list': new Set(['gym']),
   'contest.info': new Set(['contestId']),
   'contest.standings': new Set(['contestId']),
-  'contest.status': new Set(['contestId', 'handles']),
+  'contest.status': new Set(['contestId', 'handles', 'participantTypes']),
   'participant.import': new Set(['contestId', 'count', 'selection']),
   'user.info': new Set(['handles']),
 };
@@ -67,17 +67,25 @@ const createSignature = (method: string, parameters: URLSearchParams): string =>
   return `${randomPrefix}${digest}`;
 };
 
-const filterSubmissions = (body: string, handles: string | null): string => {
-  if (!handles) return body;
+const filterSubmissions = (
+  body: string,
+  handles: string | null,
+  participantTypes: string | null,
+): string => {
+  if (!handles && !participantTypes) return body;
 
-  const selectedHandles = new Set(handles.split(';'));
+  const selectedHandles = handles ? new Set(handles.split(';')) : null;
+  const selectedParticipantTypes = participantTypes ? new Set(participantTypes.split(',')) : null;
   const response = JSON.parse(body) as { result?: Submission[] };
   if (!Array.isArray(response.result)) return body;
 
   return JSON.stringify({
     ...response,
     result: response.result.filter((submission) => (
-      submission.author.members.some((member) => selectedHandles.has(member.handle))
+      (!selectedHandles
+        || submission.author.members.some((member) => selectedHandles.has(member.handle)))
+      && (!selectedParticipantTypes
+        || selectedParticipantTypes.has(submission.author.participantType))
     )),
   });
 };
@@ -141,8 +149,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ status: 'FAILED', comment: 'contestId is required' });
     return;
   }
-  if ((method === 'user.info' || method === 'contest.status') && !parameters.get('handles')) {
+  if (method === 'user.info' && !parameters.get('handles')) {
     res.status(400).json({ status: 'FAILED', comment: 'handles is required' });
+    return;
+  }
+  if (method === 'contest.status' && !parameters.get('handles') && !parameters.get('participantTypes')) {
+    res.status(400).json({ status: 'FAILED', comment: 'handles or participantTypes is required' });
     return;
   }
 
@@ -203,7 +215,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const handles = method === 'contest.status' ? parameters.get('handles') : null;
-    if (method === 'contest.status') parameters.delete('handles');
+    const participantTypes = method === 'contest.status' ? parameters.get('participantTypes') : null;
+    if (method === 'contest.status') {
+      parameters.delete('handles');
+      parameters.delete('participantTypes');
+    }
     const { body, status } = await getCodeforcesResponse(method, parameters);
 
     if (method === 'contest.list' && status === 200) {
@@ -211,7 +227,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       res.setHeader('Cache-Control', 'no-store');
     }
-    res.status(status).send(method === 'contest.status' ? filterSubmissions(body, handles) : body);
+    res.status(status).send(
+      method === 'contest.status' ? filterSubmissions(body, handles, participantTypes) : body,
+    );
   } catch (error) {
     const comment = error instanceof Error ? error.message : 'Unable to contact Codeforces';
     res.status(502).json({ status: 'FAILED', comment });

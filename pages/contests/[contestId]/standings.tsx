@@ -10,6 +10,7 @@ import ContestCountdown from '../../../components/ContestCountdown';
 import useInterval from '../../../hooks/useInterval';
 import getName from '../../../utils/getName';
 import codeforcesFetch from '../../../utils/codeforcesFetch';
+import { addMissingParticipantRows } from '../../../utils/participantStandings';
 import {
   LIVE_POLLING, LOADING_PROGRESS, MAX_SUBMISSIONS_IN_MEMORY,
 } from '../../../utils/constants';
@@ -52,15 +53,6 @@ export default function Standings() {
         standingForUser.set(user, userHandles.length);
       });
 
-      const standingsRequest = codeforcesFetch('contest.standings', {
-        contestId: contestId as string,
-      }).then((response) => {
-        if (isInitialLoad) {
-          setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.standingsLoaded));
-          setLoadingStage('Loading live submissions...');
-        }
-        return response;
-      });
       const submissionsRequest = codeforcesFetch('contest.status', {
         contestId: contestId as string,
         handles: userHandles.join(';'),
@@ -68,6 +60,15 @@ export default function Standings() {
         if (isInitialLoad) {
           setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.submissionsLoaded));
           setLoadingStage('Preparing live standings...');
+        }
+        return response;
+      });
+      const standingsRequest = codeforcesFetch('contest.standings', {
+        contestId: contestId as string,
+      }).then((response) => {
+        if (isInitialLoad) {
+          setLoadingProgress((current) => Math.max(current, LOADING_PROGRESS.standingsLoaded));
+          setLoadingStage('Loading live submissions...');
         }
         return response;
       });
@@ -80,36 +81,39 @@ export default function Standings() {
       }
 
       const standingsPromise = await standingsResponse.json();
-      const standings : Standings = {
+      const officialStandings : Standings = {
         ...standingsPromise.result,
         rows: standingsPromise.result.rows.filter((row: RanklistRow) => (
           isSubmissionAuthorInUsers(row.party)
         )),
       };
-      if (standings.contest.phase === 'FINISHED') setIsContestFinished(true);
-
-      let prevRank = -1; let
-        prevPosition = -1;
-      const userWithStandingSet = new Set<string>();
-      standings.rows.forEach((row, i) => {
-        let position = i + 1;
-        if (row.rank === prevRank) {
-          position = prevPosition;
-        }
-        if (!userWithStandingSet.has(getName(row.party))) {
-          standingForUser.set(getName(row.party), position);
-          userWithStandingSet.add(getName(row.party));
-        }
-
-        prevRank = row.rank;
-        prevPosition = position;
-      });
 
       if (!submissionsResponse.ok) {
         throw new Error('Failed to fetch submissions data');
       }
       const submissionsPromise = await submissionsResponse.json();
       const newSubmissions : Submission[] = submissionsPromise.result.reverse();
+      const standings = addMissingParticipantRows(officialStandings, newSubmissions, getName);
+      if (standings.contest.phase === 'FINISHED') setIsContestFinished(true);
+
+      let previousPoints = -1;
+      let previousPenalty = -1;
+      let previousPosition = -1;
+      const userWithStandingSet = new Set<string>();
+      standings.rows.forEach((row, i) => {
+        let position = i + 1;
+        if (row.points === previousPoints && row.penalty === previousPenalty) {
+          position = previousPosition;
+        }
+        if (!userWithStandingSet.has(getName(row.party))) {
+          standingForUser.set(getName(row.party), position);
+          userWithStandingSet.add(getName(row.party));
+        }
+
+        previousPoints = row.points;
+        previousPenalty = row.penalty;
+        previousPosition = position;
+      });
 
       const oldSubmissions : Submission[] = submissions.slice(0).reverse();
       let oldId = 0; let

@@ -1,5 +1,6 @@
 import getName from './getName';
 import { MAX_SUBMISSIONS_IN_MEMORY } from './constants';
+import calculateReplayPenalty from './replayScoring';
 
 type ReplaySnapshot = {
   localStandings: Map<string, number>;
@@ -56,7 +57,6 @@ export const buildReplaySnapshot = (
       solved.add(event.problem.index);
       if (finalResult) {
         result.points = finalResult.points;
-        result.penalty = finalResult.penalty;
         result.rejectedAttemptCount = finalResult.rejectedAttemptCount;
         result.bestSubmissionTimeSeconds = finalResult.bestSubmissionTimeSeconds;
       }
@@ -72,7 +72,7 @@ export const buildReplaySnapshot = (
 
   rows.forEach((row) => {
     row.points = row.problemResults.reduce((total, result) => total + result.points, 0);
-    row.penalty = row.problemResults.reduce((total, result) => total + result.penalty, 0);
+    row.penalty = calculateReplayPenalty(finalStandings.contest.type, row.problemResults);
   });
   rows.sort(compareRows);
 

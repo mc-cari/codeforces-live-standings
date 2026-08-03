@@ -115,8 +115,8 @@ export default function Replay() {
           setLoadingProgress((current) => Math.max(current, progress));
           setLoadingStage(stage);
         };
-        if (contestId === '1797' && getQueryValue(demo) === 'true') {
-          const response = await fetch('/demo/1797-v1.json');
+        if (contestId === '1735' && getQueryValue(demo) === 'true') {
+          const response = await fetch('/demo/1735-v1.json');
           if (!response.ok) throw new Error('Unable to load demo replay');
           const snapshot = await response.json() as {
             standings: Standings;
@@ -126,12 +126,17 @@ export default function Replay() {
           const demoEvents = snapshot.submissions.sort((first, second) => (
             first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
           ));
-          setFinalStandings(snapshot.standings);
+          const demoStandings = addMissingParticipantRows(
+            snapshot.standings,
+            demoEvents,
+            getName,
+          );
+          setFinalStandings(demoStandings);
           setEvents(demoEvents);
           setUserRank(new Map(Object.entries(snapshot.userRanks)));
           setElapsedSeconds(getStartTime(
             getQueryValue(startTime) || getQueryValue(startMinute),
-            snapshot.standings.contest.durationSeconds,
+            demoStandings.contest.durationSeconds,
             demoEvents[0]?.relativeTimeSeconds || 0,
           ));
           setSpeed(requestedSpeed);

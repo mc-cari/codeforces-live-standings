@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=22.18.0"
   },
   "packageManager": "pnpm@11.14.0",
   "scripts": {
@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test utils/*.test.ts",
-    "generate-demo": "node scripts/generateDemoSnapshot.mjs"
+    "generate-demo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generateDemoSnapshot.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

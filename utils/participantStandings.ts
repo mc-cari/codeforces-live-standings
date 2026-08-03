@@ -33,14 +33,10 @@ const createRow = (party: Party, problemCount: number): RanklistRow => ({
 const calculateCfPoints = (
   maximumPoints: number,
   relativeTimeSeconds: number,
-  durationSeconds: number,
   rejectedAttemptCount: number,
 ) => {
   const submissionMinute = Math.floor(relativeTimeSeconds / 60);
-  const durationMinutes = durationSeconds / 60;
-  const timePenalty = Math.floor(
-    (120 * maximumPoints * submissionMinute) / (250 * durationMinutes),
-  );
+  const timePenalty = Math.floor((maximumPoints * submissionMinute) / 250);
   return Math.max(
     0.3 * maximumPoints,
     maximumPoints - timePenalty - 50 * rejectedAttemptCount,
@@ -102,7 +98,6 @@ export const addMissingParticipantRows = (
           : calculateCfPoints(
             standings.problems[problemIndex].points || submission.problem.points,
             submission.relativeTimeSeconds,
-            standings.contest.durationSeconds,
             result.rejectedAttemptCount,
           );
         if (submissionPoints > result.points) {

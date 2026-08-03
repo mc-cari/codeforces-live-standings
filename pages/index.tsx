@@ -201,7 +201,7 @@ export default function Home() {
                   href={
                     '/contests/1797/replay'
                     + '?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true'
-                    + `&h=${encodeHandles(demoHandles)}`
+                    + `&demo=true&h=${encodeHandles(demoHandles)}`
                   }
                   target="_blank"
                   rel="noopener noreferrer"

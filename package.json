@@ -11,7 +11,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test utils/*.test.ts"
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test utils/*.test.ts",
+    "generate-demo": "node scripts/generateDemoSnapshot.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

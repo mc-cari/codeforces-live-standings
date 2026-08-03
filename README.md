@@ -52,3 +52,12 @@ The limiter is process-local: separate Vercel instances cannot coordinate withou
 shared service such as Redis or a database. Cached response bodies are bounded to
 100 MiB per instance and use expiry plus least-recently-used eviction, so old contest
 responses do not accumulate indefinitely.
+
+The demo replay is served from the versioned, immutable
+`public/demo/1797-v1.json` snapshot and makes no Codeforces API requests. It is not
+generated during a build or server startup. To intentionally refresh and commit it,
+run:
+
+```sh
+pnpm generate-demo
+```

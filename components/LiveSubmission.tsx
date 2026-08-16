@@ -5,10 +5,10 @@ import Position from './Position';
 import UserHandle from './UserHandle';
 
 export default function LiveSubmission({
-  submission, isNew, userCount, userRank, isGym,
+  submission, isNew, userCount, userRank, isGym, compact = false,
 }
 : { submission: Submission, isNew : boolean, userCount : number,
-  userRank : Map<string, string>, isGym: boolean }) {
+  userRank : Map<string, string>, isGym: boolean, compact?: boolean }) {
   const submissionUrl = `https://codeforces.com/${isGym ? 'gym' : 'contest'}/${submission.contestId}`
     + `/submission/${submission.id}`;
   const problemUrl = `https://codeforces.com/${isGym ? 'gym' : 'contest'}/${submission.contestId}`
@@ -16,7 +16,9 @@ export default function LiveSubmission({
 
   return (
     <div
-      className={`relative flex min-w-0 h-full flex-row border-b border-gray-800/30 hover:bg-gray-800/30 transition-all ${
+      className={`${compact
+        ? 'relative grid min-w-0 h-full grid-cols-[2rem_minmax(7rem,1fr)_3rem_3rem_3rem] border-b border-gray-800/30'
+        : 'relative flex min-w-0 h-full flex-row border-b border-gray-800/30'} hover:bg-gray-800/30 transition-all ${
         isNew || submission.verdict === 'TESTING' ? 'animate-pulse bg-blue-900/20' : ''
       }`}
     >
@@ -27,20 +29,24 @@ export default function LiveSubmission({
         aria-label={`Open submission ${submission.id}`}
         className="absolute inset-0 z-0"
       />
-      <div className="w-1/12 text-xl">
+      <div className={compact ? 'text-xl' : 'w-1/12 text-xl'}>
         <Position
           position={submission.author.rank}
           userCount={userCount}
         />
       </div>
 
-      <div className="relative z-10 min-w-0 grow flex items-center text-lg p-2">
+      <div className="relative z-10 min-w-0 flex items-center p-2 text-lg">
         <UserHandle author={submission.author} userRank={userRank} />
       </div>
-      <div className="w-1/12 flex items-center justify-center text-lg font-semibold">
+      <div className={compact
+        ? 'flex items-center justify-center text-sm font-semibold'
+        : 'w-1/12 flex items-center justify-center text-lg font-semibold'}>
         {submission.numberOfProblems}
       </div>
-      <div className="w-1/12 flex items-center justify-center text-xl font-bold">
+      <div className={compact
+        ? 'flex items-center justify-center text-lg font-bold'
+        : 'w-1/12 flex items-center justify-center text-xl font-bold'}>
         <a
           href={problemUrl}
           target="_blank"
@@ -51,7 +57,7 @@ export default function LiveSubmission({
           {submission.problem.index}
         </a>
       </div>
-      <div className="w-1/12 text-xl">
+      <div className={compact ? 'text-lg' : 'w-1/12 text-xl'}>
         <Veredict veredict={submission.verdict} test={submission.passedTestCount} />
       </div>
     </div>

@@ -261,6 +261,7 @@ export default function MiniContestSimulation({
       <div aria-live="polite" className="h-8 bg-[#081525]">
         {latestSubmission ? (
           <LiveSubmission
+            compact
             isGym={false}
             isNew={!reducedMotion && Boolean(latestEvent && recentEvents.some((event) => (
               event.participantIndex === latestEvent.participantIndex

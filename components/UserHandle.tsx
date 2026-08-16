@@ -24,7 +24,7 @@ export default function userHandle({ author, userRank }
   }
 
   return (
-    <p className={`${rankColor}`}>
+    <p className={`${rankColor} block max-w-full truncate`}>
       {' '}
       <a
         href={`https://codeforces.com/profile/${encodeURIComponent(author.members[0].handle)}`}

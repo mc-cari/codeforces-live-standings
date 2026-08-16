@@ -32,18 +32,18 @@ export default function StandingsList({
       <div className="flex flex-col grow w-full overflow-y-auto scrollbar-hide">
         {globalStandings.rows.map((row) => (
           <div
-            className="flex flex-row h-12 w-full hover:bg-gray-800/40 transition-colors border-b border-gray-800/50"
+            className="flex min-w-0 flex-row h-12 w-full hover:bg-gray-800/40 transition-colors border-b border-gray-800/50"
             key={getName(row.party)}
           >
-            <div className="flex flex-row w-1/3">
-              <div className="w-1/5 text-xl">
+            <div className="flex min-w-0 flex-row w-1/3">
+              <div className="w-1/5 shrink-0 text-xl">
                 <Position
                   position={localStandings.get(getName(row.party)) as number}
                   userCount={globalStandings.rows.length}
                 />
               </div>
 
-              <div className="w-4/5 text-lg flex items-center px-3 py-1">
+              <div className="flex min-w-0 w-4/5 items-center overflow-hidden px-3 py-1 text-lg">
                 <UserHandle author={row.party} userRank={userRank} />
               </div>
             </div>

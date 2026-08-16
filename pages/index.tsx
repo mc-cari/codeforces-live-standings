@@ -443,7 +443,8 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
+                  {contestInfo && (
+                    <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
                     <label className="block mb-2 text-sm text-white" htmlFor="participant-count">
                       Import participants
                     </label>
@@ -490,7 +491,8 @@ export default function Home() {
                         : 'Unofficial participants should be added manually.'}
                     </p>
                     {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
-                  </div>
+                    </div>
+                  )}
 
                   {contestInfo && (
                     <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">

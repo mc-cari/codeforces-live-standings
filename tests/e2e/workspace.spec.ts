@@ -92,6 +92,8 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await page.getByRole('button', { name: 'Add' }).click();
   const preview = page.getByRole('region', { name: 'Mini contest simulation' });
   await expect(preview.getByRole('heading', { name: 'Codeforces Round 1735' })).toBeVisible();
+  await expect(preview.getByText('PTS', { exact: true })).toBeVisible();
+  await expect(preview.getByText('Pen', { exact: true })).toHaveCount(0);
   await expect(preview.getByText('preview_handle')).toBeVisible();
   await expect(preview.getByRole('button')).toHaveCount(0);
   await expect(preview.getByRole('link')).toHaveCount(0);

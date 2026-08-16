@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 const DURATION_SECONDS = 28;
 const DEFAULT_PARTICIPANTS = ['bytebloom', 'dp_dreamer', 'greedyfox', 'stacktrace'];
 const problems = ['A', 'B', 'C', 'D'];
+const problemPoints: Record<string, number> = { A: 500, B: 750, C: 1_000, D: 1_250 };
 const events = [
   { second: 2, participantIndex: 2, problem: 'A', verdict: 'rejected' },
   { second: 5, participantIndex: 0, problem: 'A', verdict: 'accepted' },
@@ -130,9 +131,12 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
     const penalty = Array.from(problemStates.values()).reduce((total, state) => (
       total + (state.solvedAt ? state.solvedAt + (state.attempts - 1) * 5 : 0)
     ), 0);
-    return { handle, participantIndex, problemStates, solved, penalty };
+    const points = Array.from(problemStates.entries()).reduce((total, [problem, state]) => (
+      total + (state.solvedAt ? problemPoints[problem] : 0)
+    ), 0);
+    return { handle, participantIndex, problemStates, solved, penalty, points };
   }).sort((first, second) => (
-    second.solved - first.solved || first.penalty - second.penalty
+    second.points - first.points || first.penalty - second.penalty
   )), [elapsed, previewParticipants, visibleEvents]);
 
   const latestEvent = [...visibleEvents].reverse().find((event) => event.second <= elapsed);
@@ -163,7 +167,7 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
       </header>
 
       <div className="grid grid-cols-[2rem_minmax(7rem,1fr)_3rem_3rem_repeat(4,2.25rem)] border-b border-[#25364d] bg-[#13243a] px-2 py-2 text-center text-xs text-[#91a3ba]">
-        <span>#</span><span className="text-left">Handle</span><span>Σ</span><span>Pen</span>
+        <span>#</span><span className="text-left">Handle</span><span>PTS</span><span>Σ</span>
         {problems.map((problem) => <span key={problem}>{problem}</span>)}
       </div>
       <div aria-live="polite">
@@ -174,8 +178,8 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
           >
             <span className="font-data text-[#91a3ba]">{index + 1}</span>
             <span className="truncate text-left font-medium text-white">{row.handle}</span>
-            <span className="font-data font-medium text-white">{row.solved}</span>
-            <span className="font-data text-xs text-[#91a3ba]">{row.penalty}</span>
+            <span className="font-data font-medium text-white">{row.points}</span>
+            <span className="font-data text-xs text-[#91a3ba]">{row.solved}</span>
             {problems.map((problem) => {
               const state = row.problemStates.get(problem) as ProblemState;
               const stateClass = state.solvedAt

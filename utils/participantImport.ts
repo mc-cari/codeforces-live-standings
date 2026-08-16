@@ -1,5 +1,13 @@
 export type ParticipantSelection = 'top' | 'random';
 
+export const normalizeImportedHandles = (value: unknown): string[] => {
+  if (!Array.isArray(value) || value.some((handle) => typeof handle !== 'string')) {
+    throw new Error('Codeforces returned an invalid friend list');
+  }
+
+  return Array.from(new Set(value.map((handle) => handle.trim()).filter(Boolean)));
+};
+
 type RandomSource = () => number;
 
 export const selectParticipantHandles = (

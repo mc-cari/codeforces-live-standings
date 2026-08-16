@@ -26,6 +26,13 @@ Codeforces API key pair.
 
 You can get an API key from https://codeforces.com/settings/api.
 
+During contest setup, the app can import the friends for an authorized Codeforces
+account through `user.friends`. The account handle is required as a confirmation;
+Codeforces does not provide an anonymous or arbitrary-handle friends endpoint.
+Deployments can use the configured `CF_API_KEY`/`CF_API_SECRET`, or a user can
+provide a key pair for the one-time import request. User-provided credentials are
+sent in a POST body and are not stored by the app.
+
 ### Development
 
 Set up the project with:

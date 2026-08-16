@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
-import codeforcesFetch from '../utils/codeforcesFetch';
+import codeforcesFetch, { codeforcesPost } from '../utils/codeforcesFetch';
 import { encodeHandles } from '../utils/handlesQuery';
-import type { ParticipantSelection } from '../utils/participantImport';
+import { normalizeImportedHandles, type ParticipantSelection } from '../utils/participantImport';
 import { getContestConfiguration } from '../utils/contestConfiguration';
 import { findUpcomingContests } from '../utils/upcomingContest';
 import UpcomingContest from '../components/UpcomingContest';
@@ -25,6 +25,12 @@ export default function Home() {
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importError, setImportError] = useState<string>('');
+  const [friendHandleInput, setFriendHandleInput] = useState('');
+  const [friendApiKeyInput, setFriendApiKeyInput] = useState('');
+  const [friendApiSecretInput, setFriendApiSecretInput] = useState('');
+  const [isImportingFriends, setIsImportingFriends] = useState(false);
+  const [friendImportMessage, setFriendImportMessage] = useState('');
+  const [friendImportError, setFriendImportError] = useState('');
   const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
   const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
 
@@ -105,16 +111,20 @@ export default function Home() {
     setContestLookupError('');
     setContestLookupState('idle');
     setImportError('');
+    setFriendImportMessage('');
+    setFriendImportError('');
     setShowForm(true);
   };
 
   const addHandles = (newHandles : string[]) => {
-    newHandles = newHandles.map((handle) => handle.trim());
-    newHandles = newHandles.filter((handle) => !usersHandles.includes(handle));
+    newHandles = Array.from(new Set(newHandles.map((handle) => handle.trim())))
+      .filter((handle) => handle && !usersHandles.includes(handle));
 
     if (newHandles.length > 0) {
       setUsersHandles((oldUsers) => [...oldUsers, ...newHandles]);
     }
+
+    return newHandles.length;
   };
 
   const addInputHandles = () => {
@@ -122,6 +132,48 @@ export default function Home() {
     addHandles(handles);
 
     setHandleText('');
+  };
+
+  const importFriendHandles = async () => {
+    try {
+      if (!contestInfo || contestInfo.phase !== 'BEFORE') {
+        throw new Error('Friend imports are available during contest setup only');
+      }
+
+      const friendHandle = friendHandleInput.trim();
+      const apiKey = friendApiKeyInput.trim();
+      const apiSecret = friendApiSecretInput.trim();
+      if (!friendHandle) throw new Error('Enter the Codeforces account handle first');
+      if ((apiKey && !apiSecret) || (!apiKey && apiSecret)) {
+        throw new Error('Enter both the API key and API secret, or leave both blank');
+      }
+
+      setIsImportingFriends(true);
+      setFriendImportError('');
+      setFriendImportMessage('');
+      const response = await codeforcesPost('user.friends', {
+        apiKey,
+        apiSecret,
+      });
+      const payload = await response.json() as { result?: unknown; comment?: string };
+      if (!response.ok) {
+        throw new Error(payload.comment || 'Unable to import Codeforces friends');
+      }
+
+      const importedHandles = normalizeImportedHandles(payload.result);
+      const addedCount = addHandles(importedHandles);
+      setFriendImportMessage(
+        addedCount === 0
+          ? 'All friends from that list are already added'
+          : `Added ${addedCount} friend handle${addedCount === 1 ? '' : 's'}`,
+      );
+    } catch (error) {
+      setFriendImportError(error instanceof Error ? error.message : 'Unable to import friends');
+    } finally {
+      setIsImportingFriends(false);
+      setFriendApiKeyInput('');
+      setFriendApiSecretInput('');
+    }
   };
 
   const importHandles = async (selection: ParticipantSelection) => {
@@ -443,6 +495,76 @@ export default function Home() {
                     </p>
                     {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
                   </div>
+
+                  {contestInfo?.phase === 'BEFORE' && (
+                    <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
+                      <label className="block mb-2 text-sm font-medium text-cyan-100" htmlFor="friend-handle">
+                        Import Codeforces friends
+                      </label>
+                      <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
+                        The API returns friends for the account behind the credentials. Enter that account&apos;s
+                        handle for confirmation. Leave the key fields blank to use this deployment&apos;s configured
+                        credentials.
+                      </p>
+                      <input
+                        className={
+                          'w-full p-3 mb-2 bg-gray-900 border border-gray-600 rounded-lg '
+                          + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                        }
+                        id="friend-handle"
+                        type="text"
+                        value={friendHandleInput}
+                        onChange={(event) => setFriendHandleInput(event.target.value)}
+                        placeholder="your-codeforces-handle"
+                        autoComplete="username"
+                      />
+                      <details className="mb-3">
+                        <summary className="cursor-pointer text-xs text-cyan-200/80">
+                          Use a different API account
+                        </summary>
+                        <div className="pt-3 space-y-2">
+                          <input
+                            className={
+                              'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                              + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                            }
+                            type="password"
+                            value={friendApiKeyInput}
+                            onChange={(event) => setFriendApiKeyInput(event.target.value)}
+                            placeholder="Codeforces API key"
+                            autoComplete="off"
+                          />
+                          <input
+                            className={
+                              'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                              + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                            }
+                            type="password"
+                            value={friendApiSecretInput}
+                            onChange={(event) => setFriendApiSecretInput(event.target.value)}
+                            placeholder="Codeforces API secret"
+                            autoComplete="off"
+                          />
+                          <p className="text-xs text-gray-500">
+                            These credentials are used for this request only and are not saved by the app.
+                          </p>
+                        </div>
+                      </details>
+                      <button
+                        className={
+                          'w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                          + 'bg-cyan-700 hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-gray-700'
+                        }
+                        disabled={isImportingFriends}
+                        onClick={importFriendHandles}
+                        type="button"
+                      >
+                        {isImportingFriends ? 'Importing friends…' : 'Add friend handles'}
+                      </button>
+                      {friendImportMessage && <p className="mt-2 text-sm text-cyan-300">{friendImportMessage}</p>}
+                      {friendImportError && <p className="mt-2 text-sm text-red-400">{friendImportError}</p>}
+                    </div>
+                  )}
 
                   <div className="p-4 overflow-y-auto bg-gray-800 rounded-lg max-h-60">
                     {usersHandles.length === 0 ? (

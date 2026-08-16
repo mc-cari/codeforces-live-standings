@@ -1,6 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { selectParticipantHandles } from './participantImport.ts';
+import { normalizeImportedHandles, selectParticipantHandles } from './participantImport.ts';
+
+test('normalizes and deduplicates friend handles returned by Codeforces', () => {
+  assert.deepEqual(normalizeImportedHandles([' alice ', 'bob', 'alice', '']), ['alice', 'bob']);
+});
+
+test('rejects malformed friend lists', () => {
+  assert.throws(() => normalizeImportedHandles(['alice', 42]), /invalid friend list/);
+});
 
 const row = (handle: string, participantType: string): RanklistRow => ({
   party: {

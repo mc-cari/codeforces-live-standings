@@ -10,3 +10,14 @@ export default function codeforcesFetch(
 
   return fetch(`/api/codeforces?${searchParameters.toString()}`, init);
 }
+
+export function codeforcesPost(
+  method: string,
+  parameters: Record<string, string | number | boolean>,
+) {
+  return fetch('/api/codeforces', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ method, ...parameters }),
+  });
+}

@@ -15,6 +15,7 @@ const allowedParameters: Record<string, Set<string>> = {
   'contest.standings': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles', 'participantTypes']),
   'participant.import': new Set(['contestId', 'count', 'selection']),
+  'user.friends': new Set(['onlyOnline']),
   'user.info': new Set(['handles']),
 };
 
@@ -26,6 +27,11 @@ type CachedResponse = {
   status: number;
 };
 
+type ApiCredentials = {
+  apiKey: string;
+  apiSecret: string;
+};
+
 const responseCache = new ExpiringCache<CachedResponse>(Date.now, {
   maximumWeight: 100 * 1024 * 1024,
   getWeight: (response) => Buffer.byteLength(response.body, 'utf8'),
@@ -34,6 +40,7 @@ const requestCoordinator = new RequestCoordinator();
 
 const cacheDuration = (method: string): number => {
   if (method === 'user.info') return 60 * 60 * 1000;
+  if (method === 'user.friends') return 60 * 60 * 1000;
   if (method === 'contest.standings') return 10 * 1000;
   if (method === 'contest.list') return 5 * 60 * 1000;
   return 2 * 1000;
@@ -48,13 +55,23 @@ const toCodeforcesQuery = (parameters: URLSearchParams): string => (
   parameters.toString().replace(/%3B/gi, ';')
 );
 
-const createSignature = (method: string, parameters: URLSearchParams): string => {
+const getConfiguredCredentials = (): ApiCredentials => {
   const apiKey = process.env.CF_API_KEY;
   const apiSecret = process.env.CF_API_SECRET;
 
   if (!apiKey || !apiSecret) {
     throw new Error('Codeforces API credentials are not configured');
   }
+
+  return { apiKey, apiSecret };
+};
+
+const createSignature = (
+  method: string,
+  parameters: URLSearchParams,
+  credentials: ApiCredentials,
+): string => {
+  const { apiKey, apiSecret } = credentials;
 
   parameters.set('apiKey', apiKey);
   parameters.set('time', Math.floor(Date.now() / 1000).toString());
@@ -90,10 +107,18 @@ const filterSubmissions = (
   });
 };
 
-const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
+const fetchCodeforces = async (
+  method: string,
+  parameters: URLSearchParams,
+  credentials?: ApiCredentials,
+) => {
   let query = toCodeforcesQuery(parameters);
   if (!anonymousMethods.has(method)) {
-    const apiSignature = createSignature(method, parameters);
+    const apiSignature = createSignature(
+      method,
+      parameters,
+      credentials || getConfiguredCredentials(),
+    );
     query = `${toCodeforcesQuery(parameters)}&apiSig=${apiSignature}`;
   }
 
@@ -112,6 +137,22 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
   }
 };
 
+const getFriendCredentials = (body: unknown): ApiCredentials | undefined => {
+  if (!body || typeof body !== 'object') return undefined;
+
+  const { apiKey, apiSecret } = body as { apiKey?: unknown; apiSecret?: unknown };
+  if (apiKey === undefined && apiSecret === undefined) return undefined;
+  if (typeof apiKey !== 'string' || typeof apiSecret !== 'string') {
+    throw new Error('Both Codeforces API key and secret are required');
+  }
+  if (!apiKey.trim() && !apiSecret.trim()) return undefined;
+  if (!apiKey.trim() || !apiSecret.trim()) {
+    throw new Error('Both Codeforces API key and secret are required');
+  }
+
+  return { apiKey: apiKey.trim(), apiSecret: apiSecret.trim() };
+};
+
 const getCodeforcesResponse = async (method: string, parameters: URLSearchParams) => {
   const cacheKey = `${method}?${toCodeforcesQuery(parameters)}`;
   const cachedResponse = responseCache.get(cacheKey);
@@ -125,21 +166,32 @@ const getCodeforcesResponse = async (method: string, parameters: URLSearchParams
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
+  const isFriendImport = req.method === 'POST'
+    && req.body && typeof req.body === 'object' && req.body.method === 'user.friends';
+  if (req.method !== 'GET' && !isFriendImport) {
+    res.setHeader('Allow', 'GET, POST');
     res.status(405).json({ status: 'FAILED', comment: 'Method not allowed' });
     return;
   }
 
-  const method = getSingleQueryValue(req.query.method);
+  const method = req.method === 'POST'
+    ? (typeof req.body.method === 'string' ? req.body.method : undefined)
+    : getSingleQueryValue(req.query.method);
   if (!method || !allowedParameters[method]) {
     res.status(400).json({ status: 'FAILED', comment: 'Unsupported Codeforces API method' });
+    return;
+  }
+  if (method === 'user.friends' && req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    res.status(405).json({ status: 'FAILED', comment: 'Friend imports require POST' });
     return;
   }
 
   const parameters = new URLSearchParams();
   allowedParameters[method].forEach((parameter) => {
-    const value = getSingleQueryValue(req.query[parameter]);
+    const value = req.method === 'POST'
+      ? (typeof req.body[parameter] === 'string' ? req.body[parameter] : undefined)
+      : getSingleQueryValue(req.query[parameter]);
     if (value) parameters.set(parameter, value);
   });
 
@@ -220,7 +272,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       parameters.delete('handles');
       parameters.delete('participantTypes');
     }
-    const { body, status } = await getCodeforcesResponse(method, parameters);
+    const friendCredentials = method === 'user.friends' && req.method === 'POST'
+      ? getFriendCredentials(req.body)
+      : undefined;
+    const response = friendCredentials
+      ? await fetchCodeforces(method, parameters, friendCredentials)
+      : await getCodeforcesResponse(method, parameters);
+    const { body, status } = response;
 
     if (method === 'contest.list' && status === 200) {
       res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');

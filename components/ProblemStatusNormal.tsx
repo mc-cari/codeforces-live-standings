@@ -1,13 +1,14 @@
 import React from 'react';
-import type { CodeforcesProblemResultDto } from '@/src/integrations/codeforces/contracts';
+import type { ProblemResult } from '@/src/shared/domain/contest';
 
-export default function ProblemStatusNormal({ problem } : { problem : CodeforcesProblemResultDto }) {
+export default function ProblemStatusNormal({ problem } : { problem : ProblemResult }) {
   return (
     <div className="h-full">
       {(problem.points > 0 || problem.rejectedAttemptCount > 0)
         && (
-        <div className={`flex flex-col items-center justify-center py-1 h-full 
-        bg-${problem.points > 0 ? 'green-500' : 'red-500'}`}
+        <div className={`flex h-full flex-col items-center justify-center py-1 ${
+          problem.points > 0 ? 'bg-[#21c16b] text-[#03170d]' : 'bg-[#eb5757] text-white'
+        }`}
         >
           <div className="h-2/3 flex items-center justify-center">
             {problem.points > 0 ? problem.points : '0'}

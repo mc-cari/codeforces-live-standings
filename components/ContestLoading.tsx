@@ -2,59 +2,40 @@ import React from 'react';
 
 export default function ContestLoading({ progress, stage }: { progress: number, stage: string }) {
   return (
-    <div className="flex min-h-screen flex-row bg-black text-white">
-      <div className="flex h-screen w-2/5 p-4">
-        <div className="w-full overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 shadow-xl">
+    <main className="flex min-h-screen items-center justify-center bg-[#07111f] px-5 text-white">
+      <section className="broadcast-panel w-full max-w-2xl overflow-hidden rounded-sm">
+        <header className="flex items-center justify-between border-b border-[#25364d] bg-[#081525] px-5 py-4">
+          <div>
+            <p className="broadcast-label">Contest feed</p>
+            <h1 className="font-broadcast text-2xl font-semibold uppercase">Opening live desk</h1>
+          </div>
+          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#2d8cff]" />
+        </header>
+        <div className="p-6 sm:p-10">
+          <div className="mb-3 flex items-center justify-between gap-4">
+            <span>{stage}</span>
+            <span className="font-data text-[#91a3ba]">{Math.round(progress)}%</span>
+          </div>
           <div
-            className={
-              'h-14 border-b-2 border-gray-800 bg-gradient-to-r from-blue-600 to-blue-500 '
-              + 'flex items-center justify-center font-semibold text-lg tracking-wide '
-              + 'shadow-lg'
-            }
+            aria-label={stage}
+            aria-valuemax={100}
+            aria-valuemin={0}
+            aria-valuenow={Math.round(progress)}
+            className="h-2 overflow-hidden rounded-sm bg-[#13243a]"
+            role="progressbar"
           >
-            LIVE SUBMISSIONS
+            <div
+              className="h-full bg-[#2d8cff] transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <div className="mt-6 grid grid-cols-5 gap-2" aria-hidden="true">
+            {Array.from({ length: 5 }, (_, index) => (
+              <div className="h-12 animate-pulse rounded-sm bg-[#13243a]" key={index} />
+            ))}
           </div>
         </div>
-      </div>
-      <div className="h-screen w-3/5 p-4">
-        <div
-          className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 shadow-xl"
-        >
-          <div
-            className={
-              'h-14 border-b-2 border-gray-800 bg-gradient-to-r from-red-600 to-red-500 '
-              + 'flex items-center justify-center font-semibold text-lg tracking-wide '
-              + 'shadow-lg'
-            }
-          >
-            CURRENT STANDINGS
-          </div>
-          <div className="flex grow items-center justify-center px-8">
-            <div className="w-full max-w-lg">
-              <div className="mb-3 flex items-center justify-between text-lg">
-                <span>{stage}</span>
-                <span className="font-mono text-gray-400">{Math.round(progress)}%</span>
-              </div>
-              <div
-                aria-label={stage}
-                aria-valuemax={100}
-                aria-valuemin={0}
-                aria-valuenow={Math.round(progress)}
-                className="h-3 overflow-hidden rounded-full bg-gray-800"
-                role="progressbar"
-              >
-                <div
-                  className={
-                    'h-full rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 '
-                    + 'to-blue-500 transition-all duration-500'
-                  }
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

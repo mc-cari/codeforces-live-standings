@@ -1,12 +1,12 @@
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import type { Contest } from '@/src/shared/domain/contest';
 
 // Upcoming contests are ordered by setup relevance, with live contests first.
 
 export const findUpcomingContests = (
-  contests: CodeforcesContestDto[],
+  contests: Contest[],
   nowSeconds = Math.floor(Date.now() / 1000),
   limit = 3,
-): CodeforcesContestDto[] => contests
+): Contest[] => contests
   .filter((contest) => (
     contest.phase === 'CODING'
     || (contest.phase === 'BEFORE' && contest.startTimeSeconds > nowSeconds)

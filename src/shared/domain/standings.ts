@@ -1,28 +1,63 @@
-import type {
-  CodeforcesPartyDto,
-  CodeforcesRanklistRowDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '@/src/integrations/codeforces/contracts';
-
 // Reconstructs selected participants omitted by the official standings response.
 
-type ParticipantName = (party: CodeforcesPartyDto) => string;
+type Participant = {
+  teamName?: string;
+  members: Array<{ handle: string }>;
+  participantType: string;
+};
 
-const isPenalizedAttempt = (submission: CodeforcesSubmissionDto) => (
+type Problem = { index: string; points?: number };
+
+type ProblemResult = {
+  points: number;
+  penalty: number;
+  rejectedAttemptCount: number;
+  type: string;
+  bestSubmissionTimeSeconds: number;
+};
+
+type RanklistRow = {
+  party: Participant;
+  rank: number;
+  points: number;
+  penalty: number;
+  successfulHackCount: number;
+  unsuccessfulHackCount: number;
+  problemResults: ProblemResult[];
+  lastSubmissionTimeSeconds: number;
+};
+
+type Standings = {
+  contest: { type: string; durationSeconds: number };
+  problems: Problem[];
+  rows: RanklistRow[];
+};
+
+type Submission = {
+  id: number;
+  relativeTimeSeconds: number;
+  problem: Problem;
+  author: Participant;
+  verdict: string;
+  points?: number;
+};
+
+type ParticipantName = (party: Participant) => string;
+
+const isPenalizedAttempt = (submission: Submission) => (
   submission.verdict !== 'OK'
   && submission.verdict !== 'COMPILATION_ERROR'
   && submission.verdict !== 'SKIPPED'
   && submission.verdict !== 'TESTING'
 );
 
-const compareRows = (first: CodeforcesRanklistRowDto, second: CodeforcesRanklistRowDto) => {
+const compareRows = (first: RanklistRow, second: RanklistRow) => {
   if (first.points !== second.points) return second.points - first.points;
   if (first.penalty !== second.penalty) return first.penalty - second.penalty;
   return 0;
 };
 
-const createRow = (party: CodeforcesPartyDto, problemCount: number): CodeforcesRanklistRowDto => ({
+const createRow = (party: Participant, problemCount: number): RanklistRow => ({
   party,
   rank: 0,
   points: 0,
@@ -52,13 +87,16 @@ const calculateCfPoints = (
   );
 };
 
-export const addMissingParticipantRows = (
-  standings: CodeforcesStandingsDto,
-  submissions: CodeforcesSubmissionDto[],
+export const addMissingParticipantRows = <
+  TStandings extends Standings,
+  TSubmission extends Submission,
+>(
+  standings: TStandings,
+  submissions: TSubmission[],
   getParticipantName: ParticipantName,
-): CodeforcesStandingsDto => {
+): TStandings => {
   const existingNames = new Set(standings.rows.map((row) => getParticipantName(row.party)));
-  const missingRows = new Map<string, CodeforcesRanklistRowDto>();
+  const missingRows = new Map<string, RanklistRow>();
   const solvedProblems = new Map<string, Set<string>>();
   const problemIndexes = new Map(standings.problems.map((problem, index) => [problem.index, index]));
 
@@ -80,7 +118,7 @@ export const addMissingParticipantRows = (
         solvedProblems.set(name, new Set<string>());
       }
 
-      const row = missingRows.get(name) as CodeforcesRanklistRowDto;
+      const row = missingRows.get(name) as RanklistRow;
       const result = row.problemResults[problemIndex];
       const solved = solvedProblems.get(name) as Set<string>;
       row.lastSubmissionTimeSeconds = Math.max(
@@ -122,5 +160,5 @@ export const addMissingParticipantRows = (
   return {
     ...standings,
     rows: [...standings.rows, ...missingRows.values()].sort(compareRows),
-  };
+  } as TStandings;
 };

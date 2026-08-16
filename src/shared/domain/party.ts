@@ -1,8 +1,12 @@
-import type { CodeforcesPartyDto } from '@/src/integrations/codeforces/contracts';
-
 // The display identity is shared by standings and replay projections.
 
-export default function getName(party : CodeforcesPartyDto) : string {
+type NamedParty = {
+  teamName?: string;
+  members: Array<{ handle: string }>;
+  participantType: string;
+};
+
+export default function getName(party: NamedParty): string {
   let partyName = party.teamName ? party.teamName : party.members[0].handle;
 
   if (party.participantType === 'PRACTICE') {

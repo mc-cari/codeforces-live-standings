@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import type { Contest } from '@/src/shared/domain/contest';
 import {
   formatCountdown,
   secondsUntilContest,
 } from '@/src/contexts/contest-setup/domain/contestConfiguration';
 
 type UpcomingContestProps = {
-  contests: CodeforcesContestDto[];
-  onSelect: (contest: CodeforcesContestDto) => void;
+  contests: Contest[];
+  onSelect: (contest: Contest) => void;
 };
 
 const formatStartTime = (startTimeSeconds: number) => new Intl.DateTimeFormat(undefined, {

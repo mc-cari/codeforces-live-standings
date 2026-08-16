@@ -1,9 +1,9 @@
 import React from 'react';
-import type { CodeforcesPartyDto } from '@/src/integrations/codeforces/contracts';
+import type { Party } from '@/src/shared/domain/contest';
 import getName from '@/src/shared/domain/party';
 
 export default function userHandle({ author, userRank }
-: { author : CodeforcesPartyDto, userRank : Map<string, string> }) {
+: { author : Party, userRank : Map<string, string> }) {
   let rankColor = 'text-white';
 
   const colorPerRank = new Map<string, string>([

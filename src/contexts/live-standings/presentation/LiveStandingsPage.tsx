@@ -3,12 +3,7 @@ import React, {
 } from 'react';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import type {
-  CodeforcesContestDto,
-  CodeforcesPresentedSubmissionDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '@/src/integrations/codeforces/contracts';
+import type { Contest, Standings, Submission } from '@/src/shared/domain/contest';
 import StandingsList from '@/components/standings/StandingsList';
 import LiveSubmissionsList from '@/components/LiveSubmissionsList';
 import ContestLoading from '@/components/ContestLoading';
@@ -18,27 +13,30 @@ import {
   LIVE_POLLING, LOADING_PROGRESS,
 } from '@/src/shared/config/contestTiming';
 import { getHandlesFromQuery } from '@/src/shared/domain/participantHandles';
+import ContestRibbon from '@/src/shared/presentation/ContestRibbon';
 import { projectLiveUpdate } from '../domain/projectLiveUpdate';
 import { codeforcesLiveContestGateway } from '../infrastructure/codeforcesLiveContestGateway';
 
 export default function LiveStandingsPage() {
-  const [submissions, setSubmissions] = useState<CodeforcesPresentedSubmissionDto[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
-  const [globalStandings, setGlobalStandings] = useState<CodeforcesStandingsDto>();
+  const [globalStandings, setGlobalStandings] = useState<Standings>();
   const [delay, setDelay] = useState<number>(LIVE_POLLING.initialDelayMilliseconds);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<'standings' | 'submissions'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(8);
   const [loadingStage, setLoadingStage] = useState('Preparing live standings...');
-  const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
+  const [contestInfo, setContestInfo] = useState<Contest>();
   const [isContestReady, setIsContestReady] = useState(false);
   const [isContestFinished, setIsContestFinished] = useState(false);
   const [isUpdateStale, setIsUpdateStale] = useState(false);
   const hasLoadedInitialData = useRef(false);
   const activeRequest = useRef<AbortController | undefined>(undefined);
-  const submissionsRef = useRef<CodeforcesPresentedSubmissionDto[]>([]);
+  const submissionsRef = useRef<Submission[]>([]);
 
   const Router = useRouter();
   const {
@@ -158,9 +156,8 @@ export default function LiveStandingsPage() {
 
         const userRankMap = new Map<string, string>();
         usersInfo.forEach((user) => {
-          const rank = user.rank || 'unrated';
-          userRankMap.set(user.handle, rank);
-          userRankMap.set(`${user.handle} (practice)`, rank);
+          userRankMap.set(user.handle, user.rank);
+          userRankMap.set(`${user.handle} (practice)`, user.rank);
         });
         setUserRank(userRankMap);
       } catch {
@@ -185,7 +182,7 @@ export default function LiveStandingsPage() {
     }
 
     setIsPaused(false);
-  }, isPaused || !isContestReady || isContestFinished ? null : delay);
+  }, isPaused || isManuallyPaused || !isContestReady || isContestFinished ? null : delay);
 
   if (contestInfo?.phase === 'BEFORE' && !isContestReady) {
     return (
@@ -200,29 +197,61 @@ export default function LiveStandingsPage() {
     return <ContestLoading progress={loadingProgress} stage={loadingStage} />;
   }
 
+  const liveStatus = isContestFinished
+    ? 'Contest finished' : isManuallyPaused ? 'Updates paused' : isPaused ? 'Synchronizing' : 'Connected';
+
   return (
-    <div className="flex flex-row bg-black text-white min-h-screen">
+    <div className="flex min-h-screen flex-col bg-[#07111f] text-white">
+      <ContestRibbon
+        contest={contestInfo || globalStandings?.contest}
+        contestId={String(contestId || '')}
+        controls={(
+          <button
+            className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
+            disabled={isContestFinished}
+            onClick={() => setIsManuallyPaused((paused) => !paused)}
+            type="button"
+          >
+            {isManuallyPaused ? 'Resume live' : 'Pause live'}
+          </button>
+        )}
+        mode="LIVE"
+        status={liveStatus}
+        statusTone={isContestFinished ? 'finished' : isManuallyPaused ? 'paused' : 'live'}
+      />
       {isUpdateStale && (
-        <div
-          className="fixed top-0 left-0 right-0 z-10 px-4 py-2 text-center text-sm text-yellow-100 bg-yellow-900/90"
-          role="status"
-        >
+        <div className="border-b border-[#7a5b19] bg-[#3b2c0d] px-4 py-2 text-center text-sm text-[#ffe8a3]" role="status">
           Live updates are unavailable. Showing the latest standings.
         </div>
       )}
-      <div className="flex h-screen w-2/5 p-4">
-        <div className="w-full bg-gray-900/50 rounded-lg border border-gray-800 shadow-xl overflow-hidden">
+      <div className="grid grid-cols-2 border-b border-[#25364d] bg-[#0d1b2a] lg:hidden" role="tablist">
+        {(['standings', 'submissions'] as const).map((panel) => (
+          <button
+            aria-selected={mobilePanel === panel}
+            className={`py-3 text-sm font-semibold capitalize ${mobilePanel === panel ? 'border-b-2 border-[#2d8cff] text-white' : 'text-[#91a3ba]'}`}
+            key={panel}
+            onClick={() => setMobilePanel(panel)}
+            role="tab"
+            type="button"
+          >
+            {panel}
+          </button>
+        ))}
+      </div>
+      <div className="flex min-h-0 grow">
+        <section className={`${mobilePanel === 'submissions' ? 'flex' : 'hidden'} h-[calc(100vh-113px)] w-full p-2 lg:flex lg:h-[calc(100vh-64px)] lg:w-2/5 lg:p-3`} aria-label="Live submissions">
+          <div className="broadcast-panel w-full overflow-hidden rounded-sm">
           <LiveSubmissionsList
             submissions={submissions}
             newSubmissionsCount={newSubmissionsCount}
             globalStandings={globalStandings}
             userRank={userRank}
           />
-        </div>
-      </div>
+          </div>
+        </section>
       {(localStandings && globalStandings) ? (
-        <div className="h-screen w-3/5 p-4">
-          <div className="w-full h-full bg-gray-900/50 rounded-lg border border-gray-800 shadow-xl overflow-hidden">
+        <section className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-[calc(100vh-113px)] w-full p-2 lg:block lg:h-[calc(100vh-64px)] lg:w-3/5 lg:p-3`} aria-label="Current standings">
+          <div className="broadcast-panel h-full w-full overflow-hidden rounded-sm">
             <StandingsList
               localStandings={localStandings}
               globalStandings={globalStandings}
@@ -230,9 +259,9 @@ export default function LiveStandingsPage() {
               userRank={userRank}
             />
           </div>
-        </div>
+        </section>
       ) : (
-        <div className="h-screen w-3/5 p-4">
+        <div className="h-[calc(100vh-64px)] w-full p-3 lg:w-3/5">
           <div
             className={
               'flex items-center justify-center h-full bg-gray-900/50 rounded-lg '
@@ -253,6 +282,7 @@ export default function LiveStandingsPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -11,6 +11,11 @@ import type {
   CodeforcesSubmissionDto,
   CodeforcesUserDto,
 } from '@/src/integrations/codeforces/contracts';
+import {
+  mapStandingsDto,
+  mapSubmissionDto,
+  mapUserDto,
+} from '@/src/integrations/codeforces/mapper';
 import type { ReplayGateway } from '../application/ports';
 import type {
   ReplayContest,

@@ -1,4 +1,4 @@
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import type { Contest } from '@/src/shared/domain/contest';
 import type { ParticipantSelection } from '../domain/participantSelection';
 
 export type FriendCredentials = {
@@ -7,8 +7,8 @@ export type FriendCredentials = {
 };
 
 export interface ContestSetupGateway {
-  listContests(signal?: AbortSignal): Promise<CodeforcesContestDto[]>;
-  findContest(contestId: number, signal?: AbortSignal): Promise<CodeforcesContestDto>;
+  listContests(signal?: AbortSignal): Promise<Contest[]>;
+  findContest(contestId: number, signal?: AbortSignal): Promise<Contest>;
   importParticipants(
     contestId: number,
     count: number,

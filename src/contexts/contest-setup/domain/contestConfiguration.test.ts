@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { CodeforcesContestDto } from '../../../integrations/codeforces/contracts.ts';
+import type { Contest } from '../../../shared/domain/contest.ts';
 import { formatCountdown, getContestConfiguration, secondsUntilContest } from './contestConfiguration.ts';
 
-const contest = (overrides: Partial<CodeforcesContestDto>): CodeforcesContestDto => ({
+const contest = (overrides: Partial<Contest>): Contest => ({
   id: 2246,
   name: 'Codeforces Round 1108',
   type: 'CF',

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { CodeforcesPresentedSubmissionDto } from '@/src/integrations/codeforces/contracts';
+import type { Submission } from '@/src/shared/domain/contest';
 import Veredict from './Veredict';
 import Position from './Position';
 import UserHandle from './UserHandle';
@@ -7,7 +7,7 @@ import UserHandle from './UserHandle';
 export default function LiveSubmission({
   submission, isNew, userCount, userRank, isGym,
 }
-: { submission: CodeforcesPresentedSubmissionDto, isNew : boolean, userCount : number,
+: { submission: Submission, isNew : boolean, userCount : number,
   userRank : Map<string, string>, isGym: boolean }) {
   const submissionUrl = `https://codeforces.com/${isGym ? 'gym' : 'contest'}/${submission.contestId}`
     + `/submission/${submission.id}`;

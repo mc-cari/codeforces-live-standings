@@ -1,180 +1,119 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import { useEffect, useMemo, useState } from 'react';
+import type { Contest } from '@/src/shared/domain/contest';
 import { encodeHandles } from '@/src/shared/domain/participantHandles';
+import { getContestConfiguration } from '../domain/contestConfiguration';
 import {
   normalizeParticipantHandles,
   type ParticipantSelection,
 } from '../domain/participantSelection';
-import { getContestConfiguration } from '../domain/contestConfiguration';
 import { findUpcomingContests } from '../domain/upcomingContests';
 import { codeforcesContestSetupGateway } from '../infrastructure/codeforcesContestSetupGateway';
-import UpcomingContest from '@/components/UpcomingContest';
-import UpcomingContestsLoading from '@/components/UpcomingContestsLoading';
+import MiniContestSimulation from './MiniContestSimulation';
 
-const demoHandles = [
-  'MateoCV', 'mc._cari', 'dmga44', 'Marckess', 'julianferres', 'pacha2880', 'Giga_Cronos',
-  'martins', 'martinius', 'Mateo', 'MesSimonFallon19', 'Scano', 'Agaric',
-  'estoy-re-sebado', 'Tainel', 'Marceantasy', 'AngrySeal',
-];
+type LookupState = 'idle' | 'loading' | 'error';
+
+const formatContestStart = (contest: Contest) => new Intl.DateTimeFormat(undefined, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+}).format(new Date(contest.startTimeSeconds * 1_000));
 
 export default function ContestSetupPage() {
-  const [handleText, setHandleText] = useState<string>('');
+  const router = useRouter();
   const [contestIdInput, setContestIdInput] = useState('');
-  const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
-  const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [contestLookupError, setContestLookupError] = useState('');
-  const [usersHandles, setUsersHandles] = useState<string[]>([]);
-  const [showForm, setShowForm] = useState<boolean>(false);
-  const [participantCountInput, setParticipantCountInput] = useState('15');
-  const [isImporting, setIsImporting] = useState<boolean>(false);
-  const [importError, setImportError] = useState<string>('');
-  const [friendApiKeyInput, setFriendApiKeyInput] = useState('');
-  const [friendApiSecretInput, setFriendApiSecretInput] = useState('');
+  const [contestInfo, setContestInfo] = useState<Contest>();
+  const [lookupState, setLookupState] = useState<LookupState>('idle');
+  const [lookupError, setLookupError] = useState('');
+  const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
+  const [isLoadingUpcoming, setIsLoadingUpcoming] = useState(true);
+  const [handleInput, setHandleInput] = useState('');
+  const [handles, setHandles] = useState<string[]>([]);
+  const [participantCount, setParticipantCount] = useState('15');
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState('');
+  const [friendApiKey, setFriendApiKey] = useState('');
+  const [friendApiSecret, setFriendApiSecret] = useState('');
   const [isImportingFriends, setIsImportingFriends] = useState(false);
-  const [friendImportMessage, setFriendImportMessage] = useState('');
-  const [friendImportError, setFriendImportError] = useState('');
-  const [upcomingContests, setUpcomingContests] = useState<CodeforcesContestDto[]>([]);
-  const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
+  const [friendMessage, setFriendMessage] = useState('');
+  const [friendError, setFriendError] = useState('');
 
-  const Router = useRouter();
   const contestId = Number(contestIdInput);
-  const contestConfiguration = useMemo(
+  const configuration = useMemo(
     () => (contestInfo ? getContestConfiguration(contestInfo) : undefined),
     [contestInfo],
   );
-  const participantCount = Number(participantCountInput);
-  const hasValidParticipantCount = participantCountInput !== ''
-    && Number.isInteger(participantCount) && participantCount > 0;
 
   useEffect(() => {
     const controller = new AbortController();
-
-    const loadUpcomingContest = async () => {
-      try {
-        const contests = await codeforcesContestSetupGateway.listContests(controller.signal);
-        setUpcomingContests(findUpcomingContests(contests));
-      } catch (error) {
-        if (!controller.signal.aborted) setUpcomingContests([]);
-      } finally {
-        if (!controller.signal.aborted) setIsLoadingUpcomingContests(false);
-      }
-    };
-
-    loadUpcomingContest();
+    codeforcesContestSetupGateway.listContests(controller.signal)
+      .then((contests) => setUpcomingContests(findUpcomingContests(contests)))
+      .catch(() => setUpcomingContests([]))
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoadingUpcoming(false);
+      });
     return () => controller.abort();
   }, []);
 
   useEffect(() => {
-    if (!Number.isInteger(contestId) || contestId <= 0) {
+    if (!Number.isSafeInteger(contestId) || contestId <= 0) {
       return undefined;
     }
+
     const controller = new AbortController();
     const timer = window.setTimeout(async () => {
       try {
-        setContestLookupState('loading');
+        setLookupState('loading');
+        setLookupError('');
         const contest = await codeforcesContestSetupGateway.findContest(contestId, controller.signal);
         setContestInfo(contest);
-        setContestLookupState('idle');
+        setLookupState('idle');
       } catch (error) {
         if (controller.signal.aborted) return;
-        setContestLookupError(error instanceof Error ? error.message : 'Unable to detect contest');
-        setContestLookupState('error');
+        setContestInfo(undefined);
+        setLookupState('error');
+        setLookupError(error instanceof Error ? error.message : 'Contest not found');
       }
-    }, 2_000);
+    }, 600);
     return () => {
       controller.abort();
       window.clearTimeout(timer);
     };
   }, [contestId]);
 
-  const handleStart = () => {
-    if (contestInfo && usersHandles.length > 0 && contestConfiguration?.contestType) {
-      Router.push({
-        pathname: `/contests/${contestInfo.id}/${contestConfiguration.route}`,
-        query: {
-          contestType: contestConfiguration.contestType,
-          h: encodeHandles(usersHandles),
-        },
-      });
-    }
-  };
-
-  const selectUpcomingContest = (contest: CodeforcesContestDto) => {
-    setContestIdInput(String(contest.id));
-    setContestInfo(contest);
-    setContestLookupError('');
-    setContestLookupState('idle');
-    setImportError('');
-    setFriendImportMessage('');
-    setFriendImportError('');
-    setShowForm(true);
-  };
-
-  const addHandles = (handlesToAdd : string[]) => {
-    setUsersHandles((oldUsers) => [
-      ...oldUsers,
-      ...normalizeParticipantHandles(handlesToAdd, oldUsers),
+  const addHandles = (values: string[]) => {
+    setHandles((current) => [
+      ...current,
+      ...normalizeParticipantHandles(values, current),
     ]);
   };
 
-  const addInputHandles = () => {
-    const handles = handleText.split(',');
-    addHandles(handles);
-
-    setHandleText('');
+  const addTypedHandles = () => {
+    addHandles(handleInput.split(/[,;\n\s]+/));
+    setHandleInput('');
   };
 
-  const importFriendHandles = async () => {
-    try {
-      const apiKey = friendApiKeyInput.trim();
-      const apiSecret = friendApiSecretInput.trim();
-      if (!contestInfo) {
-        throw new Error('Contest Id not set');
-      }
-      if (!apiKey || !apiSecret) {
-        throw new Error('Enter both the Codeforces API key and API secret');
-      }
+  const selectContest = (contest: Contest) => {
+    setContestIdInput(String(contest.id));
+    setContestInfo(contest);
+    setLookupState('idle');
+    setLookupError('');
+    setImportError('');
+    setFriendError('');
+    document.getElementById('contest-workspace')?.scrollIntoView({ behavior: 'smooth' });
+  };
 
-      setIsImportingFriends(true);
-      setFriendImportError('');
-      setFriendImportMessage('');
-      const importedHandles = await codeforcesContestSetupGateway.importFriends({ apiKey, apiSecret });
-      addHandles(importedHandles);
-      setFriendImportMessage('Friend handles imported');
-    } catch (error) {
-      setFriendImportError(error instanceof Error ? error.message : 'Unable to import friends');
-    } finally {
-      setIsImportingFriends(false);
-      setFriendApiKeyInput('');
-      setFriendApiSecretInput('');
+  const importParticipants = async (selection: ParticipantSelection) => {
+    const count = Number(participantCount);
+    if (!contestInfo) return;
+    if (!Number.isSafeInteger(count) || count <= 0) {
+      setImportError('Enter a participant count of at least 1.');
+      return;
     }
-  };
-
-  const importHandles = async (selection: ParticipantSelection) => {
     try {
-      if (!contestInfo) {
-        throw new Error('Contest Id not set');
-      }
-
-      if (contestInfo.phase === 'BEFORE') {
-        throw new Error('Participant imports become available when the contest starts');
-      }
-
-      if (!hasValidParticipantCount) {
-        throw new Error('Participant count must be at least 1');
-      }
-
       setIsImporting(true);
       setImportError('');
-
-      const selectedHandles = await codeforcesContestSetupGateway.importParticipants(
-        contestInfo.id,
-        participantCount,
-        selection,
-      );
-
-      addHandles(selectedHandles);
+      addHandles(await codeforcesContestSetupGateway.importParticipants(contestInfo.id, count, selection));
     } catch (error) {
       setImportError(error instanceof Error ? error.message : 'Unable to import participants');
     } finally {
@@ -182,494 +121,233 @@ export default function ContestSetupPage() {
     }
   };
 
+  const importFriends = async () => {
+    const apiKey = friendApiKey.trim();
+    const apiSecret = friendApiSecret.trim();
+    if (!apiKey || !apiSecret) {
+      setFriendError('Enter both the Codeforces API key and API secret.');
+      return;
+    }
+    try {
+      setIsImportingFriends(true);
+      setFriendError('');
+      setFriendMessage('');
+      const imported = await codeforcesContestSetupGateway.importFriends({ apiKey, apiSecret });
+      addHandles(imported);
+      setFriendMessage('Friend handles imported.');
+    } catch (error) {
+      setFriendError(error instanceof Error ? error.message : 'Unable to import friends');
+    } finally {
+      setIsImportingFriends(false);
+      setFriendApiKey('');
+      setFriendApiSecret('');
+    }
+  };
+
+  const launch = () => {
+    if (!contestInfo || !configuration?.contestType || handles.length === 0) return;
+    router.push({
+      pathname: `/contests/${contestInfo.id}/${configuration.route}`,
+      query: { contestType: configuration.contestType, h: encodeHandles(handles) },
+    });
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-black">
-      <div className="flex-grow">
-        <div className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20" />
-          <div className="relative px-4 py-24 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h1 className="mb-6 text-5xl font-bold tracking-tight text-white md:text-7xl">
-                Codeforces
-                <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
-                  {' '}
-                  Live Standings
-                </span>
-              </h1>
-              <p
-                className="max-w-3xl mx-auto mb-8 text-xl leading-relaxed text-gray-300 md:text-2xl"
-              >
-                Visualization for live standings of Codeforces competitions
-                {' '}
-                with ICPC broadcast overlay design.
-                {' '}
-                Track your current contest with selected participants in real-time or check any past contest.
-              </p>
-              <div className="flex flex-col justify-center gap-4 sm:flex-row">
-                <button
-                  onClick={() => setShowForm(true)}
-                  className={
-                    'px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 '
-                    + 'text-white font-semibold rounded-lg hover:from-blue-700 '
-                    + 'hover:to-purple-700 transition-all duration-300 '
-                    + 'transform hover:scale-105 shadow-lg'
-                  }
-                  type="button"
-                >
-                  Get Started
-                </button>
-                <a
-                  href={
-                    '/contests/1735/replay'
-                    + '?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true'
-                    + `&demo=true&h=${encodeHandles(demoHandles)}`
-                  }
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={
-                    'px-8 py-4 border-2 border-gray-600 text-white '
-                    + 'font-semibold rounded-lg hover:border-blue-400 '
-                    + 'hover:text-blue-400 transition-all duration-300'
-                  }
-                >
-                  View Demo
-                </a>
-              </div>
-              {isLoadingUpcomingContests && <UpcomingContestsLoading />}
-              {!isLoadingUpcomingContests && upcomingContests.length > 0 && (
-                <UpcomingContest contests={upcomingContests} onSelect={selectUpcomingContest} />
-              )}
-            </div>
-          </div>
+    <main className="min-h-screen text-[#f4f8ff]">
+      <header className="border-b border-[#25364d] bg-[#07111f]/95">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+          <Link className="font-broadcast text-xl font-bold uppercase tracking-[0.08em]" href="/">
+            CF <span className="text-[#65adff]">Live Desk</span>
+          </Link>
+          <nav className="flex items-center gap-5 text-sm text-[#91a3ba]" aria-label="Primary navigation">
+            <a className="hover:text-white" href="#how-it-works">How it works</a>
+            <a className="hover:text-white" href="https://github.com/mc-cari/codeforces-live-standings">GitHub</a>
+          </nav>
+        </div>
+      </header>
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
+        <div className="mb-8 max-w-3xl">
+          <p className="broadcast-label mb-3">Personal contest tracker</p>
+          <h1 className="font-broadcast text-5xl font-bold uppercase leading-[0.92] tracking-tight sm:text-7xl">
+            Your friends.<br /><span className="text-[#65adff]">One live scoreboard.</span>
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-7 text-[#aab8ca] sm:text-lg">
+            Pick a Codeforces contest, add the handles you care about, and follow every solve,
+            penalty, and position change from one broadcast-style desk.
+          </p>
         </div>
 
-        <div className="py-20 bg-gray-900/50">
-          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-            <div className="mb-16 text-center">
-              <h2 className="mb-4 text-4xl font-bold text-white">Features</h2>
-              <p className="text-xl text-gray-400">
-                Everything you need for competitive programming contests
-              </p>
+        <section className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(32rem,1.08fr)]" id="contest-workspace">
+          <div className="broadcast-panel rounded-md p-5 sm:p-6">
+            <div className="mb-6 flex items-start justify-between gap-4 border-b border-[#25364d] pb-5">
+              <div>
+                <p className="broadcast-label">01 / Contest</p>
+                <h2 className="font-broadcast text-3xl font-semibold uppercase">Start tracking</h2>
+              </div>
+              <span className={`mt-1 h-2.5 w-2.5 rounded-full ${contestInfo ? 'bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
             </div>
 
-            <div className="grid gap-8 md:grid-cols-3">
-              <div
-                className={
-                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
-                  + 'hover:border-blue-500/50 transition-all duration-300'
-                }
-              >
-                <div
-                  className={
-                    'w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 '
-                    + 'rounded-lg mb-6 flex items-center justify-center'
-                  }
-                >
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-4 text-xl font-semibold text-white">Real-time Updates</h3>
-                <p className="text-gray-400">
-                  Automatic submission tracking and standings updates during live contests
-                </p>
-              </div>
-
-              <div
-                className={
-                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
-                  + 'hover:border-blue-500/50 transition-all duration-300'
-                }
-              >
-                <div
-                  className={
-                    'w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 '
-                    + 'rounded-lg mb-6 flex items-center justify-center'
-                  }
-                >
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={
-                        'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 '
-                        + '002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 '
-                        + '2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 '
-                        + '2 0 01-2-2z'
-                      }
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-4 text-xl font-semibold text-white">ICPC Broadcast Overlay Design</h3>
-                <p className="text-gray-400">
-                  Visualization inspired by ICPC World Finals broadcast overlay that includes a
-                  {' '}
-                  submission queue and a standings table
-                </p>
-              </div>
-
-              <div
-                className={
-                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
-                  + 'hover:border-blue-500/50 transition-all duration-300'
-                }
-              >
-                <div
-                  className={
-                    'w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg '
-                    + 'mb-6 flex items-center justify-center'
-                  }
-                >
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d={
-                        'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126'
-                        + '-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656'
-                        + '.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 '
-                        + '0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 '
-                        + '2 0 014 0z'
-                      }
-                    />
-                  </svg>
-                </div>
-                <h3 className="mb-4 text-xl font-semibold text-white">Multiple Contest Types</h3>
-                <p className="text-gray-400">
-                  Support for Normal Rounds, Educational Rounds, and public Gym Contests
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div
-            className={
-              'bg-gray-900 rounded-xl border border-gray-700 p-8 max-w-4xl w-full '
-              + 'max-h-[90vh] overflow-y-auto'
-            }
-          >
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-3xl font-bold text-white">Setup Contest Tracking</h2>
-              <button
-                onClick={() => setShowForm(false)}
-                className="text-gray-400 transition-colors hover:text-white"
-                type="button"
-                aria-label="Close form"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <label className="mb-2 block text-sm font-medium" htmlFor="contest-id">Codeforces contest ID</label>
+            <input
+              className="broadcast-input px-3"
+              id="contest-id"
+              inputMode="numeric"
+              onChange={(event) => {
+                setContestIdInput(event.target.value.replace(/\D/g, ''));
+                setContestInfo(undefined);
+                setLookupState('idle');
+                setLookupError('');
+                setImportError('');
+                setFriendError('');
+              }}
+              placeholder="For example, 1735"
+              value={contestIdInput}
+            />
+            <div className="mt-2 min-h-6 text-sm">
+              {lookupState === 'loading' && <p className="text-[#9fc8ff]">Detecting contest…</p>}
+              {lookupError && <p className="text-[#ff8585]">{lookupError}</p>}
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="space-y-6">
-                <div>
-                  <h3 className="mb-4 text-xl font-semibold text-white">Add Participants</h3>
-                  <p className="mb-4 text-gray-400">Teams are recognized by one of their members</p>
-
-                  <div className="flex gap-2 mb-4">
-                    <input
-                      className={
-                        'flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg '
-                        + 'text-white placeholder-gray-400 focus:border-blue-500 '
-                        + 'focus:outline-none'
-                      }
-                      type="text"
-                      value={handleText}
-                      onChange={(e) => setHandleText(e.target.value)}
-                      placeholder="handle1,handle2,handle3..."
-                    />
-                    <button
-                      className="px-6 py-3 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
-                      onClick={addInputHandles}
-                      type="button"
-                    >
-                      Add
-                    </button>
+            {contestInfo && (
+              <div className="mt-2 border-l-2 border-[#2d8cff] bg-[#081525] p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-white">{contestInfo.name}</p>
+                    <p className="mt-1 text-sm text-[#91a3ba]">{formatContestStart(contestInfo)}</p>
                   </div>
+                  <span className="rounded-sm bg-[#13243a] px-2 py-1 font-data text-xs text-[#9fc8ff]">
+                    {contestInfo.phase}
+                  </span>
+                </div>
+              </div>
+            )}
 
-                  {contestInfo && (
-                    <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
-                    <label className="block mb-2 text-sm text-white" htmlFor="participant-count">
-                      Import participants
-                    </label>
+            {contestInfo && (
+              <div className="mt-7 border-t border-[#25364d] pt-6">
+                <div className="mb-4">
+                  <p className="broadcast-label">02 / Participants</p>
+                  <h3 className="font-broadcast text-2xl font-semibold uppercase">Build your field</h3>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    className="broadcast-input px-3"
+                    id="participant-handles"
+                    onChange={(event) => setHandleInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') { event.preventDefault(); addTypedHandles(); }
+                    }}
+                    placeholder="tourist, Benq, your_handle"
+                    value={handleInput}
+                  />
+                  <button className="broadcast-button rounded-sm px-4" onClick={addTypedHandles} type="button">Add</button>
+                </div>
+
+                <div className="mt-4 rounded-sm border border-[#25364d] bg-[#081525] p-4">
+                  <label className="mb-2 block text-sm font-medium" htmlFor="participant-count">Official standings</label>
+                  <div className="grid grid-cols-[5rem_1fr_1fr] gap-2">
                     <input
-                      className={
-                        'w-full p-3 mb-3 bg-gray-900 border border-gray-600 rounded-lg '
-                        + 'text-white focus:border-blue-500 focus:outline-none'
-                      }
+                      className="broadcast-input px-2 text-center font-data"
                       id="participant-count"
                       min="1"
+                      onChange={(event) => setParticipantCount(event.target.value)}
                       type="number"
-                      value={participantCountInput}
-                      onChange={(event) => setParticipantCountInput(event.target.value)}
+                      value={participantCount}
                     />
-                    <div className="grid gap-2 sm:grid-cols-2">
-                      <button
-                        className={
-                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
-                          + 'bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-700'
-                        }
-                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
-                          || isImporting || !hasValidParticipantCount}
-                        onClick={() => importHandles('top')}
-                        type="button"
-                      >
-                        {isImporting ? 'Importing…' : `Add Top ${participantCountInput || 'N'}`}
-                      </button>
-                      <button
-                        className={
-                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
-                          + 'bg-purple-600 hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-700'
-                        }
-                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
-                          || isImporting || !hasValidParticipantCount}
-                        onClick={() => importHandles('random')}
-                        type="button"
-                      >
-                        {isImporting ? 'Importing…' : `Add Random ${participantCountInput || 'N'}`}
-                      </button>
-                    </div>
-                    <p className="mt-3 text-xs text-gray-400">
-                      {contestInfo?.phase === 'BEFORE'
-                        ? 'Imports become available when the contest starts. You can still add handles manually.'
-                        : 'Unofficial participants should be added manually.'}
-                    </p>
-                    {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
-                    </div>
-                  )}
-
-                  {contestInfo && (
-                    <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
-                      <details>
-                        <summary className="text-sm font-medium cursor-pointer text-cyan-200">
-                          Import Codeforces friends automatically
-                        </summary>
-                        <div className="pt-3">
-                          <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
-                            Create an API key for this import and delete it after.
-                          </p>
-                          <a
-                            className="inline-block mb-3 text-xs underline text-cyan-300 hover:text-cyan-200"
-                            href="https://codeforces.com/settings/api"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Get an API key and secret from Codeforces settings
-                          </a>
-                          <div className="mb-3 space-y-2">
-                            <input
-                              className={
-                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
-                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
-                              }
-                              type="password"
-                              value={friendApiKeyInput}
-                              onChange={(event) => setFriendApiKeyInput(event.target.value)}
-                              placeholder="Codeforces API key"
-                              autoComplete="off"
-                            />
-                            <input
-                              className={
-                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
-                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
-                              }
-                              type="password"
-                              value={friendApiSecretInput}
-                              onChange={(event) => setFriendApiSecretInput(event.target.value)}
-                              placeholder="Codeforces API secret"
-                              autoComplete="off"
-                            />
-                          </div>
-                          <button
-                            className={
-                              'w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
-                              + 'bg-cyan-700 hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-gray-700'
-                            }
-                            disabled={isImportingFriends}
-                            onClick={importFriendHandles}
-                            type="button"
-                          >
-                            {isImportingFriends ? 'Importing friends…' : 'Add friend handles'}
-                          </button>
-                        </div>
-                      </details>
-                      {friendImportMessage && <p className="mt-2 text-sm text-cyan-300">{friendImportMessage}</p>}
-                      {friendImportError && <p className="mt-2 text-sm text-red-400">{friendImportError}</p>}
-                    </div>
-                  )}
-
-                  <div className="p-4 overflow-y-auto bg-gray-800 rounded-lg max-h-60">
-                    {usersHandles.length === 0 ? (
-                      <p className="py-4 text-center text-gray-500">No participants added yet</p>
-                    ) : (
-                      <div className="space-y-2">
-                        {usersHandles.map((user) => (
-                          <div key={user} className="flex items-center justify-between p-2 bg-gray-700 rounded">
-                            <span className="text-white">{user}</span>
-                            <button
-                              className="text-red-400 transition-colors hover:text-red-300"
-                              onClick={() => setUsersHandles((currentUsers) => (
-                                currentUsers.filter((userOld) => userOld !== user)
-                              ))}
-                              type="button"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div>
-                  <h3 className="mb-4 text-xl font-semibold text-white">Contest Configuration</h3>
-
-                  <div className="mb-6">
-                    <label className="block mb-2 text-white" htmlFor="contest">
-                      Contest ID
-                    </label>
-                    <p className="mb-3 text-sm text-gray-400">
-                      From URL: https://codeforces.com/contest/
-                      <strong>1735</strong>
-                    </p>
-                    <div className="mb-3">
-                      <input
-                        className={
-                          'flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg '
-                          + 'text-white placeholder-gray-400 focus:border-blue-500 '
-                          + 'focus:outline-none'
-                        }
-                        type="text"
-                        id="contest"
-                        placeholder="1735"
-                        value={contestIdInput}
-                        onChange={(e) => {
-                          setContestIdInput(e.target.value);
-                          setContestInfo(undefined);
-                          setContestLookupError('');
-                          setContestLookupState('idle');
-                          setImportError('');
-                        }}
-                      />
-                    </div>
-                    {contestLookupState === 'loading' && (
-                      <p className="text-sm text-blue-300">Detecting contest…</p>
-                    )}
-                    {contestLookupError && <p className="text-sm text-red-400">{contestLookupError}</p>}
-                  </div>
-
-                  {contestInfo && contestConfiguration && (
-                    <div className="p-4 mb-6 border border-gray-700 rounded-lg bg-gray-800/80">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <p className="font-medium text-white">{contestInfo.name}</p>
-                          <p className="mt-1 text-sm text-gray-400">
-                            {contestInfo.type === 'ICPC' ? 'ICPC scoring' : `${contestInfo.type} scoring`}
-                            {' · '}
-                            {contestInfo.phase.replaceAll('_', ' ')}
-                          </p>
-                        </div>
-                        <span className="px-2 py-1 text-xs text-blue-200 rounded-full bg-blue-900/60">
-                          Detected
-                        </span>
-                      </div>
-                      {contestConfiguration.unsupportedReason && (
-                        <p className="mt-3 text-sm text-amber-300">
-                          {contestConfiguration.unsupportedReason}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <div>
-                    <button
-                      className={
-                        `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
-                        contestInfo && usersHandles.length > 0
-                          && contestConfiguration?.contestType
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white '
-                          + 'hover:from-blue-700 hover:to-purple-700 transform hover:scale-105'
-                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
-                      }
-                      onClick={handleStart}
-                      disabled={!contestInfo || usersHandles.length === 0
-                        || !contestConfiguration?.contestType}
-                      type="button"
-                    >
-                      {contestConfiguration?.actionLabel || 'Select a contest'}
+                    <button className="rounded-sm border border-[#25364d] px-2 text-sm font-medium hover:bg-[#13243a]" disabled={isImporting} onClick={() => importParticipants('top')} type="button">
+                      Import top
+                    </button>
+                    <button className="rounded-sm border border-[#25364d] px-2 text-sm font-medium hover:bg-[#13243a]" disabled={isImporting} onClick={() => importParticipants('random')} type="button">
+                      Import random
                     </button>
                   </div>
+                  {importError && <p className="mt-2 text-sm text-[#ff8585]">{importError}</p>}
+                </div>
+
+                <details className="mt-3 rounded-sm border border-[#1d5f78] bg-[#08212d] p-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-[#9de6ff]">Import Codeforces friends automatically</summary>
+                  <div className="pt-4">
+                    <p className="mb-2 text-xs leading-5 text-[#8fb8c7]">Create an API key for this import and delete it after.</p>
+                    <a className="text-xs text-[#7ddfff] underline underline-offset-4" href="https://codeforces.com/settings/api" rel="noreferrer" target="_blank">Get a Codeforces API key</a>
+                    <div className="mt-3 space-y-2">
+                      <input aria-label="Codeforces API key" autoComplete="off" className="broadcast-input px-3 text-sm" onChange={(event) => setFriendApiKey(event.target.value)} placeholder="API key" value={friendApiKey} />
+                      <input aria-label="Codeforces API secret" autoComplete="off" className="broadcast-input px-3 text-sm" onChange={(event) => setFriendApiSecret(event.target.value)} placeholder="API secret" type="password" value={friendApiSecret} />
+                    </div>
+                    <button className="mt-3 w-full rounded-sm border border-[#2386a8] bg-[#0c617d] px-4 py-2.5 text-sm font-semibold hover:bg-[#0e7395]" disabled={isImportingFriends} onClick={importFriends} type="button">
+                      {isImportingFriends ? 'Importing…' : 'Import friend list'}
+                    </button>
+                    {friendMessage && <p className="mt-2 text-sm text-[#70e5a5]">{friendMessage}</p>}
+                    {friendError && <p className="mt-2 text-sm text-[#ff8585]">{friendError}</p>}
+                  </div>
+                </details>
+
+                <div className="mt-4 max-h-40 overflow-y-auto rounded-sm border border-[#25364d] bg-[#081525] p-2">
+                  {handles.length === 0 ? (
+                    <p className="p-3 text-center text-sm text-[#64758c]">Add at least one handle to continue.</p>
+                  ) : handles.map((handle) => (
+                    <div className="flex items-center justify-between border-b border-[#25364d]/60 px-2 py-2 last:border-0" key={handle.toLocaleLowerCase()}>
+                      <span className="truncate font-data text-sm">{handle}</span>
+                      <button aria-label={`Remove ${handle}`} className="px-2 text-[#ff8585] hover:text-white" onClick={() => setHandles((current) => current.filter((candidate) => candidate.toLocaleLowerCase() !== handle.toLocaleLowerCase()))} type="button">×</button>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6">
+                  <p className="broadcast-label">03 / Launch</p>
+                  {configuration?.unsupportedReason && <p className="mb-2 text-sm text-[#f3b83f]">{configuration.unsupportedReason}</p>}
+                  <button className="broadcast-button mt-2 w-full rounded-sm px-5 py-3" disabled={!configuration?.contestType || handles.length === 0} onClick={launch} type="button">
+                    {configuration?.actionLabel || 'Choose a contest'}
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-        </div>
-      )}
 
-      <footer className="py-8 bg-gray-900 border-t border-gray-800">
-        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h4 className="mb-4 text-lg font-semibold text-white">Links</h4>
-            <div className="flex flex-col justify-center gap-6 sm:flex-row">
-              <a
-                href="https://codeforces.com/blog/entry/114892"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Codeforces Blog Post
-              </a>
-              <a
-                href="https://codeforces.com/apiHelp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-blue-400"
-              >
-                Codeforces API
-              </a>
-              <a
-                href="https://www.youtube.com/live/15Wyj_-PG9I?feature=share&t=10935"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 transition-colors hover:text-blue-400"
-              >
-                ICPC World Finals Inspiration
-              </a>
+          <div className="lg:sticky lg:top-6">
+            <MiniContestSimulation />
+            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-sm border border-[#25364d] bg-[#25364d]" id="how-it-works">
+              {[
+                ['Choose', 'Enter any Codeforces contest ID.'],
+                ['Collect', 'Add handles or import a friend list.'],
+                ['Follow', 'Watch standings and submissions update.'],
+              ].map(([title, copy], index) => (
+                <div className="bg-[#0d1b2a] p-3" key={title}>
+                  <p className="font-data text-xs text-[#65adff]">0{index + 1}</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{title}</p>
+                  <p className="mt-1 text-xs leading-5 text-[#91a3ba]">{copy}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
+
+        <section className="mt-12 border-t border-[#25364d] pt-8" aria-labelledby="upcoming-heading">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="broadcast-label">Codeforces schedule</p>
+              <h2 className="font-broadcast text-3xl font-semibold uppercase" id="upcoming-heading">On the grid</h2>
+            </div>
+            {isLoadingUpcoming && <span className="font-data text-xs text-[#91a3ba]">SYNCING…</span>}
+          </div>
+          {!isLoadingUpcoming && upcomingContests.length === 0 && <p className="text-[#91a3ba]">No live or upcoming contests were found.</p>}
+          <div className="grid gap-3 md:grid-cols-3">
+            {upcomingContests.map((contest) => (
+              <button className="broadcast-panel group rounded-sm p-4 text-left hover:border-[#2d8cff]" key={contest.id} onClick={() => selectContest(contest)} type="button">
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="font-data text-xs text-[#65adff]">#{contest.id}</span>
+                  <span className={`h-2 w-2 rounded-full ${contest.phase === 'CODING' ? 'animate-pulse bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
+                </div>
+                <h3 className="min-h-12 font-medium text-white group-hover:text-[#9fc8ff]">{contest.name}</h3>
+                <p className="mt-3 text-sm text-[#91a3ba]">{contest.phase === 'CODING' ? 'Live now' : formatContestStart(contest)}</p>
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <footer className="mt-10 border-t border-[#25364d] px-4 py-6 text-center text-sm text-[#64758c]">
+        Built for Codeforces spectators and small contest circles.
       </footer>
-    </div>
+    </main>
   );
 }

@@ -1,17 +1,12 @@
-import type {
-  CodeforcesContestDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-  CodeforcesUserDto,
-} from '@/src/integrations/codeforces/contracts';
+import type { Contest, Standings, Submission, User } from '@/src/shared/domain/contest';
 
 export interface LiveContestGateway {
-  getContest(contestId: string, signal?: AbortSignal): Promise<CodeforcesContestDto>;
-  getStandings(contestId: string, signal?: AbortSignal): Promise<CodeforcesStandingsDto>;
+  getContest(contestId: string, signal?: AbortSignal): Promise<Contest>;
+  getStandings(contestId: string, signal?: AbortSignal): Promise<Standings>;
   getSubmissions(
     contestId: string,
     handles: string[],
     signal?: AbortSignal,
-  ): Promise<CodeforcesSubmissionDto[]>;
-  getUsers(handles: string[], signal?: AbortSignal): Promise<CodeforcesUserDto[]>;
+  ): Promise<Submission[]>;
+  getUsers(handles: string[], signal?: AbortSignal): Promise<User[]>;
 }

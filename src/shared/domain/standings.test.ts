@@ -1,18 +1,18 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import type {
-  CodeforcesPartyDto,
-  CodeforcesProblemDto,
-  CodeforcesRanklistRowDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '../../integrations/codeforces/contracts.ts';
+  Party,
+  Problem,
+  RanklistRow,
+  Standings,
+  Submission,
+} from './contest.ts';
 import { addMissingParticipantRows } from './standings.ts';
 
 const party = (handle: string, participantType: string) => ({
   members: [{ handle, name: handle }],
   participantType,
-} as CodeforcesPartyDto);
+} as Party);
 
 const submission = (
   id: number,
@@ -20,7 +20,7 @@ const submission = (
   participantType: string,
   verdict: string,
   relativeTimeSeconds: number,
-  points?: number,
+  points = 0,
 ) => ({
   id,
   author: party(handle, participantType),
@@ -28,15 +28,15 @@ const submission = (
   verdict,
   relativeTimeSeconds,
   points,
-} as CodeforcesSubmissionDto);
+} as Submission);
 
 const standings = (type: string) => ({
   contest: { durationSeconds: 7200, type },
   problems: [{ index: 'A', points: 500 }],
   rows: [],
-} as CodeforcesStandingsDto);
+} as Standings);
 
-const getHandle = (participant: CodeforcesPartyDto) => participant.members[0].handle;
+const getHandle = (participant: Party) => participant.members[0].handle;
 
 test('adds a virtual ICPC participant from submissions', () => {
   const result = addMissingParticipantRows(standings('ICPC'), [
@@ -64,16 +64,16 @@ test('uses Codeforces scoring without scaling penalties by contest duration', ()
   const contestStandings = standings('CF');
   contestStandings.contest.durationSeconds = 8_100;
   contestStandings.problems = [500, 750, 1_250, 1_750, 2_250]
-    .map((points, index) => ({ index: 'ABCDE'[index], points } as CodeforcesProblemDto));
+    .map((points, index) => ({ index: 'ABCDE'[index], points } as Problem));
   const contestSubmission = (
     id: number,
     problemIndex: string,
     relativeTimeSeconds: number,
   ) => ({
     ...submission(id, 'MateoCV', 'OUT_OF_COMPETITION', 'OK', relativeTimeSeconds),
-    problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as CodeforcesProblemDto,
+    problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as Problem,
     points: undefined,
-  } as CodeforcesSubmissionDto);
+  } as unknown as Submission);
 
   const result = addMissingParticipantRows(contestStandings, [
     contestSubmission(1, 'A', 144),
@@ -93,7 +93,7 @@ test('uses Codeforces scoring without scaling penalties by contest duration', ()
 test('reconstructs all jiangly solves from contest 1797 submissions', () => {
   const contestStandings = standings('CF');
   contestStandings.problems = [500, 1000, 1500, 1750, 2250, 3000]
-    .map((points, index) => ({ index: 'ABCDEF'[index], points } as CodeforcesProblemDto));
+    .map((points, index) => ({ index: 'ABCDEF'[index], points } as Problem));
   const contestSubmission = (
     id: number,
     problemIndex: string,
@@ -101,9 +101,9 @@ test('reconstructs all jiangly solves from contest 1797 submissions', () => {
     relativeTimeSeconds: number,
   ) => ({
     ...submission(id, 'jiangly', 'OUT_OF_COMPETITION', verdict, relativeTimeSeconds),
-    problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as CodeforcesProblemDto,
+    problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as Problem,
     points: undefined,
-  } as CodeforcesSubmissionDto);
+  } as unknown as Submission);
 
   const result = addMissingParticipantRows(contestStandings, [
     contestSubmission(1, 'A', 'OK', 133),
@@ -126,7 +126,7 @@ test('does not duplicate a participant already present in official standings', (
   const officialStandings = standings('ICPC');
   officialStandings.rows.push({
     party: party('official-user', 'CONTESTANT'),
-  } as CodeforcesRanklistRowDto);
+  } as RanklistRow);
 
   const result = addMissingParticipantRows(officialStandings, [
     submission(1, 'official-user', 'CONTESTANT', 'OK', 180),

@@ -8,6 +8,7 @@ import type {
   ReplayStandings,
   ReplaySubmission,
 } from '../domain/models';
+import type { Standings, Submission } from '@/src/shared/domain/contest';
 import LiveSubmissionsList from '@/components/LiveSubmissionsList';
 import StandingsList from '@/components/standings/StandingsList';
 import ContestLoading from '@/components/ContestLoading';
@@ -28,6 +29,7 @@ import {
   REPLAY_SPEED_OPTIONS,
 } from '@/src/shared/config/contestTiming';
 import { getHandlesFromQuery } from '@/src/shared/domain/participantHandles';
+import ContestRibbon from '@/src/shared/presentation/ContestRibbon';
 import {
   formatElapsedTime,
   getPlaybackSpeed,
@@ -68,6 +70,7 @@ export default function ReplayPage() {
   const previousJudgingTick = useRef<number | undefined>(undefined);
   const [testingSubmissions, setTestingSubmissions] = useState<Map<number, number>>(new Map());
   const testingSubmissionsRef = useRef<Map<number, number>>(new Map());
+  const [mobilePanel, setMobilePanel] = useState<'standings' | 'submissions'>('standings');
   const clearJudging = useCallback(() => {
     judgingJobs.current.clear();
     const next = new Map<number, number>();
@@ -345,29 +348,41 @@ export default function ReplayPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen text-white bg-black">
-      <div className="px-4 py-3 bg-gray-900 border-b border-gray-800">
-        <div className="flex flex-wrap items-center gap-3 mx-auto max-w-7xl">
+    <div className="flex min-h-screen flex-col bg-[#07111f] text-white">
+      <ContestRibbon
+        clock={formatElapsedTime(elapsedSeconds)}
+        contest={finalStandings.contest}
+        contestId={String(contestId || '')}
+        controls={(
+          <>
           <button
-            className="px-4 py-2 font-semibold bg-blue-600 rounded hover:bg-blue-700"
+            className="rounded-sm bg-[#2d8cff] px-3 py-2 text-sm font-semibold hover:bg-[#1f78d7]"
             onClick={() => setIsPlaying((playing) => !playing)}
             type="button"
           >
             {isPlaying ? 'Pause' : 'Play'}
           </button>
           <button
-            className="px-4 py-2 font-semibold bg-gray-700 rounded hover:bg-gray-600"
+            className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
             onClick={() => { setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart); }}
             type="button"
           >
             Restart
           </button>
-          <span className="font-mono text-lg">
+          </>
+        )}
+        mode="REPLAY"
+        status={isPlaying ? `${speed}× playback` : 'Playback paused'}
+        statusTone={isPlaying ? 'live' : 'paused'}
+      />
+      <div className="border-b border-[#25364d] bg-[#0d1b2a] px-3 py-2">
+        <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3">
+          <span className="font-data text-sm text-[#91a3ba]">
             {formatElapsedTime(elapsedSeconds)} / {formatElapsedTime(finalStandings.contest.durationSeconds)}
           </span>
           <input
             aria-label="Replay timeline"
-            className="min-w-48 grow"
+            className="min-w-40 grow accent-[#2d8cff]"
             max={finalStandings.contest.durationSeconds}
             min={replayStart}
             onChange={(event) => {
@@ -378,10 +393,10 @@ export default function ReplayPage() {
             type="range"
             value={elapsedSeconds}
           />
-          <label className="flex items-center gap-2">
+          <label className="flex items-center gap-2 text-sm text-[#91a3ba]">
             Speed
             <select
-              className="px-2 py-1 bg-gray-800 rounded"
+              className="rounded-sm border border-[#25364d] bg-[#081525] px-2 py-1 text-white"
               onChange={(event) => setSpeed(Number(event.target.value))}
               value={speed}
             >
@@ -389,33 +404,47 @@ export default function ReplayPage() {
             </select>
           </label>
           {isTruncated && (
-            <span className="text-sm text-yellow-300">
+            <span className="text-sm text-[#f3b83f]">
               Latest {MAX_SUBMISSIONS_IN_MEMORY.toLocaleString()} events retained
             </span>
           )}
-        </div>
       </div>
-      <div className="flex flex-row min-h-0 grow">
-        <div className="h-[calc(100vh-76px)] w-2/5 p-4">
-          <div className="h-full overflow-hidden border border-gray-800 rounded-lg shadow-xl bg-gray-900/50">
+      </div>
+      <div className="grid grid-cols-2 border-b border-[#25364d] bg-[#0d1b2a] lg:hidden" role="tablist">
+        {(['standings', 'submissions'] as const).map((panel) => (
+          <button
+            aria-selected={mobilePanel === panel}
+            className={`py-3 text-sm font-semibold capitalize ${mobilePanel === panel ? 'border-b-2 border-[#2d8cff] text-white' : 'text-[#91a3ba]'}`}
+            key={panel}
+            onClick={() => setMobilePanel(panel)}
+            role="tab"
+            type="button"
+          >
+            {panel}
+          </button>
+        ))}
+      </div>
+      <div className="flex min-h-0 grow">
+        <section className={`${mobilePanel === 'submissions' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-2/5 lg:p-3`} aria-label="Replay submissions">
+          <div className="broadcast-panel h-full overflow-hidden rounded-sm">
             <LiveSubmissionsList
-              submissions={cinematicSubmissions}
+              submissions={cinematicSubmissions as unknown as Submission[]}
               newSubmissionsCount={testingSubmissions.size}
-              globalStandings={snapshot.standings}
+              globalStandings={snapshot.standings as unknown as Standings}
               userRank={userRank}
             />
           </div>
-        </div>
-        <div className="h-[calc(100vh-76px)] w-3/5 p-4">
-          <div className="h-full overflow-hidden border border-gray-800 rounded-lg shadow-xl bg-gray-900/50">
+        </section>
+        <section className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-3/5 lg:p-3`} aria-label="Replay standings">
+          <div className="broadcast-panel h-full overflow-hidden rounded-sm">
             <StandingsList
               contestType={contestType as string}
-              globalStandings={snapshot.standings}
+              globalStandings={snapshot.standings as unknown as Standings}
               localStandings={snapshot.localStandings}
               userRank={userRank}
             />
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );

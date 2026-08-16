@@ -118,6 +118,22 @@ summary {
   color: #64758c;
 }
 
+@keyframes broadcast-submission-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.broadcast-submission-enter {
+  animation: broadcast-submission-slide-up 360ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

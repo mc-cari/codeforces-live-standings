@@ -200,14 +200,18 @@ export default function MiniContestSimulation({
     ? rows.findIndex((row) => row.participantIndex === latestEvent.participantIndex) + 1
     : 0;
   const latestSubmission = latestEvent && latestParticipant && latestRow
-    ? {
-      ...buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved),
-      points: latestRow.points,
-    }
+    ? buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved)
     : undefined;
   const recentEvents = visibleEvents.filter((event) => (
     event.second <= elapsed && elapsed - event.second < RECENT_EVENT_WINDOW_SECONDS
   ));
+  const isLatestSubmissionRecent = Boolean(latestEvent && recentEvents.some((event) => (
+    event.participantIndex === latestEvent.participantIndex
+      && event.problem === latestEvent.problem
+  )));
+  const displayedSubmission = latestSubmission && isLatestSubmissionRecent
+    ? { ...latestSubmission, verdict: 'TESTING', passedTestCount: Math.max(1, latestSubmission.passedTestCount) }
+    : latestSubmission;
 
   return (
     <section
@@ -261,16 +265,14 @@ export default function MiniContestSimulation({
         ))}
       </div>
 
-      <div aria-live="polite" className="h-8 bg-[#081525]">
-        {latestSubmission ? (
+      <div aria-live="polite" className="h-8 overflow-hidden bg-[#081525]">
+        {displayedSubmission ? (
           <LiveSubmission
+            key={displayedSubmission.id}
             compact
             isGym={false}
-            isNew={!reducedMotion && Boolean(latestEvent && recentEvents.some((event) => (
-              event.participantIndex === latestEvent.participantIndex
-                && event.problem === latestEvent.problem
-            )))}
-            submission={latestSubmission}
+            isNew={!reducedMotion && isLatestSubmissionRecent}
+            submission={displayedSubmission}
             userCount={previewParticipants.length}
             userRank={new Map()}
           />

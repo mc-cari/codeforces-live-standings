@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import RequestCoordinator from '../src/integrations/codeforces/server/requestCoordinator.ts';
+import RequestCoordinator from './requestCoordinator.ts';
 
 test('deduplicates identical in-flight requests', async () => {
   let calls = 0;

@@ -1,5 +1,5 @@
 import { mkdir, writeFile } from 'node:fs/promises';
-import { addMissingParticipantRows } from '../utils/participantStandings.ts';
+import { addMissingParticipantRows } from '../src/shared/domain/standings.ts';
 
 const contestId = 1735;
 const handles = [

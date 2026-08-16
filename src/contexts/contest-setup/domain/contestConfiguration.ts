@@ -42,3 +42,5 @@ export const formatCountdown = (totalSeconds: number) => {
     : `${hours}:${minutes}:${remainingSeconds}`;
 };
 import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+
+// Contest setup policy is independent from transport and presentation concerns.

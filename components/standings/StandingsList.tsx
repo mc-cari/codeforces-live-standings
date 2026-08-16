@@ -3,7 +3,7 @@ import type { CodeforcesStandingsDto } from '@/src/integrations/codeforces/contr
 import ProblemStatusEdu from '../ProblemStatusEdu';
 import ProblemStatusNormal from '../ProblemStatusNormal';
 import Position from '../Position';
-import getName from '../../utils/getName';
+import getName from '@/src/shared/domain/party';
 import UserHandle from '../UserHandle';
 import Header from './Header';
 import NormalPoints from './NormalPoints';

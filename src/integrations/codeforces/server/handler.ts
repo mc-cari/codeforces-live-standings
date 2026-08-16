@@ -1,8 +1,11 @@
 import { createHash, randomBytes } from 'crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Agent, fetch as undiciFetch } from 'undici';
-import getName from '@/utils/getName';
-import { selectParticipantHandles, type ParticipantSelection } from '@/utils/participantImport';
+import getName from '@/src/shared/domain/party';
+import {
+  selectParticipantHandles,
+  type ParticipantSelection,
+} from '@/src/contexts/contest-setup/domain/participantSelection';
 import type {
   CodeforcesApiResponse,
   CodeforcesContestDto,

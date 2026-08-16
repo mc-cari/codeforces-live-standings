@@ -1,11 +1,22 @@
+import type {
+  CodeforcesPartyDto,
+  CodeforcesRanklistRowDto,
+} from '@/src/integrations/codeforces/contracts';
+import { normalizeHandles } from '../../../shared/domain/participantHandles.ts';
+
 export type ParticipantSelection = 'top' | 'random';
+
+export const normalizeParticipantHandles = (
+  handles: string[],
+  existingHandles: string[] = [],
+): string[] => normalizeHandles(handles, existingHandles);
 
 export const normalizeImportedHandles = (value: unknown): string[] => {
   if (!Array.isArray(value) || value.some((handle) => typeof handle !== 'string')) {
     throw new Error('Codeforces returned an invalid friend list');
   }
 
-  return Array.from(new Set(value.map((handle) => handle.trim()).filter(Boolean)));
+  return normalizeParticipantHandles(value);
 };
 
 type RandomSource = () => number;
@@ -27,7 +38,3 @@ export const selectParticipantHandles = (
     .slice(0, count)
     .map(({ handle }) => handle);
 };
-import type {
-  CodeforcesPartyDto,
-  CodeforcesRanklistRowDto,
-} from '@/src/integrations/codeforces/contracts';

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring.ts';
+import calculateReplayPenalty, { countRejectedAttempt } from './scoring.ts';
 
 test('does not count more rejected events than the final standings row', () => {
   assert.equal(countRejectedAttempt(0, 1), 1);

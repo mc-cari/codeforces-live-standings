@@ -3,8 +3,19 @@ import test from 'node:test';
 import type {
   CodeforcesPartyDto,
   CodeforcesRanklistRowDto,
-} from '../src/integrations/codeforces/contracts.ts';
-import { normalizeImportedHandles, selectParticipantHandles } from './participantImport.ts';
+} from '../../../integrations/codeforces/contracts.ts';
+import {
+  normalizeImportedHandles,
+  normalizeParticipantHandles,
+  selectParticipantHandles,
+} from './participantSelection.ts';
+
+test('normalizes participant identity case-insensitively while preserving display spelling', () => {
+  assert.deepEqual(
+    normalizeParticipantHandles([' Tourist ', 'tourist', 'Benq'], ['BENQ']),
+    ['Tourist'],
+  );
+});
 
 test('normalizes and deduplicates friend handles returned by Codeforces', () => {
   assert.deepEqual(normalizeImportedHandles([' alice ', 'bob', 'alice', '']), ['alice', 'bob']);

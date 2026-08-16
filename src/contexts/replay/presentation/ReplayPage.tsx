@@ -1,0 +1,413 @@
+import React, {
+  useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
+} from 'react';
+import type { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
+import type {
+  CodeforcesPartyDto,
+  CodeforcesStandingsDto,
+  CodeforcesSubmissionDto,
+} from '@/src/integrations/codeforces/contracts';
+import LiveSubmissionsList from '@/components/LiveSubmissionsList';
+import StandingsList from '@/components/standings/StandingsList';
+import ContestLoading from '@/components/ContestLoading';
+import getName from '@/src/shared/domain/party';
+import { addMissingParticipantRows } from '@/src/shared/domain/standings';
+import { buildReplaySnapshot } from '../domain/buildReplaySnapshot';
+import {
+  LOADING_PROGRESS,
+  MAX_SUBMISSIONS_IN_MEMORY,
+  REPLAY_ARTIFICIAL_JUDGING_SPEED_MAX,
+  REPLAY_JUDGING_BASE_DURATION_MILLISECONDS,
+  REPLAY_JUDGING_DURATION_VARIATION_MILLISECONDS,
+  REPLAY_JUDGING_MAX_MILESTONES,
+  REPLAY_JUDGING_MIN_MILESTONES,
+  REPLAY_JUDGING_TICK_MILLISECONDS,
+  REPLAY_PLAYBACK_TICK_MILLISECONDS,
+  REPLAY_RELEASE_BATCH_SIZE,
+  REPLAY_SPEED_OPTIONS,
+} from '@/src/shared/config/contestTiming';
+import { getHandlesFromQuery } from '@/src/shared/domain/participantHandles';
+import {
+  formatElapsedTime,
+  getPlaybackSpeed,
+  getQueryValue,
+  getStartTime,
+} from '../domain/replayConfiguration';
+import { codeforcesReplayGateway } from '../infrastructure/codeforcesReplayGateway';
+
+const useBrowserLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+type JudgingJob = {
+  progress: number;
+  totalTests: number;
+  duration: number;
+};
+
+export default function ReplayPage() {
+  const router = useRouter();
+  const {
+    contestId, contestType, handles, h, startMinute, startTime, playbackSpeed, autoplay, demo,
+  } = router.query;
+  const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
+  const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
+  const [finalStandings, setFinalStandings] = useState<CodeforcesStandingsDto>();
+  const [events, setEvents] = useState<CodeforcesSubmissionDto[]>([]);
+  const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(LOADING_PROGRESS.initial);
+  const [loadingStage, setLoadingStage] = useState('Preparing replay...');
+  const previousTick = useRef<number | undefined>(undefined);
+  const previousReplayTime = useRef<number | undefined>(undefined);
+  const judgingJobs = useRef<Map<number, JudgingJob>>(new Map());
+  const previousJudgingTick = useRef<number | undefined>(undefined);
+  const [testingSubmissions, setTestingSubmissions] = useState<Map<number, number>>(new Map());
+  const clearJudging = useCallback(() => {
+    judgingJobs.current.clear();
+    setTestingSubmissions(new Map());
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+    let finishTimer: number | undefined;
+    const controller = new AbortController();
+    const progressTimer = window.setInterval(() => {
+      setLoadingProgress((current) => {
+        if (current >= LOADING_PROGRESS.estimatedMaximum) return current;
+        return Math.min(
+          LOADING_PROGRESS.estimatedMaximum,
+          current + (current < LOADING_PROGRESS.submissionsLoaded
+            ? LOADING_PROGRESS.fastIncrement : LOADING_PROGRESS.slowIncrement),
+        );
+      });
+    }, LOADING_PROGRESS.tickMilliseconds);
+
+    const loadReplay = async () => {
+      if (!contestId || userHandles.length === 0 || !contestType) return;
+
+      try {
+        setIsLoading(true);
+        setLoadingProgress(LOADING_PROGRESS.initial);
+        setLoadingStage('Loading contest data...');
+        setError('');
+        const markLoaded = (progress: number, stage: string) => {
+          if (!isActive) return;
+          setLoadingProgress((current) => Math.max(current, progress));
+          setLoadingStage(stage);
+        };
+        if (contestId === '1735' && getQueryValue(demo) === 'true') {
+          const response = await fetch('/demo/1735-v1.json');
+          if (!response.ok) throw new Error('Unable to load demo replay');
+          const snapshot = await response.json() as {
+            standings: CodeforcesStandingsDto;
+            submissions: CodeforcesSubmissionDto[];
+            userRanks: Record<string, string>;
+          };
+          const demoEvents = [...snapshot.submissions].sort((first, second) => (
+            first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
+          ));
+          const demoStandings = addMissingParticipantRows(
+            snapshot.standings,
+            demoEvents,
+            getName,
+          );
+          setFinalStandings(demoStandings);
+          setEvents(demoEvents);
+          setUserRank(new Map(Object.entries(snapshot.userRanks)));
+          setElapsedSeconds(getStartTime(
+            getQueryValue(startTime) || getQueryValue(startMinute),
+            demoStandings.contest.durationSeconds,
+            demoEvents[0]?.relativeTimeSeconds || 0,
+          ));
+          setSpeed(requestedSpeed);
+          setIsPlaying(getQueryValue(autoplay) === 'true');
+          setIsTruncated(false);
+          markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing demo replay...');
+          return;
+        }
+        const statusRequest = codeforcesReplayGateway.getSubmissions(
+          contestId as string,
+          userHandles,
+          controller.signal,
+        ).then((result) => {
+          markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing replay timeline...');
+          return result;
+        });
+        const standingsRequest = codeforcesReplayGateway.getStandings(
+          contestId as string,
+          controller.signal,
+        ).then((result) => {
+            markLoaded(LOADING_PROGRESS.standingsLoaded, 'Loading contest submissions...');
+            return result;
+          });
+        const usersRequest = codeforcesReplayGateway.getUsers(userHandles, controller.signal)
+          .catch(() => []);
+        const [standingsData, allSelectedEvents, users] = await Promise.all([
+          standingsRequest, statusRequest, usersRequest,
+        ]);
+        const isSelectedParticipant = (party: CodeforcesPartyDto) => party.members
+          .some((member) => userHandles.some((handle) => (
+            handle.toLocaleLowerCase() === member.handle.toLocaleLowerCase()
+          )));
+        const officialStandings: CodeforcesStandingsDto = {
+          ...standingsData,
+          rows: standingsData.rows.filter((row) => isSelectedParticipant(row.party)),
+        };
+        const replayEvents = allSelectedEvents
+          .filter((submission) => (
+            submission.relativeTimeSeconds >= 0
+            && submission.relativeTimeSeconds <= officialStandings.contest.durationSeconds
+          ))
+          .sort((first, second) => (
+            first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
+          ));
+        const selectedStandings = addMissingParticipantRows(
+          officialStandings,
+          replayEvents,
+          getName,
+        );
+        setIsTruncated(replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY);
+        setEvents(replayEvents.slice(-MAX_SUBMISSIONS_IN_MEMORY));
+        const replayStart = replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY
+          ? replayEvents[replayEvents.length - MAX_SUBMISSIONS_IN_MEMORY].relativeTimeSeconds : 0;
+        setElapsedSeconds(getStartTime(
+          getQueryValue(startTime) || getQueryValue(startMinute),
+          selectedStandings.contest.durationSeconds,
+          replayStart,
+        ));
+        setSpeed(requestedSpeed);
+        setIsPlaying(getQueryValue(autoplay) === 'true');
+        setFinalStandings(selectedStandings);
+
+        if (users.length > 0) {
+          const ranks = new Map<string, string>();
+          users.forEach((user) => {
+            ranks.set(user.handle, user.rank);
+            ranks.set(`${user.handle} (practice)`, user.rank);
+          });
+          setUserRank(ranks);
+        }
+      } catch (loadError) {
+        if (isActive) {
+          setError(loadError instanceof Error ? loadError.message : 'Unable to load replay data');
+        }
+      } finally {
+        window.clearInterval(progressTimer);
+        if (isActive) {
+          setLoadingProgress(LOADING_PROGRESS.complete);
+          finishTimer = window.setTimeout(
+            () => setIsLoading(false),
+            LOADING_PROGRESS.completionDelayMilliseconds,
+          );
+        }
+      }
+    };
+    loadReplay();
+    return () => {
+      isActive = false;
+      controller.abort();
+      window.clearInterval(progressTimer);
+      if (finishTimer) window.clearTimeout(finishTimer);
+    };
+  }, [autoplay, contestId, contestType, demo, requestedSpeed, startMinute, startTime, userHandles]);
+
+  useEffect(() => {
+    if (!isPlaying || !finalStandings) return undefined;
+    previousTick.current = performance.now();
+    const timer = window.setInterval(() => {
+      const now = performance.now();
+      const elapsed = ((now - (previousTick.current as number)) / 1000) * speed;
+      previousTick.current = now;
+      setElapsedSeconds((current) => {
+        const next = Math.min(finalStandings.contest.durationSeconds, current + elapsed);
+        if (next === finalStandings.contest.durationSeconds) setIsPlaying(false);
+        return next;
+      });
+    }, REPLAY_PLAYBACK_TICK_MILLISECONDS);
+    return () => window.clearInterval(timer);
+  }, [finalStandings, isPlaying, speed]);
+
+  useBrowserLayoutEffect(() => {
+    const previousTime = previousReplayTime.current;
+    previousReplayTime.current = elapsedSeconds;
+
+    if (previousTime === undefined) return undefined;
+    if (elapsedSeconds < previousTime || speed > REPLAY_ARTIFICIAL_JUDGING_SPEED_MAX) {
+      clearJudging();
+      return undefined;
+    }
+    if (!isPlaying) return undefined;
+
+    const releasedEvents = events.filter((event) => (
+      event.relativeTimeSeconds > previousTime && event.relativeTimeSeconds <= elapsedSeconds
+    )).slice(-REPLAY_RELEASE_BATCH_SIZE);
+    releasedEvents.forEach((submission) => {
+      if (judgingJobs.current.has(submission.id)) return;
+      const totalTests = submission.verdict === 'OK'
+        ? Math.max(1, submission.passedTestCount)
+        : Math.max(1, submission.passedTestCount + 1);
+      judgingJobs.current.set(submission.id, {
+        progress: 0,
+        totalTests,
+        duration: REPLAY_JUDGING_BASE_DURATION_MILLISECONDS
+          + ((submission.id % 5) - 2) * REPLAY_JUDGING_DURATION_VARIATION_MILLISECONDS,
+      });
+      setTestingSubmissions((current) => new Map(current).set(submission.id, 1));
+    });
+
+    return undefined;
+  }, [clearJudging, elapsedSeconds, events, isPlaying, speed]);
+
+  useEffect(() => {
+    if (
+      !isPlaying
+      || speed > REPLAY_ARTIFICIAL_JUDGING_SPEED_MAX
+      || judgingJobs.current.size === 0
+    ) return undefined;
+    previousJudgingTick.current = performance.now();
+    const timer = window.setInterval(() => {
+      const now = performance.now();
+      const elapsed = now - (previousJudgingTick.current as number);
+      previousJudgingTick.current = now;
+      setTestingSubmissions((current) => {
+        const next = new Map(current);
+        judgingJobs.current.forEach((job, submissionId) => {
+          job.progress += (elapsed * Math.sqrt(speed)) / job.duration;
+          if (job.progress >= 1) {
+            judgingJobs.current.delete(submissionId);
+            next.delete(submissionId);
+            return;
+          }
+          const milestones = Math.min(
+            REPLAY_JUDGING_MAX_MILESTONES,
+            Math.max(REPLAY_JUDGING_MIN_MILESTONES, Math.ceil(job.totalTests / 3)),
+          );
+          const stage = Math.max(1, Math.ceil(job.progress * milestones));
+          next.set(submissionId, Math.max(1, Math.ceil((stage * job.totalTests) / milestones)));
+        });
+        return next;
+      });
+    }, REPLAY_JUDGING_TICK_MILLISECONDS);
+    return () => window.clearInterval(timer);
+  }, [isPlaying, speed, testingSubmissions.size]);
+
+  const replayStart = events[0]?.relativeTimeSeconds || 0;
+  const availableSpeeds = REPLAY_SPEED_OPTIONS.includes(speed)
+    ? REPLAY_SPEED_OPTIONS : [...REPLAY_SPEED_OPTIONS, speed].sort((first, second) => first - second);
+  const settledEvents = useMemo(() => (
+    events.filter((event) => !testingSubmissions.has(event.id))
+  ), [events, testingSubmissions]);
+  const snapshot = useMemo(() => (
+    finalStandings ? buildReplaySnapshot(finalStandings, settledEvents, elapsedSeconds) : undefined
+  ), [elapsedSeconds, finalStandings, settledEvents]);
+  const cinematicSubmissions = useMemo(() => {
+    if (!snapshot) return [];
+    const testingRows = events.filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
+      ...submission,
+      author: {
+        ...submission.author,
+        rank: snapshot.localStandings.get(getName(submission.author)) as number,
+      },
+      numberOfProblems: 0,
+      verdict: 'TESTING',
+      passedTestCount: testingSubmissions.get(submission.id) as number,
+    }));
+    return [...testingRows, ...snapshot.submissions]
+      .sort((first, second) => second.id - first.id)
+      .slice(0, MAX_SUBMISSIONS_IN_MEMORY);
+  }, [events, snapshot, testingSubmissions]);
+
+  if (isLoading) {
+    return <ContestLoading progress={loadingProgress} stage={loadingStage} />;
+  }
+  if (error || !finalStandings || !snapshot) {
+    return (
+      <div className="flex items-center justify-center min-h-screen text-xl text-red-400 bg-black">
+        {error || 'Replay data is unavailable'}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen text-white bg-black">
+      <div className="px-4 py-3 bg-gray-900 border-b border-gray-800">
+        <div className="flex flex-wrap items-center gap-3 mx-auto max-w-7xl">
+          <button
+            className="px-4 py-2 font-semibold bg-blue-600 rounded hover:bg-blue-700"
+            onClick={() => setIsPlaying((playing) => !playing)}
+            type="button"
+          >
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          <button
+            className="px-4 py-2 font-semibold bg-gray-700 rounded hover:bg-gray-600"
+            onClick={() => { setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart); }}
+            type="button"
+          >
+            Restart
+          </button>
+          <span className="font-mono text-lg">
+            {formatElapsedTime(elapsedSeconds)} / {formatElapsedTime(finalStandings.contest.durationSeconds)}
+          </span>
+          <input
+            aria-label="Replay timeline"
+            className="min-w-48 grow"
+            max={finalStandings.contest.durationSeconds}
+            min={replayStart}
+            onChange={(event) => {
+              setIsPlaying(false);
+              clearJudging();
+              setElapsedSeconds(Number(event.target.value));
+            }}
+            type="range"
+            value={elapsedSeconds}
+          />
+          <label className="flex items-center gap-2">
+            Speed
+            <select
+              className="px-2 py-1 bg-gray-800 rounded"
+              onChange={(event) => setSpeed(Number(event.target.value))}
+              value={speed}
+            >
+              {availableSpeeds.map((option) => <option key={option} value={option}>{option}×</option>)}
+            </select>
+          </label>
+          {isTruncated && (
+            <span className="text-sm text-yellow-300">
+              Latest {MAX_SUBMISSIONS_IN_MEMORY.toLocaleString()} events retained
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex flex-row min-h-0 grow">
+        <div className="h-[calc(100vh-76px)] w-2/5 p-4">
+          <div className="h-full overflow-hidden border border-gray-800 rounded-lg shadow-xl bg-gray-900/50">
+            <LiveSubmissionsList
+              submissions={cinematicSubmissions}
+              newSubmissionsCount={testingSubmissions.size}
+              globalStandings={snapshot.standings}
+              userRank={userRank}
+            />
+          </div>
+        </div>
+        <div className="h-[calc(100vh-76px)] w-3/5 p-4">
+          <div className="h-full overflow-hidden border border-gray-800 rounded-lg shadow-xl bg-gray-900/50">
+            <StandingsList
+              contestType={contestType as string}
+              globalStandings={snapshot.standings}
+              localStandings={snapshot.localStandings}
+              userRank={userRank}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export const getServerSideProps: GetServerSideProps = async () => ({ props: {} });

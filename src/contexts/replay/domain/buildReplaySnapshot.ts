@@ -1,12 +1,12 @@
-import getName from './getName';
+import getName from '@/src/shared/domain/party';
 import type {
   CodeforcesRanklistRowDto,
   CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
-import { MAX_SUBMISSIONS_IN_MEMORY } from './constants';
-import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring';
+import { MAX_SUBMISSIONS_IN_MEMORY } from '@/src/shared/config/contestTiming';
+import calculateReplayPenalty, { countRejectedAttempt } from './scoring';
 
 type ReplaySnapshot = {
   localStandings: Map<string, number>;

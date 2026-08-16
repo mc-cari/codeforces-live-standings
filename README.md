@@ -7,6 +7,19 @@ Website for a dynamic visualization for live standings of [Codeforces](https://c
 
 Website link: [Codeforces Live Standings](https://codeforces-live-standings.mccari.us/).
 
+### Architecture
+
+The application uses pragmatic domain boundaries under `src/contexts`:
+
+- `contest-setup` owns contest discovery, configuration, and participant selection.
+- `live-standings` owns polling and immutable live projections.
+- `replay` owns timeline configuration, scoring, and playback projections.
+- `integrations/codeforces` is the anti-corruption layer around Codeforces DTOs and transport.
+
+Next.js files in `pages` are route adapters. Context application ports describe external
+capabilities, infrastructure adapters implement them, and shared code is limited to contest
+timing, participant identity, party naming, and standings reconstruction.
+
 It has support for:
 
   - Normal Rounds

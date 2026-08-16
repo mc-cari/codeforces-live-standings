@@ -11,10 +11,10 @@ export const normalizeImportedHandles = (value: unknown): string[] => {
 type RandomSource = () => number;
 
 export const selectParticipantHandles = (
-  rows: RanklistRow[],
+  rows: CodeforcesRanklistRowDto[],
   count: number,
   selection: ParticipantSelection,
-  getParticipantName: (party: Party) => string,
+  getParticipantName: (party: CodeforcesPartyDto) => string,
   random: RandomSource = Math.random,
 ): string[] => {
   const handles = Array.from(new Set(rows.map((row) => getParticipantName(row.party))));
@@ -27,3 +27,7 @@ export const selectParticipantHandles = (
     .slice(0, count)
     .map(({ handle }) => handle);
 };
+import type {
+  CodeforcesPartyDto,
+  CodeforcesRanklistRowDto,
+} from '@/src/integrations/codeforces/contracts';

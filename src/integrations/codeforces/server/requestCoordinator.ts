@@ -135,12 +135,8 @@ export default class RequestCoordinator {
             queuedRequests: this.queuedRequests,
             error,
           };
-          this.debug('Codeforces request failed.', {
-            ...context,
-          });
-          if (this.productionLoggingEnabled) {
-            this.errorLogger('Codeforces request failed.', context);
-          }
+          this.debug('Codeforces request failed.', context);
+          if (this.productionLoggingEnabled) this.errorLogger('Codeforces request failed.', context);
           rejectRequest(error);
         })
         .finally(() => {
@@ -160,9 +156,7 @@ export default class RequestCoordinator {
         error,
       };
       this.debug('Codeforces request failed before start.', context);
-      if (this.productionLoggingEnabled) {
-        this.errorLogger('Codeforces request failed before start.', context);
-      }
+      if (this.productionLoggingEnabled) this.errorLogger('Codeforces request failed before start.', context);
       rejectRequest(error);
       this.inFlight.delete(key);
     });

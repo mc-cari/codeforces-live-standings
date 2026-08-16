@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
 import { formatCountdown, secondsUntilContest } from '../utils/contestConfiguration';
 
 type UpcomingContestProps = {
-  contests: Contest[];
-  onSelect: (contest: Contest) => void;
+  contests: CodeforcesContestDto[];
+  onSelect: (contest: CodeforcesContestDto) => void;
 };
 
 const formatStartTime = (startTimeSeconds: number) => new Intl.DateTimeFormat(undefined, {

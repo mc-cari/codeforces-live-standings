@@ -1,19 +1,26 @@
-type ParticipantName = (party: Party) => string;
+import type {
+  CodeforcesPartyDto,
+  CodeforcesRanklistRowDto,
+  CodeforcesStandingsDto,
+  CodeforcesSubmissionDto,
+} from '@/src/integrations/codeforces/contracts';
 
-const isPenalizedAttempt = (submission: Submission) => (
+type ParticipantName = (party: CodeforcesPartyDto) => string;
+
+const isPenalizedAttempt = (submission: CodeforcesSubmissionDto) => (
   submission.verdict !== 'OK'
   && submission.verdict !== 'COMPILATION_ERROR'
   && submission.verdict !== 'SKIPPED'
   && submission.verdict !== 'TESTING'
 );
 
-const compareRows = (first: RanklistRow, second: RanklistRow) => {
+const compareRows = (first: CodeforcesRanklistRowDto, second: CodeforcesRanklistRowDto) => {
   if (first.points !== second.points) return second.points - first.points;
   if (first.penalty !== second.penalty) return first.penalty - second.penalty;
   return 0;
 };
 
-const createRow = (party: Party, problemCount: number): RanklistRow => ({
+const createRow = (party: CodeforcesPartyDto, problemCount: number): CodeforcesRanklistRowDto => ({
   party,
   rank: 0,
   points: 0,
@@ -44,12 +51,12 @@ const calculateCfPoints = (
 };
 
 export const addMissingParticipantRows = (
-  standings: Standings,
-  submissions: Submission[],
+  standings: CodeforcesStandingsDto,
+  submissions: CodeforcesSubmissionDto[],
   getParticipantName: ParticipantName,
-): Standings => {
+): CodeforcesStandingsDto => {
   const existingNames = new Set(standings.rows.map((row) => getParticipantName(row.party)));
-  const missingRows = new Map<string, RanklistRow>();
+  const missingRows = new Map<string, CodeforcesRanklistRowDto>();
   const solvedProblems = new Map<string, Set<string>>();
   const problemIndexes = new Map(standings.problems.map((problem, index) => [problem.index, index]));
 
@@ -71,7 +78,7 @@ export const addMissingParticipantRows = (
         solvedProblems.set(name, new Set<string>());
       }
 
-      const row = missingRows.get(name) as RanklistRow;
+      const row = missingRows.get(name) as CodeforcesRanklistRowDto;
       const result = row.problemResults[problemIndex];
       const solved = solvedProblems.get(name) as Set<string>;
       row.lastSubmissionTimeSeconds = Math.max(

@@ -1,7 +1,8 @@
 import React from 'react';
+import type { CodeforcesSubmissionDto } from '@/src/integrations/codeforces/contracts';
 import Veredict from './Veredict';
 
-export default function Submission({ submission } : { submission: Submission }) {
+export default function Submission({ submission } : { submission: CodeforcesSubmissionDto }) {
   const submissionUrl = `https://codeforces.com/contest/${submission.contestId}/submission/${submission.id}`;
 
   return (

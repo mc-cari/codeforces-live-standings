@@ -3,13 +3,21 @@ import React, {
 } from 'react';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
+import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
+import type {
+  CodeforcesContestDto,
+  CodeforcesPartyDto,
+  CodeforcesRanklistRowDto,
+  CodeforcesStandingsDto,
+  CodeforcesSubmissionDto,
+  CodeforcesUserDto,
+} from '@/src/integrations/codeforces/contracts';
 import StandingsList from '../../../components/standings/StandingsList';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
 import ContestLoading from '../../../components/ContestLoading';
 import ContestCountdown from '../../../components/ContestCountdown';
 import useInterval from '../../../hooks/useInterval';
 import getName from '../../../utils/getName';
-import codeforcesFetch from '../../../utils/codeforcesFetch';
 import { addMissingParticipantRows } from '../../../utils/participantStandings';
 import {
   LIVE_POLLING, LOADING_PROGRESS, MAX_SUBMISSIONS_IN_MEMORY,
@@ -17,17 +25,17 @@ import {
 import { getHandlesFromQuery } from '../../../utils/handlesQuery';
 
 export default function Standings() {
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [submissions, setSubmissions] = useState<CodeforcesSubmissionDto[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
-  const [globalStandings, setGlobalStandings] = useState<Standings>();
+  const [globalStandings, setGlobalStandings] = useState<CodeforcesStandingsDto>();
   const [delay, setDelay] = useState<number>(LIVE_POLLING.initialDelayMilliseconds);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(8);
   const [loadingStage, setLoadingStage] = useState('Preparing live standings...');
-  const [contestInfo, setContestInfo] = useState<Contest>();
+  const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
   const [isContestReady, setIsContestReady] = useState(false);
   const [isContestFinished, setIsContestFinished] = useState(false);
   const hasLoadedInitialData = useRef(false);
@@ -38,7 +46,7 @@ export default function Standings() {
   } = Router.query;
   const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
 
-  const isSubmissionAuthorInUsers = (author : Party) :
+  const isSubmissionAuthorInUsers = (author : CodeforcesPartyDto) :
   Boolean => author.members.reduce((inUsers, user) => inUsers
   || userHandles.includes(user.handle), false);
 
@@ -81,9 +89,9 @@ export default function Standings() {
       }
 
       const standingsPromise = await standingsResponse.json();
-      const officialStandings : Standings = {
+      const officialStandings : CodeforcesStandingsDto = {
         ...standingsPromise.result,
-        rows: standingsPromise.result.rows.filter((row: RanklistRow) => (
+        rows: standingsPromise.result.rows.filter((row: CodeforcesRanklistRowDto) => (
           isSubmissionAuthorInUsers(row.party)
         )),
       };
@@ -92,7 +100,7 @@ export default function Standings() {
         throw new Error('Failed to fetch submissions data');
       }
       const submissionsPromise = await submissionsResponse.json();
-      const newSubmissions : Submission[] = submissionsPromise.result.reverse();
+      const newSubmissions : CodeforcesSubmissionDto[] = submissionsPromise.result.reverse();
       const standings = addMissingParticipantRows(officialStandings, newSubmissions, getName);
       if (standings.contest.phase === 'FINISHED') setIsContestFinished(true);
 
@@ -115,7 +123,7 @@ export default function Standings() {
         previousPosition = position;
       });
 
-      const oldSubmissions : Submission[] = submissions.slice(0).reverse();
+      const oldSubmissions : CodeforcesSubmissionDto[] = submissions.slice(0).reverse();
       let oldId = 0; let
         newSubmissionsCountUpdate = 0;
       newSubmissions.forEach((submission) => {
@@ -171,7 +179,7 @@ export default function Standings() {
         if (!response.ok) throw new Error('Unable to load contest information');
         const payload = await response.json();
         if (!active) return;
-        const detectedContest = payload.result as Contest;
+        const detectedContest = payload.result as CodeforcesContestDto;
         setContestInfo(detectedContest);
         setIsContestReady(detectedContest.phase !== 'BEFORE');
       } catch (error) {
@@ -213,7 +221,7 @@ export default function Standings() {
         }
 
         const usersInfoPromise = await usersInfoResponse.json();
-        const usersInfo : User[] = usersInfoPromise.result;
+        const usersInfo : CodeforcesUserDto[] = usersInfoPromise.result;
 
         const userRankMap = new Map<string, string>();
         usersInfo.forEach((user) => {

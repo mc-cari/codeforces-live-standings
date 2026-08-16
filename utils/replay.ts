@@ -1,22 +1,27 @@
 import getName from './getName';
+import type {
+  CodeforcesRanklistRowDto,
+  CodeforcesStandingsDto,
+  CodeforcesSubmissionDto,
+} from '@/src/integrations/codeforces/contracts';
 import { MAX_SUBMISSIONS_IN_MEMORY } from './constants';
 import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring';
 
 type ReplaySnapshot = {
   localStandings: Map<string, number>;
-  standings: Standings;
-  submissions: Submission[];
+  standings: CodeforcesStandingsDto;
+  submissions: CodeforcesSubmissionDto[];
 };
 
-const compareRows = (first: RanklistRow, second: RanklistRow) => {
+const compareRows = (first: CodeforcesRanklistRowDto, second: CodeforcesRanklistRowDto) => {
   if (first.points !== second.points) return second.points - first.points;
   if (first.penalty !== second.penalty) return first.penalty - second.penalty;
   return getName(first.party).localeCompare(getName(second.party));
 };
 
 export const buildReplaySnapshot = (
-  finalStandings: Standings,
-  events: Submission[],
+  finalStandings: CodeforcesStandingsDto,
+  events: CodeforcesSubmissionDto[],
   elapsedSeconds: number,
 ): ReplaySnapshot => {
   const solvedProblems = new Map<string, Set<string>>();
@@ -38,7 +43,7 @@ export const buildReplaySnapshot = (
     getName(row.party),
     row.problemResults,
   ]));
-  const releasedSubmissions: Submission[] = [];
+  const releasedSubmissions: CodeforcesSubmissionDto[] = [];
 
   events.forEach((event) => {
     if (event.relativeTimeSeconds > elapsedSeconds) return;

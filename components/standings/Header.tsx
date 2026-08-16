@@ -1,10 +1,11 @@
 import React from 'react';
+import type { CodeforcesStandingsDto } from '@/src/integrations/codeforces/contracts';
 import NormalPointsHeader from './NormalPointsHeader';
 import EducationalPointsHeader from './EducationalPointsHeader';
 
 export default function Header({
   globalStandings, contestType,
-} : { globalStandings: Standings, contestType: string }) {
+} : { globalStandings: CodeforcesStandingsDto, contestType: string }) {
   return (
     <div className="flex flex-row h-14 w-full border-b-2 border-gray-800">
       <div

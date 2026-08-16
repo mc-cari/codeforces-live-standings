@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import ExpiringCache from './expiringCache.ts';
+import ExpiringCache from '../src/integrations/codeforces/server/expiringCache.ts';
 
 test('returns a cached value before it expires', () => {
   let now = 1_000;

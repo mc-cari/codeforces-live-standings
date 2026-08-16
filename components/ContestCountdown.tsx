@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
 import { formatCountdown, secondsUntilContest } from '../utils/contestConfiguration';
 
 type ContestCountdownProps = {
-  contest: Contest;
+  contest: CodeforcesContestDto;
   onComplete: () => void;
 };
 

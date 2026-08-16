@@ -88,6 +88,13 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await expect(page.getByText('Codeforces Round 1735')).toBeVisible();
   await expect(page.getByText('Official standings')).toBeVisible();
   await expect(page.getByText('Import Codeforces friends automatically')).toBeVisible();
+  await page.getByPlaceholder('your_handle,second_handle,').fill('preview_handle');
+  await page.getByRole('button', { name: 'Add' }).click();
+  const preview = page.getByRole('region', { name: 'Mini contest simulation' });
+  await expect(preview.getByRole('heading', { name: 'Codeforces Round 1735' })).toBeVisible();
+  await expect(preview.getByText('preview_handle')).toBeVisible();
+  await expect(preview.getByRole('button')).toHaveCount(0);
+  await expect(preview.getByRole('link')).toHaveCount(0);
 });
 
 test('friend credentials sign a direct request and never reach the app server', async ({ page }) => {
@@ -118,14 +125,12 @@ test('friend credentials sign a direct request and never reach the app server', 
   await expect(page.getByLabel('Codeforces API secret')).toHaveValue('');
 });
 
-test('mini contest and replay controls are operable', async ({ page }) => {
+test('mini contest preview has no inline controls', async ({ page }) => {
   await installCodeforcesMocks(page);
   await page.goto('/');
   const preview = page.getByRole('region', { name: 'Mini contest simulation' });
-  await expect(preview.getByRole('button', { name: 'Pause' })).toBeVisible();
-  await preview.getByRole('button', { name: 'Pause' }).click();
-  await expect(preview.getByRole('button', { name: 'Play' })).toBeVisible();
-  await preview.getByRole('button', { name: 'Restart' }).click();
+  await expect(preview.getByRole('button')).toHaveCount(0);
+  await expect(preview.getByRole('link')).toHaveCount(0);
 
   await page.goto('/contests/1735/replay?contestType=normal&demo=true&h=VG91cmlzdA');
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();

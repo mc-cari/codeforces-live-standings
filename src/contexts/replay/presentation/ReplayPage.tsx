@@ -372,7 +372,6 @@ export default function ReplayPage() {
           </>
         )}
         mode="REPLAY"
-        status={isPlaying ? `${speed}× playback` : 'Playback paused'}
         statusTone={isPlaying ? 'live' : 'paused'}
       />
       <div className="border-b border-[#25364d] bg-[#0d1b2a] px-3 py-2">
@@ -426,7 +425,7 @@ export default function ReplayPage() {
       </div>
       <div className="flex min-h-0 grow">
         <section className={`${mobilePanel === 'submissions' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-2/5 lg:p-3`} aria-label="Replay submissions">
-          <div className="broadcast-panel h-full overflow-hidden rounded-sm">
+          <div className="h-full overflow-hidden rounded-sm broadcast-panel">
             <LiveSubmissionsList
               submissions={cinematicSubmissions as unknown as Submission[]}
               newSubmissionsCount={testingSubmissions.size}
@@ -436,7 +435,7 @@ export default function ReplayPage() {
           </div>
         </section>
         <section className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-3/5 lg:p-3`} aria-label="Replay standings">
-          <div className="broadcast-panel h-full overflow-hidden rounded-sm">
+          <div className="h-full overflow-hidden rounded-sm broadcast-panel">
             <StandingsList
               contestType={contestType as string}
               globalStandings={snapshot.standings as unknown as Standings}

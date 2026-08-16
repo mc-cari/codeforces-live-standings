@@ -12,7 +12,7 @@ type ContestRibbonProps = {
   contestId: string;
   mode: 'LIVE' | 'REPLAY';
   clock?: string;
-  status: string;
+  status?: string;
   statusTone?: 'live' | 'paused' | 'finished';
   controls?: ReactNode;
 };
@@ -56,25 +56,25 @@ export default function ContestRibbon({
     <header className="border-b border-[#25364d] bg-[#07111f]" data-testid="contest-ribbon">
       <div className="mx-auto flex min-h-16 max-w-[1600px] flex-wrap items-center gap-x-5 gap-y-2 px-3 py-2 sm:px-5">
         <Link className="font-broadcast text-lg font-bold uppercase tracking-[0.08em]" href="/">
-          CF <span className="text-[#65adff]">Live Desk</span>
+          CF <span className="text-[#65adff]">Live Standings</span>
         </Link>
         <div className="hidden h-8 w-px bg-[#25364d] sm:block" />
         <div className="min-w-0 grow">
           <p className="broadcast-label">Contest #{contestId}</p>
-          <h1 className="truncate font-broadcast text-xl font-semibold uppercase tracking-wide sm:text-2xl">
+          <h1 className="text-xl font-semibold tracking-wide uppercase truncate font-broadcast sm:text-2xl">
             {contest?.name || `Codeforces ${contestId}`}
           </h1>
         </div>
         <div className="flex items-center gap-2 rounded-sm border border-[#25364d] bg-[#0d1b2a] px-3 py-2">
           <span className={`h-2 w-2 rounded-full ${tone} ${statusTone === 'live' ? 'animate-pulse' : ''}`} />
-          <div>
-            <p className="broadcast-label leading-none">{mode}</p>
-            <p className="mt-1 text-xs font-semibold text-white">{status}</p>
+          <div className={status ? undefined : 'flex items-center'}>
+            <p className="leading-none broadcast-label">{mode}</p>
+            {status && <p className="mt-1 text-xs font-semibold text-white">{status}</p>}
           </div>
         </div>
-        <div className="min-w-28 text-right">
+        <div className="text-right min-w-28">
           <p className="broadcast-label">Contest time</p>
-          <p className="font-data text-lg text-white">{clock || formatClock(elapsedSeconds)}</p>
+          <p className="text-lg text-white font-data">{clock || formatClock(elapsedSeconds)}</p>
         </div>
         {controls && <div className="flex items-center gap-2">{controls}</div>}
       </div>

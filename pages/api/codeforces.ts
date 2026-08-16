@@ -275,6 +275,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const friendCredentials = method === 'user.friends' && req.method === 'POST'
       ? getFriendCredentials(req.body)
       : undefined;
+    if (method === 'user.friends' && !friendCredentials) {
+      res.status(400).json({
+        status: 'FAILED',
+        comment: 'Codeforces API key and secret are required for friend imports',
+      });
+      return;
+    }
     const response = friendCredentials
       ? await fetchCodeforces(method, parameters, friendCredentials)
       : await getCodeforcesResponse(method, parameters);

@@ -25,7 +25,6 @@ export default function Home() {
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importError, setImportError] = useState<string>('');
-  const [friendHandleInput, setFriendHandleInput] = useState('');
   const [friendApiKeyInput, setFriendApiKeyInput] = useState('');
   const [friendApiSecretInput, setFriendApiSecretInput] = useState('');
   const [isImportingFriends, setIsImportingFriends] = useState(false);
@@ -136,16 +135,13 @@ export default function Home() {
 
   const importFriendHandles = async () => {
     try {
-      if (!contestInfo || contestInfo.phase !== 'BEFORE') {
-        throw new Error('Friend imports are available during contest setup only');
-      }
-
-      const friendHandle = friendHandleInput.trim();
       const apiKey = friendApiKeyInput.trim();
       const apiSecret = friendApiSecretInput.trim();
-      if (!friendHandle) throw new Error('Enter the Codeforces account handle first');
-      if ((apiKey && !apiSecret) || (!apiKey && apiSecret)) {
-        throw new Error('Enter both the API key and API secret, or leave both blank');
+      if (!contestInfo) {
+        throw new Error('Contest Id not set');
+      }
+      if (!apiKey || !apiSecret) {
+        throw new Error('Enter both the Codeforces API key and API secret');
       }
 
       setIsImportingFriends(true);
@@ -496,60 +492,50 @@ export default function Home() {
                     {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
                   </div>
 
-                  {contestInfo?.phase === 'BEFORE' && (
+                  {contestInfo && (
                     <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
-                      <label className="block mb-2 text-sm font-medium text-cyan-100" htmlFor="friend-handle">
+                      <p className="block mb-2 text-sm font-medium text-cyan-100">
                         Import Codeforces friends
-                      </label>
-                      <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
-                        The API returns friends for the account behind the credentials. Enter that account&apos;s
-                        handle for confirmation. Leave the key fields blank to use this deployment&apos;s configured
-                        credentials.
                       </p>
-                      <input
-                        className={
-                          'w-full p-3 mb-2 bg-gray-900 border border-gray-600 rounded-lg '
-                          + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
-                        }
-                        id="friend-handle"
-                        type="text"
-                        value={friendHandleInput}
-                        onChange={(event) => setFriendHandleInput(event.target.value)}
-                        placeholder="your-codeforces-handle"
-                        autoComplete="username"
-                      />
-                      <details className="mb-3">
-                        <summary className="cursor-pointer text-xs text-cyan-200/80">
-                          Use a different API account
-                        </summary>
-                        <div className="pt-3 space-y-2">
-                          <input
-                            className={
-                              'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
-                              + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
-                            }
-                            type="password"
-                            value={friendApiKeyInput}
-                            onChange={(event) => setFriendApiKeyInput(event.target.value)}
-                            placeholder="Codeforces API key"
-                            autoComplete="off"
-                          />
-                          <input
-                            className={
-                              'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
-                              + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
-                            }
-                            type="password"
-                            value={friendApiSecretInput}
-                            onChange={(event) => setFriendApiSecretInput(event.target.value)}
-                            placeholder="Codeforces API secret"
-                            autoComplete="off"
-                          />
-                          <p className="text-xs text-gray-500">
-                            These credentials are used for this request only and are not saved by the app.
-                          </p>
-                        </div>
-                      </details>
+                      <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
+                        Import friends for the Codeforces account associated with your API credentials. This works
+                        during setup, live contests, and replays.
+                      </p>
+                      <a
+                        className="inline-block mb-3 text-xs text-cyan-300 underline hover:text-cyan-200"
+                        href="https://codeforces.com/settings/api"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Get an API key and secret from Codeforces settings
+                      </a>
+                      <div className="mb-3 space-y-2">
+                        <input
+                          className={
+                            'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                            + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                          }
+                          type="password"
+                          value={friendApiKeyInput}
+                          onChange={(event) => setFriendApiKeyInput(event.target.value)}
+                          placeholder="Codeforces API key"
+                          autoComplete="off"
+                        />
+                        <input
+                          className={
+                            'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                            + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                          }
+                          type="password"
+                          value={friendApiSecretInput}
+                          onChange={(event) => setFriendApiSecretInput(event.target.value)}
+                          placeholder="Codeforces API secret"
+                          autoComplete="off"
+                        />
+                      </div>
+                      <p className="mb-3 text-xs text-gray-500">
+                        These credentials are used for this request only and are not saved by the app.
+                      </p>
                       <button
                         className={
                           'w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '

@@ -200,7 +200,10 @@ export default function MiniContestSimulation({
     ? rows.findIndex((row) => row.participantIndex === latestEvent.participantIndex) + 1
     : 0;
   const latestSubmission = latestEvent && latestParticipant && latestRow
-    ? buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved)
+    ? {
+      ...buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved),
+      points: latestRow.points,
+    }
     : undefined;
   const recentEvents = visibleEvents.filter((event) => (
     event.second <= elapsed && elapsed - event.second < RECENT_EVENT_WINDOW_SECONDS
@@ -225,14 +228,14 @@ export default function MiniContestSimulation({
         </div>
       </header>
 
-      <div className="grid grid-cols-[2rem_minmax(7rem,1fr)_3rem_3rem_repeat(4,2.25rem)] border-b border-[#25364d] bg-[#13243a] px-2 py-2 text-center text-xs text-[#91a3ba]">
+      <div className="grid grid-cols-[2rem_minmax(0,1fr)_3rem_3rem_repeat(4,minmax(1.75rem,2.25rem))] border-b border-[#25364d] bg-[#13243a] px-2 py-2 text-center text-xs text-[#91a3ba]">
         <span>#</span><span className="text-left">Handle</span><span>PTS</span><span>Σ</span>
         {problems.map((problem) => <span key={problem}>{problem}</span>)}
       </div>
       <div aria-live="polite">
         {rows.map((row, index) => (
           <div
-            className={`grid grid-cols-[2rem_minmax(7rem,1fr)_3rem_3rem_repeat(4,2.25rem)] items-center border-b border-[#25364d]/70 px-2 py-2 text-center text-sm transition-all ${isSetupUpdating || (!reducedMotion && recentEvents.some((event) => event.participantIndex === row.participantIndex)) ? 'animate-pulse bg-[#0b2642]' : ''}`}
+            className={`grid grid-cols-[2rem_minmax(0,1fr)_3rem_3rem_repeat(4,minmax(1.75rem,2.25rem))] items-center border-b border-[#25364d]/70 px-2 py-2 text-center text-sm transition-all ${isSetupUpdating || (!reducedMotion && recentEvents.some((event) => event.participantIndex === row.participantIndex)) ? 'animate-pulse bg-[#0b2642]' : ''}`}
             key={row.handle}
           >
             <span className="font-data text-[#91a3ba]">{index + 1}</span>

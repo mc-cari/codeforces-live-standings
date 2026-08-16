@@ -4,6 +4,8 @@ import Veredict from './Veredict';
 import Position from './Position';
 import UserHandle from './UserHandle';
 
+const compactProblems = ['A', 'B', 'C', 'D'];
+
 export default function LiveSubmission({
   submission, isNew, userCount, userRank, isGym, compact = false,
 }
@@ -17,7 +19,7 @@ export default function LiveSubmission({
   return (
     <div
       className={`${compact
-        ? 'relative grid min-w-0 h-full grid-cols-[2rem_minmax(7rem,1fr)_3rem_3rem_3rem] border-b border-gray-800/30'
+        ? 'relative grid min-w-0 h-full grid-cols-[2rem_minmax(0,1fr)_3rem_3rem_repeat(4,minmax(1.75rem,2.25rem))] border-b border-gray-800/30'
         : 'relative flex min-w-0 h-full flex-row border-b border-gray-800/30'} hover:bg-gray-800/30 transition-all ${
         isNew || submission.verdict === 'TESTING' ? 'animate-pulse bg-blue-900/20' : ''
       }`}
@@ -29,37 +31,61 @@ export default function LiveSubmission({
         aria-label={`Open submission ${submission.id}`}
         className="absolute inset-0 z-0"
       />
-      <div className={compact ? 'text-xl' : 'w-1/12 text-xl'}>
-        <Position
-          position={submission.author.rank}
-          userCount={userCount}
-        />
-      </div>
+      {compact ? (
+        <>
+          <div className="text-xl">
+            <Position position={submission.author.rank} userCount={userCount} />
+          </div>
+          <div className="relative z-10 min-w-0 flex items-center px-2 text-sm">
+            <UserHandle author={submission.author} userRank={userRank} />
+          </div>
+          <div className="flex items-center justify-center text-sm font-semibold">
+            {submission.points}
+          </div>
+          <div className="flex items-center justify-center text-sm font-semibold text-[#91a3ba]">
+            {submission.numberOfProblems}
+          </div>
+          {compactProblems.map((problem) => (
+            <div className="flex items-center justify-center" key={problem}>
+              {problem === submission.problem.index ? (
+                <span className="flex h-7 w-8 overflow-hidden rounded-sm">
+                  <Veredict veredict={submission.verdict} test={submission.passedTestCount} />
+                </span>
+              ) : <span className="font-data text-[#64758c]">·</span>}
+            </div>
+          ))}
+        </>
+      ) : (
+        <>
+          <div className="w-1/12 text-xl">
+            <Position
+              position={submission.author.rank}
+              userCount={userCount}
+            />
+          </div>
 
-      <div className="relative z-10 min-w-0 flex items-center p-2 text-lg">
-        <UserHandle author={submission.author} userRank={userRank} />
-      </div>
-      <div className={compact
-        ? 'flex items-center justify-center text-sm font-semibold'
-        : 'w-1/12 flex items-center justify-center text-lg font-semibold'}>
-        {submission.numberOfProblems}
-      </div>
-      <div className={compact
-        ? 'flex items-center justify-center text-lg font-bold'
-        : 'w-1/12 flex items-center justify-center text-xl font-bold'}>
-        <a
-          href={problemUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="relative z-10"
-          aria-label={`Open problem ${submission.problem.index}`}
-        >
-          {submission.problem.index}
-        </a>
-      </div>
-      <div className={compact ? 'text-lg' : 'w-1/12 text-xl'}>
-        <Veredict veredict={submission.verdict} test={submission.passedTestCount} />
-      </div>
+          <div className="relative z-10 min-w-0 grow flex items-center p-2 text-lg">
+            <UserHandle author={submission.author} userRank={userRank} />
+          </div>
+          <div className="w-1/12 flex items-center justify-center text-lg font-semibold">
+            {submission.numberOfProblems}
+          </div>
+          <div className="w-1/12 flex items-center justify-center text-xl font-bold">
+            <a
+              href={problemUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10"
+              aria-label={`Open problem ${submission.problem.index}`}
+            >
+              {submission.problem.index}
+            </a>
+          </div>
+          <div className="w-1/12 text-xl">
+            <Veredict veredict={submission.verdict} test={submission.passedTestCount} />
+          </div>
+        </>
+      )}
     </div>
   );
 }

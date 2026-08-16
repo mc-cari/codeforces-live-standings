@@ -310,7 +310,7 @@ export default function ContestSetupPage() {
           </div>
 
           <div className="lg:sticky lg:top-6">
-            <MiniContestSimulation contestName={contestInfo?.name} handles={handles} />
+            <MiniContestSimulation contestId={contestInfo?.id} contestName={contestInfo?.name} handles={handles} />
             <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-sm border border-[#25364d] bg-[#25364d]" id="how-it-works">
               {[
                 ['Choose', 'Enter any Codeforces contest ID.'],

@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import type { Submission } from '@/src/shared/domain/contest';
+import LiveSubmission from '@/components/LiveSubmission';
 
 const DURATION_SECONDS = 28;
 const DEFAULT_PARTICIPANTS = ['bytebloom', 'dp_dreamer', 'greedyfox', 'stacktrace'];
@@ -17,13 +19,61 @@ const events = [
 const RECENT_EVENT_WINDOW_SECONDS = 1;
 
 type ProblemState = { attempts: number; solvedAt?: number };
-type MiniContestSimulationProps = { contestName?: string; handles?: string[] };
+type MiniContestSimulationProps = { contestId?: number; contestName?: string; handles?: string[] };
 type PreviewParticipant = { handle: string; participantIndex: number };
 
 const formatClock = (seconds: number) => `00:${Math.floor(seconds / 60)
   .toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
 
-export default function MiniContestSimulation({ contestName, handles }: MiniContestSimulationProps) {
+const buildPreviewSubmission = (
+  contestId: number,
+  event: typeof events[number],
+  participant: PreviewParticipant,
+  rank: number,
+  solved: number,
+): Submission => {
+  const points = problemPoints[event.problem];
+  const accepted = event.verdict === 'accepted';
+  return {
+    id: event.second * 10 + event.participantIndex,
+    contestId,
+    creationTimeSeconds: event.second,
+    relativeTimeSeconds: event.second,
+    problem: {
+      contestId,
+      problemSetName: '',
+      index: event.problem,
+      name: `Problem ${event.problem}`,
+      type: 'PROGRAMMING',
+      points,
+      rating: 0,
+      tags: [],
+    },
+    author: {
+      contestId,
+      members: [{ handle: participant.handle, name: participant.handle }],
+      participantType: 'CONTESTANT',
+      teamId: undefined,
+      teamName: undefined,
+      ghost: false,
+      room: undefined,
+      startTimeSeconds: undefined,
+      rank,
+    },
+    programmingLanguage: 'GNU C++17',
+    verdict: accepted ? 'OK' : 'WRONG_ANSWER',
+    testset: 'TESTS',
+    passedTestCount: accepted ? 42 : 0,
+    timeConsumedMillis: 0,
+    memoryConsumedBytes: 0,
+    points: accepted ? points : 0,
+    numberOfProblems: solved,
+  };
+};
+
+export default function MiniContestSimulation({
+  contestId = 1735, contestName, handles,
+}: MiniContestSimulationProps) {
   const container = useRef<HTMLElement | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
@@ -143,6 +193,15 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
   const latestParticipant = latestEvent
     ? previewParticipants.find((participant) => participant.participantIndex === latestEvent.participantIndex)
     : undefined;
+  const latestRow = latestEvent
+    ? rows.find((row) => row.participantIndex === latestEvent.participantIndex)
+    : undefined;
+  const latestRank = latestEvent
+    ? rows.findIndex((row) => row.participantIndex === latestEvent.participantIndex) + 1
+    : 0;
+  const latestSubmission = latestEvent && latestParticipant && latestRow
+    ? buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved)
+    : undefined;
   const recentEvents = visibleEvents.filter((event) => (
     event.second <= elapsed && elapsed - event.second < RECENT_EVENT_WINDOW_SECONDS
   ));
@@ -199,13 +258,22 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
         ))}
       </div>
 
-      <footer className="bg-[#081525] px-4 py-3">
-        <p className="min-w-0 text-sm text-[#91a3ba]">
-          {latestEvent
-            ? <><span className="text-white">{latestParticipant?.handle}</span> submitted {latestEvent.problem}</>
-            : 'Waiting for the first submission…'}
-        </p>
-      </footer>
+      <div aria-live="polite" className="h-8 bg-[#081525]">
+        {latestSubmission ? (
+          <LiveSubmission
+            isGym={false}
+            isNew={!reducedMotion && Boolean(latestEvent && recentEvents.some((event) => (
+              event.participantIndex === latestEvent.participantIndex
+                && event.problem === latestEvent.problem
+            )))}
+            submission={latestSubmission}
+            userCount={previewParticipants.length}
+            userRank={new Map()}
+          />
+        ) : (
+          <div className="flex h-full items-center px-4 text-xs text-[#64758c]">Waiting for the first submission…</div>
+        )}
+      </div>
     </section>
   );
 }

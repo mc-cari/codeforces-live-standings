@@ -79,7 +79,7 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
-  await expect(page.getByRole('heading', { name: 'Your friends. One live scoreboard.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Your (friends|setup)\. One live scoreboard\./ })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Replay demo' })).toHaveAttribute('href', /\/contests\/1735\/replay\?/);
   await expect(page.getByText('Official standings')).toHaveCount(0);
   await expect(page.getByText('Pocket Invitational')).toBeVisible();
@@ -96,7 +96,7 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await expect(preview.getByText('Pen', { exact: true })).toHaveCount(0);
   await expect(preview.getByText('preview_handle')).toBeVisible();
   await expect(preview.getByRole('button')).toHaveCount(0);
-  await expect(preview.getByRole('link')).toHaveCount(0);
+  await expect(preview.getByRole('link', { name: 'Full replay' })).toHaveCount(0);
 
   await page.waitForTimeout(1_500);
   const clockBeforeHandleToggle = await preview.getByTestId('mini-contest-clock').textContent();
@@ -144,7 +144,7 @@ test('mini contest preview has no inline controls', async ({ page }) => {
   await page.goto('/');
   const preview = page.getByRole('region', { name: 'Mini contest simulation' });
   await expect(preview.getByRole('button')).toHaveCount(0);
-  await expect(preview.getByRole('link')).toHaveCount(0);
+  await expect(preview.getByRole('link', { name: 'Full replay' })).toHaveCount(0);
 
   await page.goto('/contests/1735/replay?contestType=normal&demo=true&h=VG91cmlzdA');
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();

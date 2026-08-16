@@ -16,7 +16,7 @@ export default function LiveSubmission({
 
   return (
     <div
-      className={`relative h-full flex flex-row border-b border-gray-800/30 hover:bg-gray-800/30 transition-all ${
+      className={`relative flex min-w-0 h-full flex-row border-b border-gray-800/30 hover:bg-gray-800/30 transition-all ${
         isNew || submission.verdict === 'TESTING' ? 'animate-pulse bg-blue-900/20' : ''
       }`}
     >
@@ -34,7 +34,7 @@ export default function LiveSubmission({
         />
       </div>
 
-      <div className="relative z-10 grow flex items-center text-lg p-2">
+      <div className="relative z-10 min-w-0 grow flex items-center text-lg p-2">
         <UserHandle author={submission.author} userRank={userRank} />
       </div>
       <div className="w-1/12 flex items-center justify-center text-lg font-semibold">

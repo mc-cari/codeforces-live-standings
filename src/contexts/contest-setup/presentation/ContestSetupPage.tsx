@@ -3,7 +3,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 import type { Contest } from '@/src/shared/domain/contest';
 import { encodeHandles } from '@/src/shared/domain/participantHandles';
-import { getContestConfiguration } from '../domain/contestConfiguration';
+import {
+  formatCountdown,
+  getContestConfiguration,
+  secondsUntilContest,
+} from '../domain/contestConfiguration';
 import {
   normalizeParticipantHandles,
   type ParticipantSelection,
@@ -15,8 +19,12 @@ import MiniContestSimulation from './MiniContestSimulation';
 type LookupState = 'idle' | 'loading' | 'error';
 
 const formatContestStart = (contest: Contest) => new Intl.DateTimeFormat(undefined, {
-  dateStyle: 'medium',
-  timeStyle: 'short',
+  year: 'numeric',
+  month: 'short',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  timeZoneName: 'short',
 }).format(new Date(contest.startTimeSeconds * 1_000));
 
 export default function ContestSetupPage() {
@@ -27,6 +35,7 @@ export default function ContestSetupPage() {
   const [lookupError, setLookupError] = useState('');
   const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
   const [isLoadingUpcoming, setIsLoadingUpcoming] = useState(true);
+  const [nowMilliseconds, setNowMilliseconds] = useState(() => Date.now());
   const [handleInput, setHandleInput] = useState('');
   const [handles, setHandles] = useState<string[]>([]);
   const [participantCount, setParticipantCount] = useState('15');
@@ -43,6 +52,11 @@ export default function ContestSetupPage() {
     () => (contestInfo ? getContestConfiguration(contestInfo) : undefined),
     [contestInfo],
   );
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNowMilliseconds(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -337,16 +351,31 @@ export default function ContestSetupPage() {
           </div>
           {!isLoadingUpcoming && upcomingContests.length === 0 && <p className="text-[#91a3ba]">No live or upcoming contests were found.</p>}
           <div className="grid gap-3 md:grid-cols-3">
-            {upcomingContests.map((contest) => (
-              <button className="broadcast-panel group rounded-sm p-4 text-left hover:border-[#2d8cff]" key={contest.id} onClick={() => selectContest(contest)} type="button">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="font-data text-xs text-[#65adff]">#{contest.id}</span>
-                  <span className={`h-2 w-2 rounded-full ${contest.phase === 'CODING' ? 'animate-pulse bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
-                </div>
-                <h3 className="min-h-12 font-medium text-white group-hover:text-[#9fc8ff]">{contest.name}</h3>
-                <p className="mt-3 text-sm text-[#91a3ba]">{contest.phase === 'CODING' ? 'Live now' : formatContestStart(contest)}</p>
-              </button>
-            ))}
+            {upcomingContests.map((contest) => {
+              const isLive = contest.phase === 'CODING';
+              return (
+                <button className="broadcast-panel group rounded-sm p-4 text-left hover:border-[#2d8cff]" key={contest.id} onClick={() => selectContest(contest)} type="button">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-data text-xs text-[#65adff]">#{contest.id}</span>
+                    <span className={`h-2 w-2 rounded-full ${isLive ? 'animate-pulse bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
+                  </div>
+                  <h3 className="min-h-12 font-medium text-white group-hover:text-[#9fc8ff]">{contest.name}</h3>
+                  <p className="mt-3 text-sm text-[#91a3ba]">{isLive ? 'Live now' : formatContestStart(contest)}</p>
+                  <div className="mt-4 flex items-end justify-between gap-3 border-t border-[#25364d] pt-3">
+                    <div>
+                      <p className="broadcast-label">{isLive ? 'Status' : 'Starts in'}</p>
+                      <p
+                        className={`font-data text-lg tabular-nums ${isLive ? 'text-[#70e5a5]' : 'text-[#9fc8ff]'}`}
+                        data-testid={`upcoming-countdown-${contest.id}`}
+                      >
+                        {isLive ? 'LIVE NOW' : formatCountdown(secondsUntilContest(contest, nowMilliseconds))}
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-[0.14em] text-[#64758c] group-hover:text-[#9fc8ff]">Set up</span>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </section>
       </div>

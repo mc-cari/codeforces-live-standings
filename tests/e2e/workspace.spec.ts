@@ -13,6 +13,14 @@ const contest = {
   kind: '', icpcRegion: '', country: '', city: '', season: '',
 };
 
+const upcomingContest = {
+  ...contest,
+  id: 2246,
+  name: 'Codeforces Round 2246',
+  phase: 'BEFORE',
+  startTimeSeconds: Math.floor(Date.now() / 1_000) + 90,
+};
+
 const party = {
   contestId: 1735,
   members: [{ handle: 'Tourist', name: 'Tourist' }],
@@ -62,7 +70,7 @@ const installCodeforcesMocks = async (page: Page) => {
     appRequests.push(url.toString());
     const method = url.searchParams.get('method');
     const result = {
-      'contest.list': [contest],
+      'contest.list': [contest, upcomingContest],
       'contest.info': contest,
       'contest.standings': standings,
       'contest.status': [],
@@ -83,6 +91,7 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await expect(page.getByRole('link', { name: 'Replay demo' })).toHaveAttribute('href', /\/contests\/1735\/replay\?/);
   await expect(page.getByText('Official standings')).toHaveCount(0);
   await expect(page.getByText('Pocket Invitational')).toBeVisible();
+  await expect(page.getByTestId(`upcoming-countdown-${upcomingContest.id}`)).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
 
   await page.getByLabel('Codeforces contest ID').fill('1735');
   await expect(page.getByText('Codeforces Round 1735')).toBeVisible();

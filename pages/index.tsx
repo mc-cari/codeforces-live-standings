@@ -494,17 +494,13 @@ export default function Home() {
 
                   {contestInfo && (
                     <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
-                      <p className="block mb-2 text-sm font-medium text-cyan-100">
-                        Import Codeforces friends
-                      </p>
                       <details>
-                        <summary className="cursor-pointer text-sm text-cyan-200">
-                          Optional: import friend handles automatically
+                        <summary className="text-sm font-medium cursor-pointer text-cyan-200">
+                          Import Codeforces friends automatically
                         </summary>
                         <div className="pt-3">
                           <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
-                            Create an API key for this import and delete it afterward. The credentials are used in
-                            this browser to sign one request directly to Codeforces and are not sent to this app server.
+                            Create an API key for this import and delete it after.
                           </p>
                           <a
                             className="inline-block mb-3 text-xs underline text-cyan-300 hover:text-cyan-200"

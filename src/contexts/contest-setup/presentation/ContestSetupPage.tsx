@@ -160,6 +160,12 @@ export default function ContestSetupPage() {
             CF <span className="text-[#65adff]">Live Desk</span>
           </Link>
           <nav className="flex items-center gap-5 text-sm text-[#91a3ba]" aria-label="Primary navigation">
+            <Link
+              className="rounded-sm border border-[#2d8cff] px-3 py-2 font-semibold text-[#9fc8ff] transition-colors hover:bg-[#12315a] hover:text-white"
+              href="/contests/1735/replay?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true&demo=true&h=TWF0ZW9DVjttYy5fY2FyaTtkbWdhNDQ7TWFyY2tlc3M7anVsaWFuZmVycmVzO3BhY2hhMjg4MDtHaWdhX0Nyb25vczttYXJ0aW5zO21hcnRpbml1cztNYXRlbztNZXNTaW1vbkZhbGxvbjE5O1NjYW5vO0FnYXJpYztlc3RveS1yZS1zZWJhZG87VGFpbmVsO01hcmNlYW50YXN5O0FuZ3J5U2VhbA"
+            >
+              Replay demo
+            </Link>
             <a className="hover:text-white" href="#how-it-works">How it works</a>
             <a className="hover:text-white" href="https://github.com/mc-cari/codeforces-live-standings">GitHub</a>
           </nav>

@@ -80,6 +80,7 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await page.waitForLoadState('networkidle');
 
   await expect(page.getByRole('heading', { name: 'Your friends. One live scoreboard.' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Replay demo' })).toHaveAttribute('href', /\/contests\/1735\/replay\?/);
   await expect(page.getByText('Official standings')).toHaveCount(0);
   await expect(page.getByText('Pocket Invitational')).toBeVisible();
 

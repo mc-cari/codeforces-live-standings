@@ -29,8 +29,8 @@ You can get an API key from https://codeforces.com/settings/api.
 The contest form can import friends for an authorized Codeforces account through
 `user.friends` at any contest phase. Codeforces does not provide an anonymous or
 arbitrary-handle friends endpoint, so the user must provide an API key and secret
-from https://codeforces.com/settings/api. Credentials are sent in a POST body for
-the one-time import request and are not stored by the app.
+from https://codeforces.com/settings/api. The browser signs the one-time request
+directly to Codeforces; credentials are not sent to this app server or stored.
 
 ### Development
 

@@ -353,24 +353,6 @@ export default function ReplayPage() {
         clock={formatElapsedTime(elapsedSeconds)}
         contest={finalStandings.contest}
         contestId={String(contestId || '')}
-        controls={(
-          <>
-          <button
-            className="rounded-sm bg-[#2d8cff] px-3 py-2 text-sm font-semibold hover:bg-[#1f78d7]"
-            onClick={() => setIsPlaying((playing) => !playing)}
-            type="button"
-          >
-            {isPlaying ? 'Pause' : 'Play'}
-          </button>
-          <button
-            className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
-            onClick={() => { setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart); }}
-            type="button"
-          >
-            Restart
-          </button>
-          </>
-        )}
         mode="REPLAY"
         statusTone={isPlaying ? 'live' : 'paused'}
       />
@@ -402,6 +384,22 @@ export default function ReplayPage() {
               {availableSpeeds.map((option) => <option key={option} value={option}>{option}×</option>)}
             </select>
           </label>
+          <div className="flex items-center gap-2">
+            <button
+              className="rounded-sm bg-[#2d8cff] px-3 py-2 text-sm font-semibold hover:bg-[#1f78d7]"
+              onClick={() => setIsPlaying((playing) => !playing)}
+              type="button"
+            >
+              {isPlaying ? 'Pause' : 'Play'}
+            </button>
+            <button
+              className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
+              onClick={() => { setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart); }}
+              type="button"
+            >
+              Restart
+            </button>
+          </div>
           {isTruncated && (
             <span className="text-sm text-[#f3b83f]">
               Latest {MAX_SUBMISSIONS_IN_MEMORY.toLocaleString()} events retained

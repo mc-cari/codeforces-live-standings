@@ -17,6 +17,7 @@ const RECENT_EVENT_WINDOW_SECONDS = 1;
 
 type ProblemState = { attempts: number; solvedAt?: number };
 type MiniContestSimulationProps = { contestName?: string; handles?: string[] };
+type PreviewParticipant = { handle: string; participantIndex: number };
 
 const formatClock = (seconds: number) => `00:${Math.floor(seconds / 60)
   .toString().padStart(2, '0')}:${Math.floor(seconds % 60).toString().padStart(2, '0')}`;
@@ -27,12 +28,51 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
   const [isVisible, setIsVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [isSetupUpdating, setIsSetupUpdating] = useState(false);
+  const [participantSlots, setParticipantSlots] = useState<Map<string, number>>(new Map());
 
-  const previewParticipants = useMemo(() => {
-    const configuredHandles = (handles || []).filter(Boolean).slice(0, 4);
-    return configuredHandles.length > 0 ? configuredHandles : DEFAULT_PARTICIPANTS;
-  }, [handles]);
+  const configuredHandles = useMemo(() => (handles || []).filter(Boolean).slice(0, 4), [handles]);
+  const previewParticipants = useMemo<PreviewParticipant[]>(() => {
+    if (configuredHandles.length === 0) {
+      return DEFAULT_PARTICIPANTS.map((handle, participantIndex) => ({ handle, participantIndex }));
+    }
+
+    const usedSlots = new Set<number>();
+    return configuredHandles.map((handle) => {
+      const handleKey = handle.toLocaleLowerCase();
+      const knownSlot = participantSlots.get(handleKey);
+      const participantIndex = knownSlot !== undefined && !usedSlots.has(knownSlot)
+        ? knownSlot
+        : [0, 1, 2, 3].find((slot) => !usedSlots.has(slot)) || 0;
+      usedSlots.add(participantIndex);
+      return { handle, participantIndex };
+    });
+  }, [configuredHandles, participantSlots]);
   const displayContestName = contestName || 'Pocket Invitational';
+
+  useEffect(() => {
+    if (configuredHandles.length === 0) return undefined;
+    const timer = window.setTimeout(() => {
+      setParticipantSlots((current) => {
+        const next = new Map(current);
+        const usedSlots = new Set<number>();
+        let changed = false;
+        configuredHandles.forEach((handle) => {
+          const handleKey = handle.toLocaleLowerCase();
+          const knownSlot = next.get(handleKey);
+          const participantIndex = knownSlot !== undefined && !usedSlots.has(knownSlot)
+            ? knownSlot
+            : [0, 1, 2, 3].find((slot) => !usedSlots.has(slot)) || 0;
+          if (next.get(handleKey) !== participantIndex) {
+            next.set(handleKey, participantIndex);
+            changed = true;
+          }
+          usedSlots.add(participantIndex);
+        });
+        return changed ? next : current;
+      });
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [configuredHandles]);
 
   useEffect(() => {
     const media = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -78,7 +118,7 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
     [previewParticipants.length],
   );
 
-  const rows = useMemo(() => previewParticipants.map((handle, participantIndex) => {
+  const rows = useMemo(() => previewParticipants.map(({ handle, participantIndex }) => {
     const problemStates = new Map<string, ProblemState>();
     problems.forEach((problem) => problemStates.set(problem, { attempts: 0 }));
     visibleEvents.filter((event) => event.participantIndex === participantIndex && event.second <= elapsed).forEach((event) => {
@@ -96,6 +136,9 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
   )), [elapsed, previewParticipants, visibleEvents]);
 
   const latestEvent = [...visibleEvents].reverse().find((event) => event.second <= elapsed);
+  const latestParticipant = latestEvent
+    ? previewParticipants.find((participant) => participant.participantIndex === latestEvent.participantIndex)
+    : undefined;
   const recentEvents = visibleEvents.filter((event) => (
     event.second <= elapsed && elapsed - event.second < RECENT_EVENT_WINDOW_SECONDS
   ));
@@ -115,7 +158,7 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
         </div>
         <div className="text-right">
           <p className="broadcast-label">Contest time</p>
-          <p className="font-data text-lg text-white">{formatClock(elapsed)}</p>
+          <p className="font-data text-lg text-white" data-testid="mini-contest-clock">{formatClock(elapsed)}</p>
         </div>
       </header>
 
@@ -155,7 +198,7 @@ export default function MiniContestSimulation({ contestName, handles }: MiniCont
       <footer className="bg-[#081525] px-4 py-3">
         <p className="min-w-0 text-sm text-[#91a3ba]">
           {latestEvent
-            ? <><span className="text-white">{previewParticipants[latestEvent.participantIndex]}</span> submitted {latestEvent.problem}</>
+            ? <><span className="text-white">{latestParticipant?.handle}</span> submitted {latestEvent.problem}</>
             : 'Waiting for the first submission…'}
         </p>
       </footer>

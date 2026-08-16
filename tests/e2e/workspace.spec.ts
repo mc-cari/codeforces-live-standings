@@ -95,6 +95,18 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await expect(preview.getByText('preview_handle')).toBeVisible();
   await expect(preview.getByRole('button')).toHaveCount(0);
   await expect(preview.getByRole('link')).toHaveCount(0);
+
+  await page.waitForTimeout(1_500);
+  const clockBeforeHandleToggle = await preview.getByTestId('mini-contest-clock').textContent();
+  await page.getByRole('button', { name: 'Remove preview_handle' }).click();
+  await expect(preview.getByText('preview_handle')).toHaveCount(0);
+  await page.getByPlaceholder('your_handle,second_handle,').fill('preview_handle');
+  await page.getByRole('button', { name: 'Add' }).click();
+  await expect(preview.getByText('preview_handle')).toBeVisible();
+  await page.waitForTimeout(1_500);
+  const clockAfterHandleToggle = await preview.getByTestId('mini-contest-clock').textContent();
+  expect(clockAfterHandleToggle).not.toBe('00:00:00');
+  expect(clockAfterHandleToggle).not.toBe(clockBeforeHandleToggle);
 });
 
 test('friend credentials sign a direct request and never reach the app server', async ({ page }) => {

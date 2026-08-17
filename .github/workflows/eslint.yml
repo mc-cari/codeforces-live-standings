@@ -18,16 +18,22 @@ jobs:
       actions: read
     steps:
 
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.14.0
+
       - name: Install NodeJS
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 24
-
-      - name: Checkout code
-        uses: actions/checkout@v3
+          cache: pnpm
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run EsLint
-        run: npm run lint
+        run: pnpm lint

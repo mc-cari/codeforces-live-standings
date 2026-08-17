@@ -1,11 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { Submission } from '@/src/shared/domain/contest';
 import LiveSubmission from '@/components/LiveSubmission';
+import {
+  REPLAY_JUDGING_BASE_DURATION_MILLISECONDS,
+  REPLAY_JUDGING_DURATION_VARIATION_MILLISECONDS,
+} from '@/src/shared/config/contestTiming';
 
-const DURATION_SECONDS = 28;
+const DURATION_SECONDS = 38;
 const DEFAULT_PARTICIPANTS = ['bytebloom', 'dp_dreamer', 'greedyfox', 'stacktrace'];
 const problems = ['A', 'B', 'C', 'D'];
 const problemPoints: Record<string, number> = { A: 500, B: 750, C: 1_000, D: 1_250 };
+const PREVIEW_JUDGING_MILESTONES = 6;
+const PREVIEW_JUDGING_EXTRA_DELAY_MILLISECONDS = 900;
+const SCORE_DECAY_INTERVAL_SECONDS = 5;
+const SCORE_DECAY_POINTS = 10;
+const SCORE_PENALTY_PER_FAILED_ATTEMPT = 20;
+const RANK_PENALTY_PER_FAILED_ATTEMPT = 5;
 const events = [
   { second: 2, participantIndex: 2, problem: 'A', verdict: 'rejected' },
   { second: 5, participantIndex: 0, problem: 'A', verdict: 'accepted' },
@@ -15,9 +26,10 @@ const events = [
   { second: 20, participantIndex: 0, problem: 'D', verdict: 'accepted' },
   { second: 24, participantIndex: 1, problem: 'C', verdict: 'accepted' },
   { second: 27, participantIndex: 3, problem: 'A', verdict: 'accepted' },
+  { second: 30, participantIndex: 2, problem: 'B', verdict: 'accepted' },
+  { second: 33, participantIndex: 1, problem: 'D', verdict: 'accepted' },
+  { second: 35, participantIndex: 0, problem: 'B', verdict: 'rejected' },
 ] as const;
-const RECENT_EVENT_WINDOW_SECONDS = 1;
-
 type ProblemState = { attempts: number; solvedAt?: number };
 type MiniContestSimulationProps = { contestId?: number; contestName?: string; handles?: string[] };
 type PreviewParticipant = { handle: string; participantIndex: number };
@@ -70,6 +82,16 @@ const buildPreviewSubmission = (
     numberOfProblems: solved,
   };
 };
+
+const judgingDurationSeconds = (submissionId: number) => (
+  (REPLAY_JUDGING_BASE_DURATION_MILLISECONDS
+    + ((submissionId % 5) - 2) * REPLAY_JUDGING_DURATION_VARIATION_MILLISECONDS
+    + PREVIEW_JUDGING_EXTRA_DELAY_MILLISECONDS) / 1_000
+);
+
+const previewSubmissionId = (event: typeof events[number]) => (
+  event.second * 10 + event.participantIndex
+);
 
 export default function MiniContestSimulation({
   contestId = 1735, contestName, handles,
@@ -169,26 +191,43 @@ export default function MiniContestSimulation({
     [previewParticipants.length],
   );
 
+  const settledEvents = visibleEvents.filter((event) => (
+    event.second <= elapsed
+      && elapsed - event.second >= judgingDurationSeconds(previewSubmissionId(event))
+  ));
+
   const rows = useMemo(() => previewParticipants.map(({ handle, participantIndex }) => {
     const problemStates = new Map<string, ProblemState>();
     problems.forEach((problem) => problemStates.set(problem, { attempts: 0 }));
-    visibleEvents.filter((event) => event.participantIndex === participantIndex && event.second <= elapsed).forEach((event) => {
+    settledEvents.filter((event) => event.participantIndex === participantIndex).forEach((event) => {
       const state = problemStates.get(event.problem) as ProblemState;
       state.attempts += 1;
       if (event.verdict === 'accepted') state.solvedAt = event.second;
     });
     const solved = Array.from(problemStates.values()).filter((state) => state.solvedAt).length;
     const penalty = Array.from(problemStates.values()).reduce((total, state) => (
-      total + (state.solvedAt ? state.solvedAt + (state.attempts - 1) * 5 : 0)
+      total + (state.solvedAt
+        ? state.solvedAt + (state.attempts - 1) * RANK_PENALTY_PER_FAILED_ATTEMPT : 0)
     ), 0);
     const points = Array.from(problemStates.entries()).reduce((total, [problem, state]) => (
-      total + (state.solvedAt ? problemPoints[problem] : 0)
+      total + (state.solvedAt
+        ? Math.max(
+          0,
+          problemPoints[problem]
+            - Math.floor(state.solvedAt / SCORE_DECAY_INTERVAL_SECONDS) * SCORE_DECAY_POINTS
+            - (state.attempts - 1) * SCORE_PENALTY_PER_FAILED_ATTEMPT,
+        )
+        : 0)
     ), 0);
     return { handle, participantIndex, problemStates, solved, penalty, points };
   }).sort((first, second) => (
     second.points - first.points || first.penalty - second.penalty
-  )), [elapsed, previewParticipants, visibleEvents]);
+  )), [previewParticipants, settledEvents]);
 
+  const recentEvents = visibleEvents.filter((event) => (
+    event.second <= elapsed
+      && elapsed - event.second < judgingDurationSeconds(previewSubmissionId(event))
+  ));
   const latestEvent = [...visibleEvents].reverse().find((event) => event.second <= elapsed);
   const latestParticipant = latestEvent
     ? previewParticipants.find((participant) => participant.participantIndex === latestEvent.participantIndex)
@@ -196,21 +235,43 @@ export default function MiniContestSimulation({
   const latestRow = latestEvent
     ? rows.find((row) => row.participantIndex === latestEvent.participantIndex)
     : undefined;
-  const latestRank = latestEvent
-    ? rows.findIndex((row) => row.participantIndex === latestEvent.participantIndex) + 1
-    : 0;
   const latestSubmission = latestEvent && latestParticipant && latestRow
-    ? buildPreviewSubmission(contestId, latestEvent, latestParticipant, latestRank, latestRow.solved)
+    ? buildPreviewSubmission(
+      contestId,
+      latestEvent,
+      latestParticipant,
+      rows.findIndex((row) => row.participantIndex === latestEvent.participantIndex) + 1,
+      latestRow.solved,
+    )
     : undefined;
-  const recentEvents = visibleEvents.filter((event) => (
-    event.second <= elapsed && elapsed - event.second < RECENT_EVENT_WINDOW_SECONDS
-  ));
-  const isLatestSubmissionRecent = Boolean(latestEvent && recentEvents.some((event) => (
-    event.participantIndex === latestEvent.participantIndex
-      && event.problem === latestEvent.problem
-  )));
-  const displayedSubmission = latestSubmission && isLatestSubmissionRecent
-    ? { ...latestSubmission, verdict: 'TESTING', passedTestCount: Math.max(1, latestSubmission.passedTestCount) }
+  const latestElapsed = latestEvent ? elapsed - latestEvent.second : 0;
+  const latestIsProcessing = Boolean(
+    latestEvent
+      && latestSubmission
+      && latestElapsed < judgingDurationSeconds(latestSubmission.id),
+  );
+  const displayedSubmission = latestSubmission && latestIsProcessing
+    ? {
+      ...latestSubmission,
+      verdict: 'TESTING',
+      passedTestCount: Math.max(
+        1,
+        Math.ceil(
+          (Math.max(
+            1,
+            Math.ceil(
+              (latestElapsed / judgingDurationSeconds(latestSubmission.id))
+                * PREVIEW_JUDGING_MILESTONES,
+            ),
+          ) * Math.max(
+            1,
+            latestSubmission.verdict === 'OK'
+              ? latestSubmission.passedTestCount
+              : latestSubmission.passedTestCount + 1,
+          )) / PREVIEW_JUDGING_MILESTONES,
+        ),
+      ),
+    }
     : latestSubmission;
 
   return (
@@ -267,15 +328,27 @@ export default function MiniContestSimulation({
 
       <div aria-live="polite" className="h-8 overflow-hidden bg-[#081525]">
         {displayedSubmission ? (
-          <LiveSubmission
-            key={displayedSubmission.id}
-            compact
-            isGym={false}
-            isNew={!reducedMotion && isLatestSubmissionRecent}
-            submission={displayedSubmission}
-            userCount={previewParticipants.length}
-            userRank={new Map()}
-          />
+          <div className="relative h-full">
+            <AnimatePresence initial={false} mode="sync">
+              <motion.div
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute inset-x-0 top-0 h-8"
+                exit={{ opacity: 0, y: '-100%' }}
+                initial={{ opacity: 0, y: '100%' }}
+                key={displayedSubmission.id}
+                transition={{ duration: 0.36, ease: 'easeOut' }}
+              >
+                <LiveSubmission
+                  compact
+                  isGym={false}
+                  isNew={!reducedMotion && latestIsProcessing}
+                  submission={displayedSubmission}
+                  userCount={previewParticipants.length}
+                  userRank={new Map()}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
         ) : (
           <div className="flex h-full items-center px-4 text-xs text-[#64758c]">Waiting for the first submission…</div>
         )}

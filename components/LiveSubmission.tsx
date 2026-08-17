@@ -17,7 +17,7 @@ export default function LiveSubmission({
   return (
     <div
       className={`${compact
-        ? 'relative grid min-w-0 h-full grid-cols-[2rem_minmax(0,1fr)_3rem_3rem] border-b border-gray-800/30 px-2'
+        ? 'relative grid min-w-0 h-full items-center grid-cols-[2rem_minmax(0,1fr)_3rem_3rem] border-b border-gray-800/30 px-2'
         : 'relative flex min-w-0 h-full flex-row border-b border-gray-800/30'} hover:bg-gray-800/30 transition-all ${
         isNew || submission.verdict === 'TESTING' ? 'animate-pulse bg-blue-900/20' : ''
       } ${compact && isNew ? 'broadcast-submission-enter' : ''}`}
@@ -34,7 +34,7 @@ export default function LiveSubmission({
           <div className="flex items-center justify-center font-data text-sm text-[#91a3ba]">
             {submission.author.rank}
           </div>
-          <div className="relative z-10 min-w-0 truncate text-left text-sm font-medium text-white">
+          <div className="relative z-10 flex min-w-0 items-center truncate text-left text-sm font-medium text-white">
             <a
               href={`https://codeforces.com/profile/${encodeURIComponent(submission.author.members[0].handle)}`}
               target="_blank"

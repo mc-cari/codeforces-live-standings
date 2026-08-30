@@ -120,7 +120,7 @@ export default function MiniContestSimulation({
       return { handle, participantIndex };
     });
   }, [configuredHandles, participantSlots]);
-  const displayContestName = contestName || 'Pocket Invitational';
+  const displayContestName = contestName || 'Codeforces Contest';
 
   useEffect(() => {
     if (configuredHandles.length === 0) return undefined;
@@ -277,7 +277,7 @@ export default function MiniContestSimulation({
   return (
     <section
       aria-label="Mini contest simulation"
-      className="broadcast-panel overflow-hidden rounded-md"
+      className="overflow-hidden rounded-md broadcast-panel"
       ref={container}
     >
       <header className="flex items-center justify-between border-b border-[#25364d] bg-[#081525] px-4 py-3">
@@ -289,7 +289,7 @@ export default function MiniContestSimulation({
         </div>
         <div className="text-right">
           <p className="broadcast-label">Contest time</p>
-          <p className="font-data text-lg text-white" data-testid="mini-contest-clock">{formatClock(elapsed)}</p>
+          <p className="text-lg text-white font-data" data-testid="mini-contest-clock">{formatClock(elapsed)}</p>
         </div>
       </header>
 
@@ -304,8 +304,8 @@ export default function MiniContestSimulation({
             key={row.handle}
           >
             <span className="font-data text-[#91a3ba]">{index + 1}</span>
-            <span className="truncate text-left font-medium text-white">{row.handle}</span>
-            <span className="font-data font-medium text-white">{row.points}</span>
+            <span className="font-medium text-left text-white truncate">{row.handle}</span>
+            <span className="font-medium text-white font-data">{row.points}</span>
             <span className="font-data text-xs text-[#91a3ba]">{row.solved}</span>
             {problems.map((problem) => {
               const state = row.problemStates.get(problem) as ProblemState;

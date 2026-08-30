@@ -379,7 +379,12 @@ export default function ContestSetupPage() {
       </div>
 
       <footer className="mt-10 border-t border-[#25364d] px-4 py-6 text-center text-sm text-[#64758c]">
-        Built for Codeforces spectators and small contest circles.
+        <p className="mb-3 font-semibold uppercase tracking-[0.14em] text-[#91a3ba]">Links</p>
+        <nav aria-label="Footer links" className="flex flex-wrap justify-center gap-x-5 gap-y-2">
+          <a className="hover:text-white" href="https://codeforces.com/blog/entry/114892" rel="noreferrer" target="_blank">Codeforces Blog Post</a>
+          <a className="hover:text-white" href="https://codeforces.com/apiHelp" rel="noreferrer" target="_blank">Codeforces API</a>
+          <a className="hover:text-white" href="https://www.youtube.com/live/15Wyj_-PG9I?feature=share&amp;t=10935" rel="noreferrer" target="_blank">ICPC World Finals Inspiration</a>
+        </nav>
       </footer>
     </main>
   );

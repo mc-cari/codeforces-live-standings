@@ -31,12 +31,11 @@ export default function ContestCountdown({ contest, onComplete }: ContestCountdo
           'broadcast-panel w-full max-w-2xl rounded-sm p-10 text-center'
         }
       >
-        <p className="broadcast-label mb-3">Contest #{contest.id}</p>
-        <h1 className="mb-8 font-broadcast text-4xl font-semibold uppercase">{contest.name}</h1>
+        <h1 className="mb-8 text-4xl font-semibold uppercase font-broadcast">{contest.name}</h1>
         <p className="mb-3 text-sm font-medium uppercase tracking-widest text-[#9fc8ff]">
           Contest starts in
         </p>
-        <div className="font-data text-5xl font-semibold tracking-tight text-white sm:text-7xl">
+        <div className="text-5xl font-semibold tracking-tight text-white font-data sm:text-7xl">
           {formatCountdown(remainingSeconds)}
         </div>
       </section>

@@ -38,4 +38,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# local implementation plans
+/docs/local/
+
 tries

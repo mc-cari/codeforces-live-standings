@@ -60,7 +60,6 @@ export default function ContestRibbon({
         </Link>
         <div className="hidden h-8 w-px bg-[#25364d] sm:block" />
         <div className="min-w-0 grow">
-          <p className="broadcast-label">Contest #{contestId}</p>
           <h1 className="text-xl font-semibold tracking-wide uppercase truncate font-broadcast sm:text-2xl">
             {contest?.name || `Codeforces ${contestId}`}
           </h1>

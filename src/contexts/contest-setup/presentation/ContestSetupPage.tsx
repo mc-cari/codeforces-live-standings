@@ -169,7 +169,7 @@ export default function ContestSetupPage() {
   return (
     <main className="min-h-screen text-[#f4f8ff]">
       <header className="border-b border-[#25364d] bg-[#07111f]/95">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+        <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6">
           <Link className="font-broadcast text-xl font-bold uppercase tracking-[0.08em]" href="/">
             CF <span className="text-[#65adff]">Live Desk</span>
           </Link>
@@ -180,37 +180,35 @@ export default function ContestSetupPage() {
             >
               Replay demo
             </Link>
-            <a className="hover:text-white" href="#how-it-works">How it works</a>
-            <a className="hover:text-white" href="https://github.com/mc-cari/codeforces-live-standings">GitHub</a>
+            <a className="hover:text-white" href="https://github.com/mc-cari/codeforces-live-standings">GitHub Repo</a>
           </nav>
         </div>
       </header>
 
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-12">
-        <div className="mb-8 max-w-3xl">
-          <p className="broadcast-label mb-3">Personal contest tracker</p>
+      <div className="px-4 py-8 mx-auto max-w-7xl sm:px-6 lg:py-12">
+        <div className="max-w-3xl mb-8">
           <h1 className="font-broadcast text-5xl font-bold uppercase leading-[0.92] tracking-tight sm:text-7xl">
-            Your friends.<br /><span className="text-[#65adff]">One live scoreboard.</span>
+            Your setup.<br /><span className="text-[#65adff]">One live scoreboard.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-7 text-[#aab8ca] sm:text-lg">
-            Pick a Codeforces contest, add the handles you care about, and follow every solve,
-            penalty, and position change from one broadcast-style desk.
+            Pick a Codeforces contest, add the handles you want to track, and follow every solve,
+            penalty, and position change on a live broadcast or replay.
           </p>
         </div>
 
         <section className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(32rem,1.08fr)]" id="contest-workspace">
-          <div className="broadcast-panel rounded-md p-5 sm:p-6">
+          <div className="p-5 rounded-md broadcast-panel sm:p-6">
             <div className="mb-6 flex items-start justify-between gap-4 border-b border-[#25364d] pb-5">
               <div>
                 <p className="broadcast-label">01 / Contest</p>
-                <h2 className="font-broadcast text-3xl font-semibold uppercase">Start tracking</h2>
+                <h2 className="text-3xl font-semibold uppercase font-broadcast">Choose contest</h2>
               </div>
               <span className={`mt-1 h-2.5 w-2.5 rounded-full ${contestInfo ? 'bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
             </div>
 
-            <label className="mb-2 block text-sm font-medium" htmlFor="contest-id">Codeforces contest ID</label>
+            <label className="block mb-2 text-sm font-medium" htmlFor="contest-id">Codeforces contest ID</label>
             <input
-              className="broadcast-input px-3"
+              className="px-3 broadcast-input"
               id="contest-id"
               inputMode="numeric"
               onChange={(event) => {
@@ -221,10 +219,10 @@ export default function ContestSetupPage() {
                 setImportError('');
                 setFriendError('');
               }}
-              placeholder="For example, 1735"
+              placeholder="1735"
               value={contestIdInput}
             />
-            <div className="mt-2 min-h-6 text-sm">
+            <div className="mt-2 text-sm min-h-6">
               {lookupState === 'loading' && <p className="text-[#9fc8ff]">Detecting contest…</p>}
               {lookupError && <p className="text-[#ff8585]">{lookupError}</p>}
             </div>
@@ -247,27 +245,27 @@ export default function ContestSetupPage() {
               <div className="mt-7 border-t border-[#25364d] pt-6">
                 <div className="mb-4">
                   <p className="broadcast-label">02 / Participants</p>
-                  <h3 className="font-broadcast text-2xl font-semibold uppercase">Build your field</h3>
+                  <h3 className="text-2xl font-semibold uppercase font-broadcast">Add participants</h3>
                 </div>
                 <div className="flex gap-2">
                   <input
-                    className="broadcast-input px-3"
+                    className="px-3 broadcast-input"
                     id="participant-handles"
                     onChange={(event) => setHandleInput(event.target.value)}
                     onKeyDown={(event) => {
                       if (event.key === 'Enter') { event.preventDefault(); addTypedHandles(); }
                     }}
-                    placeholder="tourist, Benq, your_handle"
+                    placeholder="your_handle,second_handle,"
                     value={handleInput}
                   />
-                  <button className="broadcast-button rounded-sm px-4" onClick={addTypedHandles} type="button">Add</button>
+                  <button className="px-4 rounded-sm broadcast-button" onClick={addTypedHandles} type="button">Add</button>
                 </div>
 
                 <div className="mt-4 rounded-sm border border-[#25364d] bg-[#081525] p-4">
-                  <label className="mb-2 block text-sm font-medium" htmlFor="participant-count">Official standings</label>
+                  <label className="block mb-2 text-sm font-medium" htmlFor="participant-count">Official standings</label>
                   <div className="grid grid-cols-[5rem_1fr_1fr] gap-2">
                     <input
-                      className="broadcast-input px-2 text-center font-data"
+                      className="px-2 text-center broadcast-input font-data"
                       id="participant-count"
                       min="1"
                       onChange={(event) => setParticipantCount(event.target.value)}
@@ -290,8 +288,8 @@ export default function ContestSetupPage() {
                     <p className="mb-2 text-xs leading-5 text-[#8fb8c7]">Create an API key for this import and delete it after.</p>
                     <a className="text-xs text-[#7ddfff] underline underline-offset-4" href="https://codeforces.com/settings/api" rel="noreferrer" target="_blank">Get a Codeforces API key</a>
                     <div className="mt-3 space-y-2">
-                      <input aria-label="Codeforces API key" autoComplete="off" className="broadcast-input px-3 text-sm" onChange={(event) => setFriendApiKey(event.target.value)} placeholder="API key" value={friendApiKey} />
-                      <input aria-label="Codeforces API secret" autoComplete="off" className="broadcast-input px-3 text-sm" onChange={(event) => setFriendApiSecret(event.target.value)} placeholder="API secret" type="password" value={friendApiSecret} />
+                      <input aria-label="Codeforces API key" autoComplete="off" className="px-3 text-sm broadcast-input" onChange={(event) => setFriendApiKey(event.target.value)} placeholder="API key" value={friendApiKey} />
+                      <input aria-label="Codeforces API secret" autoComplete="off" className="px-3 text-sm broadcast-input" onChange={(event) => setFriendApiSecret(event.target.value)} placeholder="API secret" type="password" value={friendApiSecret} />
                     </div>
                     <button className="mt-3 w-full rounded-sm border border-[#2386a8] bg-[#0c617d] px-4 py-2.5 text-sm font-semibold hover:bg-[#0e7395]" disabled={isImportingFriends} onClick={importFriends} type="button">
                       {isImportingFriends ? 'Importing…' : 'Import friend list'}
@@ -306,16 +304,17 @@ export default function ContestSetupPage() {
                     <p className="p-3 text-center text-sm text-[#64758c]">Add at least one handle to continue.</p>
                   ) : handles.map((handle) => (
                     <div className="flex items-center justify-between border-b border-[#25364d]/60 px-2 py-2 last:border-0" key={handle.toLocaleLowerCase()}>
-                      <span className="truncate font-data text-sm">{handle}</span>
+                      <span className="text-sm truncate font-data">{handle}</span>
                       <button aria-label={`Remove ${handle}`} className="px-2 text-[#ff8585] hover:text-white" onClick={() => setHandles((current) => current.filter((candidate) => candidate.toLocaleLowerCase() !== handle.toLocaleLowerCase()))} type="button">×</button>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-6">
-                  <p className="broadcast-label">03 / Launch</p>
+                  <p className="broadcast-label">03 / Track</p>
+                  <h3 className="text-2xl font-semibold uppercase font-broadcast">Launch</h3>
                   {configuration?.unsupportedReason && <p className="mb-2 text-sm text-[#f3b83f]">{configuration.unsupportedReason}</p>}
-                  <button className="broadcast-button mt-2 w-full rounded-sm px-5 py-3" disabled={!configuration?.contestType || handles.length === 0} onClick={launch} type="button">
+                  <button className="w-full px-5 py-3 mt-2 rounded-sm broadcast-button" disabled={!configuration?.contestType || handles.length === 0} onClick={launch} type="button">
                     {configuration?.actionLabel || 'Choose a contest'}
                   </button>
                 </div>
@@ -328,8 +327,8 @@ export default function ContestSetupPage() {
             <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded-sm border border-[#25364d] bg-[#25364d]" id="how-it-works">
               {[
                 ['Choose', 'Enter any Codeforces contest ID.'],
-                ['Collect', 'Add handles or import a friend list.'],
-                ['Follow', 'Watch standings and submissions update.'],
+                ['Setup', 'Add participants.'],
+                ['Track', 'Watch standings and submissions update.'],
               ].map(([title, copy], index) => (
                 <div className="bg-[#0d1b2a] p-3" key={title}>
                   <p className="font-data text-xs text-[#65adff]">0{index + 1}</p>
@@ -342,10 +341,9 @@ export default function ContestSetupPage() {
         </section>
 
         <section className="mt-12 border-t border-[#25364d] pt-8" aria-labelledby="upcoming-heading">
-          <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="flex items-end justify-between gap-4 mb-5">
             <div>
-              <p className="broadcast-label">Codeforces schedule</p>
-              <h2 className="font-broadcast text-3xl font-semibold uppercase" id="upcoming-heading">On the grid</h2>
+              <h2 className="text-3xl font-semibold uppercase font-broadcast" id="upcoming-heading">Upcoming contests</h2>
             </div>
             {isLoadingUpcoming && <span className="font-data text-xs text-[#91a3ba]">SYNCING…</span>}
           </div>

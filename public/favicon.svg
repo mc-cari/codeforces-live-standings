@@ -1,7 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#111827"/>
-  <rect x="12" y="18" width="10" height="28" rx="2" fill="#2563eb"/>
-  <rect x="27" y="11" width="10" height="35" rx="2" fill="#eab308"/>
-  <rect x="42" y="24" width="10" height="22" rx="2" fill="#dc2626"/>
-  <path d="M12 51h40" stroke="#f9fafb" stroke-width="4" stroke-linecap="round"/>
+  <title>CF Live Desk</title>
+  <defs>
+    <linearGradient id="field" x1="8" y1="6" x2="57" y2="59" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#122b43"/>
+      <stop offset="1" stop-color="#07111f"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="17" fill="#07111f"/>
+  <rect x="3" y="3" width="58" height="58" rx="14" fill="url(#field)" stroke="#26435e" stroke-width="2"/>
+
+  <!-- The split-second reading, optically centered in the broadcast field. -->
+  <g transform="translate(0 -5)">
+    <path d="M17 37.5h7l3.2-9.2 5.7 18.3 3.4-9.1H48" fill="none" stroke="#fff8ee" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.6"/>
+    <path d="M40.5 43.5h8" stroke="#ff7668" stroke-linecap="round" stroke-width="3.6"/>
+  </g>
 </svg>

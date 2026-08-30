@@ -1,5 +1,16 @@
-import type { Contest, Standings, Submission, User } from '@/src/shared/domain/contest';
 import type {
+  Contest,
+  Member,
+  Party,
+  Problem,
+  RanklistRow,
+  Standings,
+  Submission,
+  User,
+} from '@/src/shared/domain/contest';
+import type {
+  CodeforcesPartyDto,
+  CodeforcesProblemDto,
   CodeforcesContestDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
@@ -7,7 +18,14 @@ import type {
 } from './contracts';
 
 export const mapContestDto = (contest: CodeforcesContestDto): Contest => ({
-  ...contest,
+  id: contest.id,
+  name: contest.name,
+  type: contest.type,
+  phase: contest.phase,
+  frozen: contest.frozen,
+  durationSeconds: contest.durationSeconds,
+  startTimeSeconds: contest.startTimeSeconds,
+  relativeTimeSeconds: contest.relativeTimeSeconds,
   preparedBy: contest.preparedBy ?? '',
   websiteUrl: contest.websiteUrl ?? '',
   description: contest.description ?? '',
@@ -19,54 +37,46 @@ export const mapContestDto = (contest: CodeforcesContestDto): Contest => ({
   season: contest.season ?? '',
 });
 
+const mapProblemDto = (problem: CodeforcesProblemDto): Problem => ({
+  contestId: problem.contestId ?? 0,
+  problemSetName: problem.problemsetName ?? '',
+  index: problem.index,
+  name: problem.name,
+  type: problem.type,
+  points: problem.points ?? 0,
+  rating: problem.rating ?? 0,
+  tags: [...(problem.tags ?? [])],
+});
+
+const mapPartyDto = (party: CodeforcesPartyDto): Party => ({
+  contestId: party.contestId ?? 0,
+  members: party.members.map((member): Member => ({
+    handle: member.handle,
+    name: member.name ?? '',
+  })),
+  participantType: party.participantType,
+  teamId: party.teamId,
+  teamName: party.teamName,
+  ghost: party.ghost ?? false,
+  room: party.room,
+  startTimeSeconds: party.startTimeSeconds,
+  rank: 0,
+});
+
 export const mapSubmissionDto = (submission: CodeforcesSubmissionDto): Submission => ({
   ...submission,
+  problem: mapProblemDto(submission.problem),
+  author: mapPartyDto(submission.author),
   points: submission.points ?? 0,
   numberOfProblems: 0,
-  problem: {
-    ...submission.problem,
-    contestId: submission.problem.contestId ?? submission.contestId,
-    problemSetName: submission.problem.problemsetName ?? '',
-    points: submission.problem.points ?? 0,
-    rating: submission.problem.rating ?? 0,
-    tags: [...(submission.problem.tags ?? [])],
-  },
-  author: {
-    ...submission.author,
-    contestId: submission.author.contestId ?? submission.contestId,
-    teamId: submission.author.teamId,
-    teamName: submission.author.teamName,
-    ghost: submission.author.ghost ?? false,
-    room: submission.author.room,
-    startTimeSeconds: submission.author.startTimeSeconds,
-    rank: 0,
-    members: submission.author.members.map((member) => ({ ...member, name: member.name ?? '' })),
-  },
 });
 
 export const mapStandingsDto = (standings: CodeforcesStandingsDto): Standings => ({
   contest: mapContestDto(standings.contest),
-  problems: standings.problems.map((problem) => ({
-    ...problem,
-    contestId: problem.contestId ?? standings.contest.id,
-    problemSetName: problem.problemsetName ?? '',
-    points: problem.points ?? 0,
-    rating: problem.rating ?? 0,
-    tags: [...(problem.tags ?? [])],
-  })),
-  rows: standings.rows.map((row) => ({
+  problems: standings.problems.map(mapProblemDto),
+  rows: standings.rows.map((row): RanklistRow => ({
     ...row,
-    party: {
-      ...row.party,
-      contestId: row.party.contestId ?? standings.contest.id,
-      teamId: row.party.teamId,
-      teamName: row.party.teamName,
-      ghost: row.party.ghost ?? false,
-      room: row.party.room,
-      startTimeSeconds: row.party.startTimeSeconds,
-      rank: row.rank,
-      members: row.party.members.map((member) => ({ ...member, name: member.name ?? '' })),
-    },
+    party: mapPartyDto(row.party),
     problemResults: row.problemResults.map((result) => ({ ...result })),
   })),
 });

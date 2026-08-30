@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import codeforcesFetch from '../utils/codeforcesFetch';
 import { fetchCodeforcesFriends } from '../utils/codeforcesFriends';
@@ -22,6 +22,7 @@ export default function Home() {
   const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [contestLookupError, setContestLookupError] = useState('');
   const [usersHandles, setUsersHandles] = useState<string[]>([]);
+  const usersHandlesRef = useRef<string[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
@@ -128,17 +129,29 @@ export default function Home() {
     const normalizedHandles = Array.from(
       new Set(newHandles.map((handle) => handle.trim()).filter(Boolean)),
     );
-    let addedCount = 0;
+    const handlesToAdd = normalizedHandles.filter(
+      (handle) => !usersHandlesRef.current.includes(handle),
+    );
+    usersHandlesRef.current = [...usersHandlesRef.current, ...handlesToAdd];
 
     setUsersHandles((oldUsers) => {
       const existingHandles = new Set(oldUsers);
-      const handlesToAdd = normalizedHandles.filter((handle) => !existingHandles.has(handle));
-      addedCount = handlesToAdd.length;
+      const actualHandlesToAdd = normalizedHandles.filter((handle) => !existingHandles.has(handle));
+      const mergedUsers = actualHandlesToAdd.length > 0
+        ? [...oldUsers, ...actualHandlesToAdd]
+        : oldUsers;
+      usersHandlesRef.current = mergedUsers;
 
-      return handlesToAdd.length > 0 ? [...oldUsers, ...handlesToAdd] : oldUsers;
+      return mergedUsers;
     });
 
-    return addedCount;
+    return handlesToAdd.length;
+  };
+
+  const removeHandle = (handleToRemove: string) => {
+    const remainingHandles = usersHandlesRef.current.filter((handle) => handle !== handleToRemove);
+    usersHandlesRef.current = remainingHandles;
+    setUsersHandles(remainingHandles);
   };
 
   const addInputHandles = () => {
@@ -576,7 +589,7 @@ export default function Home() {
                             <span className="text-white">{user}</span>
                             <button
                               className="text-red-400 transition-colors hover:text-red-300"
-                              onClick={() => setUsersHandles(usersHandles.filter((userOld) => userOld !== user))}
+                              onClick={() => removeHandle(user)}
                               type="button"
                             >
                               Remove

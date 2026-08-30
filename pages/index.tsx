@@ -105,6 +105,12 @@ export default function Home() {
     }
   };
 
+  const closeForm = () => {
+    setShowForm(false);
+    setFriendApiKeyInput('');
+    setFriendApiSecretInput('');
+  };
+
   const selectUpcomingContest = (contest: Contest) => {
     setContestIdInput(String(contest.id));
     setContestInfo(contest);
@@ -113,18 +119,26 @@ export default function Home() {
     setImportError('');
     setFriendImportMessage('');
     setFriendImportError('');
+    setFriendApiKeyInput('');
+    setFriendApiSecretInput('');
     setShowForm(true);
   };
 
-  const addHandles = (newHandles : string[]) => {
-    newHandles = Array.from(new Set(newHandles.map((handle) => handle.trim())))
-      .filter((handle) => handle && !usersHandles.includes(handle));
+  const addHandles = (newHandles: string[]) => {
+    const normalizedHandles = Array.from(
+      new Set(newHandles.map((handle) => handle.trim()).filter(Boolean)),
+    );
+    let addedCount = 0;
 
-    if (newHandles.length > 0) {
-      setUsersHandles((oldUsers) => [...oldUsers, ...newHandles]);
-    }
+    setUsersHandles((oldUsers) => {
+      const existingHandles = new Set(oldUsers);
+      const handlesToAdd = normalizedHandles.filter((handle) => !existingHandles.has(handle));
+      addedCount = handlesToAdd.length;
 
-    return newHandles.length;
+      return handlesToAdd.length > 0 ? [...oldUsers, ...handlesToAdd] : oldUsers;
+    });
+
+    return addedCount;
   };
 
   const addInputHandles = () => {
@@ -149,8 +163,8 @@ export default function Home() {
       setFriendImportError('');
       setFriendImportMessage('');
       const response = await fetchCodeforcesFriends(apiKey, apiSecret);
-      const payload = await response.json() as { result?: unknown; comment?: string };
-      if (!response.ok) {
+      const payload = await response.json() as { status?: string; result?: unknown; comment?: string };
+      if (!response.ok || payload.status !== 'OK') {
         throw new Error(payload.comment || 'Unable to import Codeforces friends');
       }
 
@@ -403,7 +417,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold text-white">Setup Contest Tracking</h2>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={closeForm}
                 className="text-gray-400 transition-colors hover:text-white"
                 type="button"
                 aria-label="Close form"
@@ -604,6 +618,8 @@ export default function Home() {
                           setContestLookupError('');
                           setContestLookupState('idle');
                           setImportError('');
+                          setFriendApiKeyInput('');
+                          setFriendApiSecretInput('');
                         }}
                       />
                     </div>

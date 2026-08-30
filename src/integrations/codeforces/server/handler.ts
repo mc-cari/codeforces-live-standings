@@ -14,7 +14,7 @@ import RequestCoordinator from './requestCoordinator';
 import { getResponseCacheDuration, isSuccessfulCodeforcesResponse } from './responseCachePolicy';
 
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
-const DEFAULT_CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = 10 * 60 * 1000;
+const DEFAULT_CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = 9 * 60 * 1000;
 const configuredRequestTimeout = Number(process.env.CF_REQUEST_TIMEOUT_MS);
 const CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = Number.isFinite(configuredRequestTimeout)
   && configuredRequestTimeout > 0

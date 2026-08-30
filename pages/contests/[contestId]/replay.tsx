@@ -6,6 +6,7 @@ import { useRouter } from 'next/router';
 import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
 import type {
   CodeforcesPartyDto,
+  CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
   CodeforcesUserDto,
@@ -209,8 +210,9 @@ export default function Replay() {
         if (usersResponse.ok) {
           const ranks = new Map<string, string>();
           ((await usersResponse.json()).result as CodeforcesUserDto[]).forEach((user) => {
-            ranks.set(user.handle, user.rank);
-            ranks.set(`${user.handle} (practice)`, user.rank);
+            const rank = user.rank || 'unrated';
+            ranks.set(user.handle, rank);
+            ranks.set(`${user.handle} (practice)`, rank);
           });
           setUserRank(ranks);
         }
@@ -328,7 +330,8 @@ export default function Replay() {
   ), [elapsedSeconds, finalStandings, settledEvents]);
   const cinematicSubmissions = useMemo(() => {
     if (!snapshot) return [];
-    const testingRows = events.filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
+    const testingRows: CodeforcesPresentedSubmissionDto[] = events
+      .filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
       ...submission,
       author: {
         ...submission.author,

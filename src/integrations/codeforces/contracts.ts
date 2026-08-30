@@ -1,29 +1,28 @@
 export type CodeforcesProblemDto = {
-  contestId: number;
-  problemSetName: string;
+  contestId?: number;
+  problemsetName?: string;
   index: string;
   name: string;
   type: string;
-  points: number;
-  rating: number;
-  tags: string[];
+  points?: number;
+  rating?: number;
+  tags?: string[];
 };
 
 export type CodeforcesMemberDto = {
   handle: string;
-  name: string;
+  name?: string;
 };
 
 export type CodeforcesPartyDto = {
-  contestId: number;
+  contestId?: number;
   members: CodeforcesMemberDto[];
   participantType: string;
-  teamId: number | undefined;
-  teamName: string | undefined;
-  ghost: boolean;
-  room: number | undefined;
-  startTimeSeconds: number | undefined;
-  rank: number;
+  teamId?: number;
+  teamName?: string;
+  ghost?: boolean;
+  room?: number;
+  startTimeSeconds?: number;
 };
 
 export type CodeforcesSubmissionDto = {
@@ -39,8 +38,7 @@ export type CodeforcesSubmissionDto = {
   passedTestCount: number;
   timeConsumedMillis: number;
   memoryConsumedBytes: number;
-  points: number;
-  numberOfProblems: number;
+  points?: number;
 };
 
 export type CodeforcesContestDto = {
@@ -52,15 +50,15 @@ export type CodeforcesContestDto = {
   durationSeconds: number;
   startTimeSeconds: number;
   relativeTimeSeconds: number;
-  preparedBy: string;
-  websiteUrl: string;
-  description: string;
-  difficulty: number;
-  kind: string;
-  icpcRegion: string;
-  country: string;
-  city: string;
-  season: string;
+  preparedBy?: string;
+  websiteUrl?: string;
+  description?: string;
+  difficulty?: number;
+  kind?: string;
+  icpcRegion?: string;
+  country?: string;
+  city?: string;
+  season?: string;
 };
 
 export type CodeforcesProblemResultDto = {
@@ -90,24 +88,33 @@ export type CodeforcesStandingsDto = {
 
 export type CodeforcesUserDto = {
   handle: string;
-  email: string;
-  vkId: string | undefined;
-  openId: string | undefined;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  country: string | undefined;
-  city: string | undefined;
-  organization: string | undefined;
-  contribution: number;
-  rank: string;
-  rating: number;
-  maxRank: string;
-  maxRating: number;
-  lastOnlineTimeSeconds: number;
-  registrationTimeSeconds: number;
-  friendOfCount: number;
-  avatar: string;
-  titlePhoto: string;
+  email?: string;
+  vkId?: string;
+  openId?: string;
+  firstName?: string;
+  lastName?: string;
+  country?: string;
+  city?: string;
+  organization?: string;
+  contribution?: number;
+  rank?: string;
+  rating?: number;
+  maxRank?: string;
+  maxRating?: number;
+  lastOnlineTimeSeconds?: number;
+  registrationTimeSeconds?: number;
+  friendOfCount?: number;
+  avatar?: string;
+  titlePhoto?: string;
+};
+
+export type CodeforcesRankedPartyDto = CodeforcesPartyDto & {
+  rank: number;
+};
+
+export type CodeforcesPresentedSubmissionDto = Omit<CodeforcesSubmissionDto, 'author'> & {
+  author: CodeforcesRankedPartyDto;
+  numberOfProblems: number;
 };
 
 export type CodeforcesApiResponse<Result> = {

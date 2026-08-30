@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "pnpm test:unit",
-    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test utils/*.test.ts",
+    "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"utils/*.test.ts\" \"src/**/*.test.ts\"",
     "generate-demo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generateDemoSnapshot.mjs"
   },
   "dependencies": {

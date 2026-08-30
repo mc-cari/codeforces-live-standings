@@ -13,16 +13,28 @@ test('returns a cached value before it expires', () => {
   assert.equal(cache.size, 1);
 });
 
-test('removes all expired entries during the next cache operation', () => {
+test('removes an expired entry when it is read', () => {
   let now = 1_000;
   const cache = new ExpiringCache<string>(() => now);
 
   cache.set('first-contest', 'large response one', 2_000);
-  cache.set('second-contest', 'large response two', 2_000);
+  cache.set('second-contest', 'large response two', 4_000);
+  now = 3_000;
+
+  assert.equal(cache.get('first-contest'), undefined);
+  assert.equal(cache.size, 1);
+});
+
+test('does not sweep unrelated entries during a cache read', () => {
+  let now = 1_000;
+  const cache = new ExpiringCache<string>(() => now);
+
+  cache.set('first-contest', 'response one', 2_000);
+  cache.set('second-contest', 'response two', 4_000);
   now = 3_000;
 
   assert.equal(cache.get('unrelated-key'), undefined);
-  assert.equal(cache.size, 0);
+  assert.equal(cache.size, 1);
 });
 
 test('keeps fresh entries while removing stale entries', () => {
@@ -60,4 +72,15 @@ test('does not retain a value larger than the total weight limit', () => {
   });
   cache.set('huge', '1234', 10_000);
   assert.equal(cache.size, 0);
+});
+
+test('preserves the existing entry when a replacement is oversized', () => {
+  const cache = new ExpiringCache<string>(Date.now, {
+    maximumWeight: 3,
+    getWeight: (value) => value.length,
+  });
+  cache.set('response', 'ok', 10_000);
+  cache.set('response', 'huge', 10_000);
+
+  assert.equal(cache.get('response'), 'ok');
 });

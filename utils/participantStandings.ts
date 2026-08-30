@@ -99,11 +99,11 @@ export const addMissingParticipantRows = (
           return;
         }
 
-        const reportedPoints = Number.isFinite(submission.points) ? submission.points : 0;
+        const reportedPoints = submission.points ?? 0;
         const submissionPoints = reportedPoints > 0
           ? reportedPoints
           : calculateCfPoints(
-            standings.problems[problemIndex].points || submission.problem.points,
+            standings.problems[problemIndex].points || submission.problem.points || 0,
             submission.relativeTimeSeconds,
             result.rejectedAttemptCount,
           );

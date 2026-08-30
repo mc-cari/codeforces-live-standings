@@ -1,7 +1,7 @@
 import React from 'react';
 import type {
+  CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
 import { AnimatePresence, motion } from 'framer-motion';
 import LiveSubmission from './LiveSubmission';
@@ -9,7 +9,7 @@ import LiveSubmission from './LiveSubmission';
 export default function LiveSubmissionsList({
   submissions, newSubmissionsCount, globalStandings, userRank,
 } :
-{ submissions : CodeforcesSubmissionDto[], newSubmissionsCount : number,
+{ submissions : CodeforcesPresentedSubmissionDto[], newSubmissionsCount : number,
   globalStandings : CodeforcesStandingsDto | undefined,
   userRank : Map<string, string> }) {
   return (
@@ -25,7 +25,7 @@ export default function LiveSubmissionsList({
       </div>
       <div className="flex flex-col-reverse overflow-y-auto scrollbar-hide flex-grow">
         <AnimatePresence initial={false}>
-          {submissions.map((submission : CodeforcesSubmissionDto, index : number) => (
+          {submissions.map((submission : CodeforcesPresentedSubmissionDto, index : number) => (
             <motion.div
               layout="position"
               initial={{ opacity: 0, y: 32 }}

@@ -7,6 +7,7 @@ import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
 import type {
   CodeforcesContestDto,
   CodeforcesPartyDto,
+  CodeforcesPresentedSubmissionDto,
   CodeforcesRanklistRowDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
@@ -25,7 +26,7 @@ import {
 import { getHandlesFromQuery } from '../../../utils/handlesQuery';
 
 export default function Standings() {
-  const [submissions, setSubmissions] = useState<CodeforcesSubmissionDto[]>([]);
+  const [submissions, setSubmissions] = useState<CodeforcesPresentedSubmissionDto[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
@@ -123,7 +124,7 @@ export default function Standings() {
         previousPosition = position;
       });
 
-      const oldSubmissions : CodeforcesSubmissionDto[] = submissions.slice(0).reverse();
+      const oldSubmissions : CodeforcesPresentedSubmissionDto[] = submissions.slice(0).reverse();
       let oldId = 0; let
         newSubmissionsCountUpdate = 0;
       newSubmissions.forEach((submission) => {
@@ -133,8 +134,19 @@ export default function Standings() {
           }
           if (oldId === oldSubmissions.length) {
             newSubmissionsCountUpdate += 1;
-            oldSubmissions.push(submission);
-          } else { oldSubmissions[oldId] = submission; }
+            oldSubmissions.push({
+              ...submission,
+              author: { ...submission.author, rank: 0 },
+              numberOfProblems: 0,
+            });
+          } else {
+            const previousSubmission = oldSubmissions[oldId];
+            oldSubmissions[oldId] = {
+              ...submission,
+              author: { ...submission.author, rank: previousSubmission.author.rank },
+              numberOfProblems: previousSubmission.numberOfProblems,
+            };
+          }
         }
       });
 
@@ -225,8 +237,9 @@ export default function Standings() {
 
         const userRankMap = new Map<string, string>();
         usersInfo.forEach((user) => {
-          userRankMap.set(user.handle, user.rank);
-          userRankMap.set(`${user.handle} (practice)`, user.rank);
+          const rank = user.rank || 'unrated';
+          userRankMap.set(user.handle, rank);
+          userRankMap.set(`${user.handle} (practice)`, rank);
         });
         setUserRank(userRankMap);
       } catch (error) {

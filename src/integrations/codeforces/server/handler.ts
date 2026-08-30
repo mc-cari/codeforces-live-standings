@@ -11,8 +11,15 @@ import type {
 } from '../contracts';
 import ExpiringCache from './expiringCache';
 import RequestCoordinator from './requestCoordinator';
+import { getResponseCacheDuration, isSuccessfulCodeforcesResponse } from './responseCachePolicy';
 
 const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
+const DEFAULT_CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = 10 * 60 * 1000;
+const configuredRequestTimeout = Number(process.env.CF_REQUEST_TIMEOUT_MS);
+const CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = Number.isFinite(configuredRequestTimeout)
+  && configuredRequestTimeout > 0
+  ? configuredRequestTimeout
+  : DEFAULT_CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS;
 
 const allowedParameters: Record<string, Set<string>> = {
   'contest.list': new Set(['gym']),
@@ -50,6 +57,20 @@ const toCodeforcesQuery = (parameters: URLSearchParams): string => (
   parameters.toString().replace(/%3B/gi, ';')
 );
 
+const isRecord = (value: unknown): value is Record<string, unknown> => (
+  typeof value === 'object' && value !== null
+);
+
+const parseCodeforcesResponse = <Result>(body: string): CodeforcesApiResponse<Result> => {
+  const parsed: unknown = JSON.parse(body);
+  if (!isRecord(parsed)
+    || (parsed.status !== 'OK' && parsed.status !== 'FAILED')
+    || (parsed.status === 'OK' && parsed.result === undefined)) {
+    throw new Error('Invalid response from Codeforces');
+  }
+  return parsed as CodeforcesApiResponse<Result>;
+};
+
 export const createServerSignature = (method: string, parameters: URLSearchParams): string => {
   const apiKey = process.env.CF_API_KEY;
   const apiSecret = process.env.CF_API_SECRET;
@@ -75,7 +96,7 @@ const filterSubmissions = (
 
   const selectedHandles = handles ? new Set(handles.split(';')) : null;
   const selectedParticipantTypes = participantTypes ? new Set(participantTypes.split(',')) : null;
-  const response = JSON.parse(body) as CodeforcesApiResponse<CodeforcesSubmissionDto[]>;
+  const response = parseCodeforcesResponse<CodeforcesSubmissionDto[]>(body);
   if (!Array.isArray(response.result)) return body;
 
   return JSON.stringify({
@@ -97,14 +118,15 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
   }
 
   const url = `${CODEFORCES_API_URL}${method}?${query}`;
+  const signal = AbortSignal.timeout(CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS);
   if (!freshConnectionMethods.has(method)) {
-    const response = await fetch(url);
+    const response = await fetch(url, { signal });
     return { body: await response.text(), status: response.status };
   }
 
   const dispatcher = new Agent({ connections: 1, pipelining: 0 });
   try {
-    const response = await undiciFetch(url, { dispatcher });
+    const response = await undiciFetch(url, { dispatcher, signal });
     return { body: await response.text(), status: response.status };
   } finally {
     await dispatcher.close();
@@ -118,7 +140,7 @@ const getCodeforcesResponse = async (method: string, parameters: URLSearchParams
 
   return requestCoordinator.run(cacheKey, async () => {
     const response = await fetchCodeforces(method, new URLSearchParams(parameters));
-    responseCache.set(cacheKey, response, cacheDuration(method));
+    responseCache.set(cacheKey, response, getResponseCacheDuration(cacheDuration(method), response));
     return response;
   });
 };
@@ -178,7 +200,7 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
         return;
       }
 
-      const standingsResponse = JSON.parse(body) as CodeforcesApiResponse<CodeforcesStandingsDto>;
+      const standingsResponse = parseCodeforcesResponse<CodeforcesStandingsDto>(body);
       const handles = selectParticipantHandles(
         standingsResponse.result?.rows || [],
         count,
@@ -198,7 +220,7 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
         res.status(status).send(body);
         return;
       }
-      const listResponse = JSON.parse(body) as CodeforcesApiResponse<CodeforcesContestDto[]>;
+      const listResponse = parseCodeforcesResponse<CodeforcesContestDto[]>(body);
       const contest = listResponse.result?.find((candidate) => candidate.id === contestId);
       res.setHeader('Cache-Control', 'no-store');
       if (!contest) {
@@ -217,7 +239,7 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
     }
     const { body, status } = await getCodeforcesResponse(method, parameters);
 
-    if (method === 'contest.list' && status === 200) {
+    if (method === 'contest.list' && isSuccessfulCodeforcesResponse({ body, status })) {
       res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
     } else {
       res.setHeader('Cache-Control', 'no-store');
@@ -226,7 +248,7 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
       method === 'contest.status' ? filterSubmissions(body, handles, participantTypes) : body,
     );
   } catch (error) {
-    const comment = error instanceof Error ? error.message : 'Unable to contact Codeforces';
-    res.status(502).json({ status: 'FAILED', comment });
+    console.error('Codeforces API handler failed.', { method, error });
+    res.status(502).json({ status: 'FAILED', comment: 'Unable to contact Codeforces' });
   }
 };

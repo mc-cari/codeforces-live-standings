@@ -1,6 +1,7 @@
 import getName from './getName';
 import type {
   CodeforcesRanklistRowDto,
+  CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
@@ -10,7 +11,7 @@ import calculateReplayPenalty, { countRejectedAttempt } from './replayScoring';
 type ReplaySnapshot = {
   localStandings: Map<string, number>;
   standings: CodeforcesStandingsDto;
-  submissions: CodeforcesSubmissionDto[];
+  submissions: CodeforcesPresentedSubmissionDto[];
 };
 
 const compareRows = (first: CodeforcesRanklistRowDto, second: CodeforcesRanklistRowDto) => {
@@ -90,7 +91,6 @@ export const buildReplaySnapshot = (
     const position = previousRow && previousRow.points === row.points && previousRow.penalty === row.penalty
       ? localStandings.get(getName(previousRow.party)) as number
       : index + 1;
-    row.party.rank = position;
     localStandings.set(getName(row.party), position);
   });
 
@@ -98,7 +98,8 @@ export const buildReplaySnapshot = (
     getName(row.party),
     row.problemResults.filter((result) => result.points > 0).length,
   ]));
-  const rankedSubmissions = releasedSubmissions.reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((submission) => ({
+  const rankedSubmissions: CodeforcesPresentedSubmissionDto[] = releasedSubmissions
+    .reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((submission) => ({
     ...submission,
     numberOfProblems: solvedCount.get(getName(submission.author)) as number,
     author: {

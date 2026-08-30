@@ -20,7 +20,7 @@ const submission = (
   participantType: string,
   verdict: string,
   relativeTimeSeconds: number,
-  points = 0,
+  points?: number,
 ) => ({
   id,
   author: party(handle, participantType),
@@ -73,7 +73,7 @@ test('uses Codeforces scoring without scaling penalties by contest duration', ()
     ...submission(id, 'MateoCV', 'OUT_OF_COMPETITION', 'OK', relativeTimeSeconds),
     problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as CodeforcesProblemDto,
     points: undefined,
-  } as unknown as CodeforcesSubmissionDto);
+  } as CodeforcesSubmissionDto);
 
   const result = addMissingParticipantRows(contestStandings, [
     contestSubmission(1, 'A', 144),
@@ -103,7 +103,7 @@ test('reconstructs all jiangly solves from contest 1797 submissions', () => {
     ...submission(id, 'jiangly', 'OUT_OF_COMPETITION', verdict, relativeTimeSeconds),
     problem: contestStandings.problems.find((problem) => problem.index === problemIndex) as CodeforcesProblemDto,
     points: undefined,
-  } as unknown as CodeforcesSubmissionDto);
+  } as CodeforcesSubmissionDto);
 
   const result = addMissingParticipantRows(contestStandings, [
     contestSubmission(1, 'A', 'OK', 133),

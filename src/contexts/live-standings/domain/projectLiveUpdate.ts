@@ -1,5 +1,6 @@
 import type {
   CodeforcesPartyDto,
+  CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
@@ -10,7 +11,7 @@ import { addMissingParticipantRows } from '../../../shared/domain/standings.ts';
 export type LiveProjection = {
   standings: CodeforcesStandingsDto;
   localStandings: Map<string, number>;
-  submissions: CodeforcesSubmissionDto[];
+  submissions: CodeforcesPresentedSubmissionDto[];
   newSubmissionCount: number;
   isFinished: boolean;
 };

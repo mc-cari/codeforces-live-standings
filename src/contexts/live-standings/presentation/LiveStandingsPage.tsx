@@ -5,6 +5,7 @@ import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import type {
   CodeforcesContestDto,
+  CodeforcesPresentedSubmissionDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
@@ -21,7 +22,7 @@ import { projectLiveUpdate } from '../domain/projectLiveUpdate';
 import { codeforcesLiveContestGateway } from '../infrastructure/codeforcesLiveContestGateway';
 
 export default function LiveStandingsPage() {
-  const [submissions, setSubmissions] = useState<CodeforcesSubmissionDto[]>([]);
+  const [submissions, setSubmissions] = useState<CodeforcesPresentedSubmissionDto[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState<number>(0);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
@@ -36,7 +37,7 @@ export default function LiveStandingsPage() {
   const [isContestFinished, setIsContestFinished] = useState(false);
   const hasLoadedInitialData = useRef(false);
   const activeRequest = useRef<AbortController | undefined>(undefined);
-  const submissionsRef = useRef<CodeforcesSubmissionDto[]>([]);
+  const submissionsRef = useRef<CodeforcesPresentedSubmissionDto[]>([]);
 
   const Router = useRouter();
   const {
@@ -154,8 +155,9 @@ export default function LiveStandingsPage() {
 
         const userRankMap = new Map<string, string>();
         usersInfo.forEach((user) => {
-          userRankMap.set(user.handle, user.rank);
-          userRankMap.set(`${user.handle} (practice)`, user.rank);
+          const rank = user.rank || 'unrated';
+          userRankMap.set(user.handle, rank);
+          userRankMap.set(`${user.handle} (practice)`, rank);
         });
         setUserRank(userRankMap);
       } catch {

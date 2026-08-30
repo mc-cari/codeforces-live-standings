@@ -187,8 +187,9 @@ export default function ReplayPage() {
         if (users.length > 0) {
           const ranks = new Map<string, string>();
           users.forEach((user) => {
-            ranks.set(user.handle, user.rank);
-            ranks.set(`${user.handle} (practice)`, user.rank);
+            const rank = user.rank || 'unrated';
+            ranks.set(user.handle, rank);
+            ranks.set(`${user.handle} (practice)`, rank);
           });
           setUserRank(ranks);
         }

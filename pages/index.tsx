@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import codeforcesFetch from '../utils/codeforcesFetch';
+import { fetchCodeforcesFriends } from '../utils/codeforcesFriends';
 import { encodeHandles } from '../utils/handlesQuery';
-import type { ParticipantSelection } from '../utils/participantImport';
+import { normalizeImportedHandles, type ParticipantSelection } from '../utils/participantImport';
 import { getContestConfiguration } from '../utils/contestConfiguration';
 import { findUpcomingContests } from '../utils/upcomingContest';
 import UpcomingContest from '../components/UpcomingContest';
@@ -21,10 +22,16 @@ export default function Home() {
   const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [contestLookupError, setContestLookupError] = useState('');
   const [usersHandles, setUsersHandles] = useState<string[]>([]);
+  const usersHandlesRef = useRef<string[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
   const [participantCountInput, setParticipantCountInput] = useState('15');
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importError, setImportError] = useState<string>('');
+  const [friendApiKeyInput, setFriendApiKeyInput] = useState('');
+  const [friendApiSecretInput, setFriendApiSecretInput] = useState('');
+  const [isImportingFriends, setIsImportingFriends] = useState(false);
+  const [friendImportMessage, setFriendImportMessage] = useState('');
+  const [friendImportError, setFriendImportError] = useState('');
   const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
   const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
 
@@ -99,22 +106,52 @@ export default function Home() {
     }
   };
 
+  const closeForm = () => {
+    setShowForm(false);
+    setFriendApiKeyInput('');
+    setFriendApiSecretInput('');
+  };
+
   const selectUpcomingContest = (contest: Contest) => {
     setContestIdInput(String(contest.id));
     setContestInfo(contest);
     setContestLookupError('');
     setContestLookupState('idle');
     setImportError('');
+    setFriendImportMessage('');
+    setFriendImportError('');
+    setFriendApiKeyInput('');
+    setFriendApiSecretInput('');
     setShowForm(true);
   };
 
-  const addHandles = (newHandles : string[]) => {
-    newHandles = newHandles.map((handle) => handle.trim());
-    newHandles = newHandles.filter((handle) => !usersHandles.includes(handle));
+  const addHandles = (newHandles: string[]) => {
+    const normalizedHandles = Array.from(
+      new Set(newHandles.map((handle) => handle.trim()).filter(Boolean)),
+    );
+    const handlesToAdd = normalizedHandles.filter(
+      (handle) => !usersHandlesRef.current.includes(handle),
+    );
+    usersHandlesRef.current = [...usersHandlesRef.current, ...handlesToAdd];
 
-    if (newHandles.length > 0) {
-      setUsersHandles((oldUsers) => [...oldUsers, ...newHandles]);
-    }
+    setUsersHandles((oldUsers) => {
+      const existingHandles = new Set(oldUsers);
+      const actualHandlesToAdd = normalizedHandles.filter((handle) => !existingHandles.has(handle));
+      const mergedUsers = actualHandlesToAdd.length > 0
+        ? [...oldUsers, ...actualHandlesToAdd]
+        : oldUsers;
+      usersHandlesRef.current = mergedUsers;
+
+      return mergedUsers;
+    });
+
+    return handlesToAdd.length;
+  };
+
+  const removeHandle = (handleToRemove: string) => {
+    const remainingHandles = usersHandlesRef.current.filter((handle) => handle !== handleToRemove);
+    usersHandlesRef.current = remainingHandles;
+    setUsersHandles(remainingHandles);
   };
 
   const addInputHandles = () => {
@@ -122,6 +159,42 @@ export default function Home() {
     addHandles(handles);
 
     setHandleText('');
+  };
+
+  const importFriendHandles = async () => {
+    try {
+      const apiKey = friendApiKeyInput.trim();
+      const apiSecret = friendApiSecretInput.trim();
+      if (!contestInfo) {
+        throw new Error('Contest Id not set');
+      }
+      if (!apiKey || !apiSecret) {
+        throw new Error('Enter both the Codeforces API key and API secret');
+      }
+
+      setIsImportingFriends(true);
+      setFriendImportError('');
+      setFriendImportMessage('');
+      const response = await fetchCodeforcesFriends(apiKey, apiSecret);
+      const payload = await response.json() as { status?: string; result?: unknown; comment?: string };
+      if (!response.ok || payload.status !== 'OK') {
+        throw new Error(payload.comment || 'Unable to import Codeforces friends');
+      }
+
+      const importedHandles = normalizeImportedHandles(payload.result);
+      const addedCount = addHandles(importedHandles);
+      setFriendImportMessage(
+        addedCount === 0
+          ? 'All friends from that list are already added'
+          : `Added ${addedCount} friend handle${addedCount === 1 ? '' : 's'}`,
+      );
+    } catch (error) {
+      setFriendImportError(error instanceof Error ? error.message : 'Unable to import friends');
+    } finally {
+      setIsImportingFriends(false);
+      setFriendApiKeyInput('');
+      setFriendApiSecretInput('');
+    }
   };
 
   const importHandles = async (selection: ParticipantSelection) => {
@@ -357,7 +430,7 @@ export default function Home() {
             <div className="flex items-center justify-between mb-8">
               <h2 className="text-3xl font-bold text-white">Setup Contest Tracking</h2>
               <button
-                onClick={() => setShowForm(false)}
+                onClick={closeForm}
                 className="text-gray-400 transition-colors hover:text-white"
                 type="button"
                 aria-label="Close form"
@@ -395,7 +468,8 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
+                  {contestInfo && (
+                    <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
                     <label className="block mb-2 text-sm text-white" htmlFor="participant-count">
                       Import participants
                     </label>
@@ -442,7 +516,68 @@ export default function Home() {
                         : 'Unofficial participants should be added manually.'}
                     </p>
                     {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
-                  </div>
+                    </div>
+                  )}
+
+                  {contestInfo && (
+                    <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
+                      <details>
+                        <summary className="text-sm font-medium cursor-pointer text-cyan-200">
+                          Import Codeforces friends automatically
+                        </summary>
+                        <div className="pt-3">
+                          <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
+                            Create an API key for this import and delete it after.
+                          </p>
+                          <a
+                            className="inline-block mb-3 text-xs underline text-cyan-300 hover:text-cyan-200"
+                            href="https://codeforces.com/settings/api"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Get an API key and secret from Codeforces settings
+                          </a>
+                          <div className="mb-3 space-y-2">
+                            <input
+                              className={
+                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                              }
+                              type="password"
+                              value={friendApiKeyInput}
+                              onChange={(event) => setFriendApiKeyInput(event.target.value)}
+                              placeholder="Codeforces API key"
+                              autoComplete="off"
+                            />
+                            <input
+                              className={
+                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                              }
+                              type="password"
+                              value={friendApiSecretInput}
+                              onChange={(event) => setFriendApiSecretInput(event.target.value)}
+                              placeholder="Codeforces API secret"
+                              autoComplete="off"
+                            />
+                          </div>
+                          <button
+                            className={
+                              'w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                              + 'bg-cyan-700 hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-gray-700'
+                            }
+                            disabled={isImportingFriends}
+                            onClick={importFriendHandles}
+                            type="button"
+                          >
+                            {isImportingFriends ? 'Importing friends…' : 'Add friend handles'}
+                          </button>
+                        </div>
+                      </details>
+                      {friendImportMessage && <p className="mt-2 text-sm text-cyan-300">{friendImportMessage}</p>}
+                      {friendImportError && <p className="mt-2 text-sm text-red-400">{friendImportError}</p>}
+                    </div>
+                  )}
 
                   <div className="p-4 overflow-y-auto bg-gray-800 rounded-lg max-h-60">
                     {usersHandles.length === 0 ? (
@@ -454,7 +589,7 @@ export default function Home() {
                             <span className="text-white">{user}</span>
                             <button
                               className="text-red-400 transition-colors hover:text-red-300"
-                              onClick={() => setUsersHandles(usersHandles.filter((userOld) => userOld !== user))}
+                              onClick={() => removeHandle(user)}
                               type="button"
                             >
                               Remove
@@ -496,6 +631,8 @@ export default function Home() {
                           setContestLookupError('');
                           setContestLookupState('idle');
                           setImportError('');
+                          setFriendApiKeyInput('');
+                          setFriendApiSecretInput('');
                         }}
                       />
                     </div>

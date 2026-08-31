@@ -136,7 +136,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ status: 'FAILED', comment: 'Unsupported Codeforces API method' });
     return;
   }
-
   const parameters = new URLSearchParams();
   allowedParameters[method].forEach((parameter) => {
     const value = getSingleQueryValue(req.query[parameter]);

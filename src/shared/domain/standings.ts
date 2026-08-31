@@ -5,6 +5,8 @@ import type {
   CodeforcesSubmissionDto,
 } from '@/src/integrations/codeforces/contracts';
 
+// Reconstructs selected participants omitted by the official standings response.
+
 type ParticipantName = (party: CodeforcesPartyDto) => string;
 
 const isPenalizedAttempt = (submission: CodeforcesSubmissionDto) => (

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import RequestCoordinator from '../src/integrations/codeforces/server/requestCoordinator.ts';
+import RequestCoordinator, { RequestQueueCapacityError } from './requestCoordinator.ts';
 
 test('deduplicates identical in-flight requests', async () => {
   let calls = 0;
@@ -12,6 +12,36 @@ test('deduplicates identical in-flight requests', async () => {
   });
   assert.deepEqual(await Promise.all([request(), request()]), ['response', 'response']);
   assert.equal(calls, 1);
+});
+
+test('rejects distinct requests at capacity while preserving deduplication', async () => {
+  let releaseFirst: (value: string) => void = () => undefined;
+  const coordinator = new RequestCoordinator(
+    0,
+    Date.now,
+    undefined,
+    false,
+    undefined,
+    false,
+    undefined,
+    undefined,
+    30_000,
+    1,
+  );
+  const first = coordinator.run('first', () => new Promise<string>((resolve) => {
+    releaseFirst = resolve;
+  }));
+
+  assert.equal(coordinator.run('first', async () => 'duplicate'), first);
+  await assert.rejects(
+    coordinator.run('second', async () => 'rejected'),
+    RequestQueueCapacityError,
+  );
+
+  releaseFirst('first');
+  assert.equal(await first, 'first');
+  await new Promise((resolve) => { setImmediate(resolve); });
+  assert.equal(await coordinator.run('second', async () => 'accepted'), 'accepted');
 });
 
 test('spaces different upstream requests', async () => {

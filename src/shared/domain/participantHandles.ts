@@ -16,8 +16,10 @@ const fromBase64Url = (value: string) => {
   return decodeBase64(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
 };
 
+export const participantIdentity = (handle: string) => handle.toLowerCase();
+
 export const encodeHandles = (handles: string[]) => (
-  toBase64Url(handles.map((handle) => handle.trim()).filter(Boolean).join(';'))
+  toBase64Url(normalizeHandles(handles).join(';'))
 );
 
 export const getHandlesFromQuery = (
@@ -27,10 +29,25 @@ export const getHandlesFromQuery = (
   if (typeof compactHandles === 'string') {
     try {
       const decodedHandles = fromBase64Url(compactHandles).split(';').filter(Boolean);
-      if (decodedHandles.length > 0) return decodedHandles;
+      if (decodedHandles.length > 0) return normalizeHandles(decodedHandles);
     } catch {
-      return typeof handles === 'string' ? [handles] : handles || [];
+      return normalizeHandles(typeof handles === 'string' ? [handles] : handles || []);
     }
   }
-  return typeof handles === 'string' ? [handles] : handles || [];
+  return normalizeHandles(typeof handles === 'string' ? [handles] : handles || []);
+};
+export const normalizeHandles = (
+  handles: string[],
+  existingHandles: string[] = [],
+): string[] => {
+  const knownHandles = new Set(existingHandles.map(participantIdentity));
+  return handles.reduce<string[]>((normalized, handle) => {
+    const value = handle.trim();
+    const identity = participantIdentity(value);
+    if (value && !knownHandles.has(identity)) {
+      knownHandles.add(identity);
+      normalized.push(value);
+    }
+    return normalized;
+  }, []);
 };

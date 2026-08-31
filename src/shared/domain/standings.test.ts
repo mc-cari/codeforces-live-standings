@@ -6,8 +6,8 @@ import type {
   CodeforcesRanklistRowDto,
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
-} from '../src/integrations/codeforces/contracts.ts';
-import { addMissingParticipantRows } from './participantStandings.ts';
+} from '../../integrations/codeforces/contracts.ts';
+import { addMissingParticipantRows } from './standings.ts';
 
 const party = (handle: string, participantType: string) => ({
   members: [{ handle, name: handle }],

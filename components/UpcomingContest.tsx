@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
-import { formatCountdown, secondsUntilContest } from '../utils/contestConfiguration';
+import {
+  formatCountdown,
+  secondsUntilContest,
+} from '@/src/contexts/contest-setup/domain/contestConfiguration';
 
 type UpcomingContestProps = {
   contests: CodeforcesContestDto[];

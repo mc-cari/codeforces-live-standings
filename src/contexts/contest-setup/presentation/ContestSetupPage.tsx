@@ -1,0 +1,675 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import { encodeHandles } from '@/src/shared/domain/participantHandles';
+import {
+  normalizeParticipantHandles,
+  type ParticipantSelection,
+} from '../domain/participantSelection';
+import { getContestConfiguration } from '../domain/contestConfiguration';
+import { findUpcomingContests } from '../domain/upcomingContests';
+import { codeforcesContestSetupGateway } from '../infrastructure/codeforcesContestSetupGateway';
+import UpcomingContest from '@/components/UpcomingContest';
+import UpcomingContestsLoading from '@/components/UpcomingContestsLoading';
+
+const demoHandles = [
+  'MateoCV', 'mc._cari', 'dmga44', 'Marckess', 'julianferres', 'pacha2880', 'Giga_Cronos',
+  'martins', 'martinius', 'Mateo', 'MesSimonFallon19', 'Scano', 'Agaric',
+  'estoy-re-sebado', 'Tainel', 'Marceantasy', 'AngrySeal',
+];
+
+export default function ContestSetupPage() {
+  const [handleText, setHandleText] = useState<string>('');
+  const [contestIdInput, setContestIdInput] = useState('');
+  const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
+  const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
+  const [contestLookupError, setContestLookupError] = useState('');
+  const [usersHandles, setUsersHandles] = useState<string[]>([]);
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [participantCountInput, setParticipantCountInput] = useState('15');
+  const [isImporting, setIsImporting] = useState<boolean>(false);
+  const [importError, setImportError] = useState<string>('');
+  const [friendApiKeyInput, setFriendApiKeyInput] = useState('');
+  const [friendApiSecretInput, setFriendApiSecretInput] = useState('');
+  const [isImportingFriends, setIsImportingFriends] = useState(false);
+  const [friendImportMessage, setFriendImportMessage] = useState('');
+  const [friendImportError, setFriendImportError] = useState('');
+  const [upcomingContests, setUpcomingContests] = useState<CodeforcesContestDto[]>([]);
+  const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
+
+  const Router = useRouter();
+  const contestId = Number(contestIdInput);
+  const contestConfiguration = useMemo(
+    () => (contestInfo ? getContestConfiguration(contestInfo) : undefined),
+    [contestInfo],
+  );
+  const participantCount = Number(participantCountInput);
+  const hasValidParticipantCount = participantCountInput !== ''
+    && Number.isInteger(participantCount) && participantCount > 0;
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const loadUpcomingContest = async () => {
+      try {
+        const contests = await codeforcesContestSetupGateway.listContests(controller.signal);
+        setUpcomingContests(findUpcomingContests(contests));
+      } catch (error) {
+        if (!controller.signal.aborted) setUpcomingContests([]);
+      } finally {
+        if (!controller.signal.aborted) setIsLoadingUpcomingContests(false);
+      }
+    };
+
+    loadUpcomingContest();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    if (!Number.isInteger(contestId) || contestId <= 0) {
+      return undefined;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(async () => {
+      try {
+        setContestLookupState('loading');
+        const contest = await codeforcesContestSetupGateway.findContest(contestId, controller.signal);
+        setContestInfo(contest);
+        setContestLookupState('idle');
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        setContestLookupError(error instanceof Error ? error.message : 'Unable to detect contest');
+        setContestLookupState('error');
+      }
+    }, 2_000);
+    return () => {
+      controller.abort();
+      window.clearTimeout(timer);
+    };
+  }, [contestId]);
+
+  const handleStart = () => {
+    if (contestInfo && usersHandles.length > 0 && contestConfiguration?.contestType) {
+      Router.push({
+        pathname: `/contests/${contestInfo.id}/${contestConfiguration.route}`,
+        query: {
+          contestType: contestConfiguration.contestType,
+          h: encodeHandles(usersHandles),
+        },
+      });
+    }
+  };
+
+  const selectUpcomingContest = (contest: CodeforcesContestDto) => {
+    setContestIdInput(String(contest.id));
+    setContestInfo(contest);
+    setContestLookupError('');
+    setContestLookupState('idle');
+    setImportError('');
+    setFriendImportMessage('');
+    setFriendImportError('');
+    setShowForm(true);
+  };
+
+  const addHandles = (handlesToAdd : string[]) => {
+    setUsersHandles((oldUsers) => [
+      ...oldUsers,
+      ...normalizeParticipantHandles(handlesToAdd, oldUsers),
+    ]);
+  };
+
+  const addInputHandles = () => {
+    const handles = handleText.split(',');
+    addHandles(handles);
+
+    setHandleText('');
+  };
+
+  const importFriendHandles = async () => {
+    try {
+      const apiKey = friendApiKeyInput.trim();
+      const apiSecret = friendApiSecretInput.trim();
+      if (!contestInfo) {
+        throw new Error('Contest Id not set');
+      }
+      if (!apiKey || !apiSecret) {
+        throw new Error('Enter both the Codeforces API key and API secret');
+      }
+
+      setIsImportingFriends(true);
+      setFriendImportError('');
+      setFriendImportMessage('');
+      const importedHandles = await codeforcesContestSetupGateway.importFriends({ apiKey, apiSecret });
+      addHandles(importedHandles);
+      setFriendImportMessage('Friend handles imported');
+    } catch (error) {
+      setFriendImportError(error instanceof Error ? error.message : 'Unable to import friends');
+    } finally {
+      setIsImportingFriends(false);
+      setFriendApiKeyInput('');
+      setFriendApiSecretInput('');
+    }
+  };
+
+  const importHandles = async (selection: ParticipantSelection) => {
+    try {
+      if (!contestInfo) {
+        throw new Error('Contest Id not set');
+      }
+
+      if (contestInfo.phase === 'BEFORE') {
+        throw new Error('Participant imports become available when the contest starts');
+      }
+
+      if (!hasValidParticipantCount) {
+        throw new Error('Participant count must be at least 1');
+      }
+
+      setIsImporting(true);
+      setImportError('');
+
+      const selectedHandles = await codeforcesContestSetupGateway.importParticipants(
+        contestInfo.id,
+        participantCount,
+        selection,
+      );
+
+      addHandles(selectedHandles);
+    } catch (error) {
+      setImportError(error instanceof Error ? error.message : 'Unable to import participants');
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-black">
+      <div className="flex-grow">
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20" />
+          <div className="relative px-4 py-24 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h1 className="mb-6 text-5xl font-bold tracking-tight text-white md:text-7xl">
+                Codeforces
+                <span className="text-transparent bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text">
+                  {' '}
+                  Live Standings
+                </span>
+              </h1>
+              <p
+                className="max-w-3xl mx-auto mb-8 text-xl leading-relaxed text-gray-300 md:text-2xl"
+              >
+                Visualization for live standings of Codeforces competitions
+                {' '}
+                with ICPC broadcast overlay design.
+                {' '}
+                Track your current contest with selected participants in real-time or check any past contest.
+              </p>
+              <div className="flex flex-col justify-center gap-4 sm:flex-row">
+                <button
+                  onClick={() => setShowForm(true)}
+                  className={
+                    'px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 '
+                    + 'text-white font-semibold rounded-lg hover:from-blue-700 '
+                    + 'hover:to-purple-700 transition-all duration-300 '
+                    + 'transform hover:scale-105 shadow-lg'
+                  }
+                  type="button"
+                >
+                  Get Started
+                </button>
+                <a
+                  href={
+                    '/contests/1735/replay'
+                    + '?contestType=normal&startTime=2%3A50&playbackSpeed=15&autoplay=true'
+                    + `&demo=true&h=${encodeHandles(demoHandles)}`
+                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={
+                    'px-8 py-4 border-2 border-gray-600 text-white '
+                    + 'font-semibold rounded-lg hover:border-blue-400 '
+                    + 'hover:text-blue-400 transition-all duration-300'
+                  }
+                >
+                  View Demo
+                </a>
+              </div>
+              {isLoadingUpcomingContests && <UpcomingContestsLoading />}
+              {!isLoadingUpcomingContests && upcomingContests.length > 0 && (
+                <UpcomingContest contests={upcomingContests} onSelect={selectUpcomingContest} />
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="py-20 bg-gray-900/50">
+          <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+            <div className="mb-16 text-center">
+              <h2 className="mb-4 text-4xl font-bold text-white">Features</h2>
+              <p className="text-xl text-gray-400">
+                Everything you need for competitive programming contests
+              </p>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-3">
+              <div
+                className={
+                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
+                  + 'hover:border-blue-500/50 transition-all duration-300'
+                }
+              >
+                <div
+                  className={
+                    'w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 '
+                    + 'rounded-lg mb-6 flex items-center justify-center'
+                  }
+                >
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 10V3L4 14h7v7l9-11h-7z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-4 text-xl font-semibold text-white">Real-time Updates</h3>
+                <p className="text-gray-400">
+                  Automatic submission tracking and standings updates during live contests
+                </p>
+              </div>
+
+              <div
+                className={
+                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
+                  + 'hover:border-blue-500/50 transition-all duration-300'
+                }
+              >
+                <div
+                  className={
+                    'w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 '
+                    + 'rounded-lg mb-6 flex items-center justify-center'
+                  }
+                >
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={
+                        'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 '
+                        + '002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 '
+                        + '2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 '
+                        + '2 0 01-2-2z'
+                      }
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-4 text-xl font-semibold text-white">ICPC Broadcast Overlay Design</h3>
+                <p className="text-gray-400">
+                  Visualization inspired by ICPC World Finals broadcast overlay that includes a
+                  {' '}
+                  submission queue and a standings table
+                </p>
+              </div>
+
+              <div
+                className={
+                  'bg-gray-800/50 p-8 rounded-xl border border-gray-700 '
+                  + 'hover:border-blue-500/50 transition-all duration-300'
+                }
+              >
+                <div
+                  className={
+                    'w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg '
+                    + 'mb-6 flex items-center justify-center'
+                  }
+                >
+                  <svg
+                    className="w-6 h-6 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={
+                        'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126'
+                        + '-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656'
+                        + '.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 '
+                        + '0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 '
+                        + '2 0 014 0z'
+                      }
+                    />
+                  </svg>
+                </div>
+                <h3 className="mb-4 text-xl font-semibold text-white">Multiple Contest Types</h3>
+                <p className="text-gray-400">
+                  Support for Normal Rounds, Educational Rounds, and public Gym Contests
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div
+            className={
+              'bg-gray-900 rounded-xl border border-gray-700 p-8 max-w-4xl w-full '
+              + 'max-h-[90vh] overflow-y-auto'
+            }
+          >
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-3xl font-bold text-white">Setup Contest Tracking</h2>
+              <button
+                onClick={() => setShowForm(false)}
+                className="text-gray-400 transition-colors hover:text-white"
+                type="button"
+                aria-label="Close form"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="grid gap-8 md:grid-cols-2">
+              <div className="space-y-6">
+                <div>
+                  <h3 className="mb-4 text-xl font-semibold text-white">Add Participants</h3>
+                  <p className="mb-4 text-gray-400">Teams are recognized by one of their members</p>
+
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      className={
+                        'flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg '
+                        + 'text-white placeholder-gray-400 focus:border-blue-500 '
+                        + 'focus:outline-none'
+                      }
+                      type="text"
+                      value={handleText}
+                      onChange={(e) => setHandleText(e.target.value)}
+                      placeholder="handle1,handle2,handle3..."
+                    />
+                    <button
+                      className="px-6 py-3 text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700"
+                      onClick={addInputHandles}
+                      type="button"
+                    >
+                      Add
+                    </button>
+                  </div>
+
+                  {contestInfo && (
+                    <div className="p-4 mb-4 bg-gray-800 border border-gray-700 rounded-lg">
+                    <label className="block mb-2 text-sm text-white" htmlFor="participant-count">
+                      Import participants
+                    </label>
+                    <input
+                      className={
+                        'w-full p-3 mb-3 bg-gray-900 border border-gray-600 rounded-lg '
+                        + 'text-white focus:border-blue-500 focus:outline-none'
+                      }
+                      id="participant-count"
+                      min="1"
+                      type="number"
+                      value={participantCountInput}
+                      onChange={(event) => setParticipantCountInput(event.target.value)}
+                    />
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      <button
+                        className={
+                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                          + 'bg-green-600 hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-700'
+                        }
+                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
+                          || isImporting || !hasValidParticipantCount}
+                        onClick={() => importHandles('top')}
+                        type="button"
+                      >
+                        {isImporting ? 'Importing…' : `Add Top ${participantCountInput || 'N'}`}
+                      </button>
+                      <button
+                        className={
+                          'px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                          + 'bg-purple-600 hover:bg-purple-700 disabled:cursor-not-allowed disabled:bg-gray-700'
+                        }
+                        disabled={!contestInfo || contestInfo.phase === 'BEFORE'
+                          || isImporting || !hasValidParticipantCount}
+                        onClick={() => importHandles('random')}
+                        type="button"
+                      >
+                        {isImporting ? 'Importing…' : `Add Random ${participantCountInput || 'N'}`}
+                      </button>
+                    </div>
+                    <p className="mt-3 text-xs text-gray-400">
+                      {contestInfo?.phase === 'BEFORE'
+                        ? 'Imports become available when the contest starts. You can still add handles manually.'
+                        : 'Unofficial participants should be added manually.'}
+                    </p>
+                    {importError && <p className="mt-2 text-sm text-red-400">{importError}</p>}
+                    </div>
+                  )}
+
+                  {contestInfo && (
+                    <div className="p-4 mb-4 border rounded-lg border-cyan-900/80 bg-cyan-950/30">
+                      <details>
+                        <summary className="text-sm font-medium cursor-pointer text-cyan-200">
+                          Import Codeforces friends automatically
+                        </summary>
+                        <div className="pt-3">
+                          <p className="mb-3 text-xs leading-relaxed text-cyan-200/70">
+                            Create an API key for this import and delete it after.
+                          </p>
+                          <a
+                            className="inline-block mb-3 text-xs underline text-cyan-300 hover:text-cyan-200"
+                            href="https://codeforces.com/settings/api"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Get an API key and secret from Codeforces settings
+                          </a>
+                          <div className="mb-3 space-y-2">
+                            <input
+                              className={
+                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                              }
+                              type="password"
+                              value={friendApiKeyInput}
+                              onChange={(event) => setFriendApiKeyInput(event.target.value)}
+                              placeholder="Codeforces API key"
+                              autoComplete="off"
+                            />
+                            <input
+                              className={
+                                'w-full p-3 bg-gray-900 border border-gray-600 rounded-lg '
+                                + 'text-white placeholder-gray-500 focus:border-cyan-500 focus:outline-none'
+                              }
+                              type="password"
+                              value={friendApiSecretInput}
+                              onChange={(event) => setFriendApiSecretInput(event.target.value)}
+                              placeholder="Codeforces API secret"
+                              autoComplete="off"
+                            />
+                          </div>
+                          <button
+                            className={
+                              'w-full px-4 py-3 text-sm font-medium text-white transition-colors rounded-lg '
+                              + 'bg-cyan-700 hover:bg-cyan-600 disabled:cursor-not-allowed disabled:bg-gray-700'
+                            }
+                            disabled={isImportingFriends}
+                            onClick={importFriendHandles}
+                            type="button"
+                          >
+                            {isImportingFriends ? 'Importing friends…' : 'Add friend handles'}
+                          </button>
+                        </div>
+                      </details>
+                      {friendImportMessage && <p className="mt-2 text-sm text-cyan-300">{friendImportMessage}</p>}
+                      {friendImportError && <p className="mt-2 text-sm text-red-400">{friendImportError}</p>}
+                    </div>
+                  )}
+
+                  <div className="p-4 overflow-y-auto bg-gray-800 rounded-lg max-h-60">
+                    {usersHandles.length === 0 ? (
+                      <p className="py-4 text-center text-gray-500">No participants added yet</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {usersHandles.map((user) => (
+                          <div key={user} className="flex items-center justify-between p-2 bg-gray-700 rounded">
+                            <span className="text-white">{user}</span>
+                            <button
+                              className="text-red-400 transition-colors hover:text-red-300"
+                              onClick={() => setUsersHandles((currentUsers) => (
+                                currentUsers.filter((userOld) => userOld !== user)
+                              ))}
+                              type="button"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="mb-4 text-xl font-semibold text-white">Contest Configuration</h3>
+
+                  <div className="mb-6">
+                    <label className="block mb-2 text-white" htmlFor="contest">
+                      Contest ID
+                    </label>
+                    <p className="mb-3 text-sm text-gray-400">
+                      From URL: https://codeforces.com/contest/
+                      <strong>1735</strong>
+                    </p>
+                    <div className="mb-3">
+                      <input
+                        className={
+                          'flex-1 p-3 bg-gray-800 border border-gray-600 rounded-lg '
+                          + 'text-white placeholder-gray-400 focus:border-blue-500 '
+                          + 'focus:outline-none'
+                        }
+                        type="text"
+                        id="contest"
+                        placeholder="1735"
+                        value={contestIdInput}
+                        onChange={(e) => {
+                          setContestIdInput(e.target.value);
+                          setContestInfo(undefined);
+                          setContestLookupError('');
+                          setContestLookupState('idle');
+                          setImportError('');
+                        }}
+                      />
+                    </div>
+                    {contestLookupState === 'loading' && (
+                      <p className="text-sm text-blue-300">Detecting contest…</p>
+                    )}
+                    {contestLookupError && <p className="text-sm text-red-400">{contestLookupError}</p>}
+                  </div>
+
+                  {contestInfo && contestConfiguration && (
+                    <div className="p-4 mb-6 border border-gray-700 rounded-lg bg-gray-800/80">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="font-medium text-white">{contestInfo.name}</p>
+                          <p className="mt-1 text-sm text-gray-400">
+                            {contestInfo.type === 'ICPC' ? 'ICPC scoring' : `${contestInfo.type} scoring`}
+                            {' · '}
+                            {contestInfo.phase.replaceAll('_', ' ')}
+                          </p>
+                        </div>
+                        <span className="px-2 py-1 text-xs text-blue-200 rounded-full bg-blue-900/60">
+                          Detected
+                        </span>
+                      </div>
+                      {contestConfiguration.unsupportedReason && (
+                        <p className="mt-3 text-sm text-amber-300">
+                          {contestConfiguration.unsupportedReason}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  <div>
+                    <button
+                      className={
+                        `w-full py-4 rounded-lg font-semibold transition-all duration-300 ${
+                        contestInfo && usersHandles.length > 0
+                          && contestConfiguration?.contestType
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white '
+                          + 'hover:from-blue-700 hover:to-purple-700 transform hover:scale-105'
+                          : 'bg-gray-700 text-gray-400 cursor-not-allowed'}`
+                      }
+                      onClick={handleStart}
+                      disabled={!contestInfo || usersHandles.length === 0
+                        || !contestConfiguration?.contestType}
+                      type="button"
+                    >
+                      {contestConfiguration?.actionLabel || 'Select a contest'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <footer className="py-8 bg-gray-900 border-t border-gray-800">
+        <div className="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h4 className="mb-4 text-lg font-semibold text-white">Links</h4>
+            <div className="flex flex-col justify-center gap-6 sm:flex-row">
+              <a
+                href="https://codeforces.com/blog/entry/114892"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 transition-colors hover:text-blue-400"
+              >
+                Codeforces Blog Post
+              </a>
+              <a
+                href="https://codeforces.com/apiHelp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 transition-colors hover:text-blue-400"
+              >
+                Codeforces API
+              </a>
+              <a
+                href="https://www.youtube.com/live/15Wyj_-PG9I?feature=share&t=10935"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 transition-colors hover:text-blue-400"
+              >
+                ICPC World Finals Inspiration
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

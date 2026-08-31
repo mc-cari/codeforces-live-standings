@@ -172,14 +172,12 @@ test('mini contest preview has no inline controls', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible();
 });
 
-test('live desk exposes pause and responsive standings tabs', async ({ page }, testInfo) => {
+test('live desk exposes synchronization status and responsive standings tabs', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile panel assertions only apply to the mobile project');
   await installCodeforcesMocks(page);
   await page.goto('/contests/1735/standings?contestType=normal&h=VG91cmlzdA');
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();
-  const pause = page.getByRole('button', { name: 'Pause live' });
-  await pause.click();
-  await expect(page.getByRole('button', { name: 'Resume live' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Pause live' })).toHaveCount(0);
 
   await expect(page.getByRole('tab', { name: 'standings' })).toBeVisible();
   await page.getByRole('tab', { name: 'submissions' }).click();

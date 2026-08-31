@@ -25,7 +25,6 @@ export default function LiveStandingsPage() {
   const [globalStandings, setGlobalStandings] = useState<Standings>();
   const [delay, setDelay] = useState<number>(LIVE_POLLING.initialDelayMilliseconds);
   const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [isManuallyPaused, setIsManuallyPaused] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<'standings' | 'submissions'>('standings');
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(8);
@@ -182,7 +181,7 @@ export default function LiveStandingsPage() {
     }
 
     setIsPaused(false);
-  }, isPaused || isManuallyPaused || !isContestReady || isContestFinished ? null : delay);
+  }, isPaused || !isContestReady || isContestFinished ? null : delay);
 
   if (contestInfo?.phase === 'BEFORE' && !isContestReady) {
     return (
@@ -198,26 +197,16 @@ export default function LiveStandingsPage() {
   }
 
   const liveStatus = isContestFinished
-    ? 'Contest finished' : isManuallyPaused ? 'Updates paused' : isPaused ? 'Synchronizing' : 'Connected';
+    ? 'Contest finished' : isPaused ? 'Synchronizing' : 'Connected';
 
   return (
     <div className="flex min-h-screen flex-col bg-[#07111f] text-white">
       <ContestRibbon
         contest={contestInfo || globalStandings?.contest}
         contestId={String(contestId || '')}
-        controls={(
-          <button
-            className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
-            disabled={isContestFinished}
-            onClick={() => setIsManuallyPaused((paused) => !paused)}
-            type="button"
-          >
-            {isManuallyPaused ? 'Resume live' : 'Pause live'}
-          </button>
-        )}
         mode="LIVE"
         status={liveStatus}
-        statusTone={isContestFinished ? 'finished' : isManuallyPaused ? 'paused' : 'live'}
+        statusTone={isContestFinished ? 'finished' : 'live'}
       />
       {isUpdateStale && (
         <div className="border-b border-[#7a5b19] bg-[#3b2c0d] px-4 py-2 text-center text-sm text-[#ffe8a3]" role="status">

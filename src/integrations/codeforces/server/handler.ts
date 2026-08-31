@@ -13,10 +13,19 @@ import type {
   CodeforcesSubmissionDto,
 } from '../contracts';
 import ExpiringCache from './expiringCache';
-import RequestCoordinator from './requestCoordinator';
+import RequestCoordinator, { RequestQueueCapacityError } from './requestCoordinator';
 import { getResponseCacheDuration, isSuccessfulCodeforcesResponse } from './responseCachePolicy';
 
-const CODEFORCES_API_URL = process.env.CF_API_BASE_URL || 'https://codeforces.com/api/';
+const DEFAULT_CODEFORCES_API_URL = 'https://codeforces.com/api/';
+const configuredCodeforcesApiUrl = process.env.CF_API_BASE_URL;
+const CODEFORCES_API_URL = (() => {
+  if (!configuredCodeforcesApiUrl) return DEFAULT_CODEFORCES_API_URL;
+  const parsedUrl = new URL(configuredCodeforcesApiUrl);
+  if (parsedUrl.protocol !== 'https:') {
+    throw new Error('CF_API_BASE_URL must use HTTPS');
+  }
+  return configuredCodeforcesApiUrl;
+})();
 const DEFAULT_CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = 290 * 1000;
 const configuredRequestTimeout = Number(process.env.CF_REQUEST_TIMEOUT_MS);
 const CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS = Number.isFinite(configuredRequestTimeout)
@@ -123,13 +132,13 @@ const fetchCodeforces = async (method: string, parameters: URLSearchParams) => {
   const url = `${CODEFORCES_API_URL}${method}?${query}`;
   const signal = AbortSignal.timeout(CODEFORCES_REQUEST_TIMEOUT_MILLISECONDS);
   if (!freshConnectionMethods.has(method)) {
-    const response = await fetch(url, { signal });
+    const response = await fetch(url, { signal, redirect: 'error' });
     return { body: await response.text(), status: response.status };
   }
 
   const dispatcher = new Agent({ connections: 1, pipelining: 0 });
   try {
-    const response = await undiciFetch(url, { dispatcher, signal });
+    const response = await undiciFetch(url, { dispatcher, signal, redirect: 'error' });
     return { body: await response.text(), status: response.status };
   } finally {
     await dispatcher.close();
@@ -252,6 +261,10 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
       method === 'contest.status' ? filterSubmissions(body, handles, participantTypes) : body,
     );
   } catch (error) {
+    if (error instanceof RequestQueueCapacityError) {
+      res.status(503).json({ status: 'FAILED', comment: 'Codeforces request capacity is temporarily full' });
+      return;
+    }
     console.error('Codeforces API handler failed.', { method, error });
     res.status(502).json({ status: 'FAILED', comment: 'Unable to contact Codeforces' });
   }

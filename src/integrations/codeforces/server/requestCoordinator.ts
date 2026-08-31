@@ -3,6 +3,13 @@ type Sleep = (milliseconds: number) => Promise<void>;
 type DebugContext = Record<string, unknown>;
 type DebugLogger = (message: string, context: DebugContext) => void;
 
+export class RequestQueueCapacityError extends Error {
+  constructor() {
+    super('Codeforces request queue is full');
+    this.name = 'RequestQueueCapacityError';
+  }
+}
+
 export default class RequestCoordinator {
   private readonly inFlight = new Map<string, Promise<unknown>>();
 
@@ -34,6 +41,8 @@ export default class RequestCoordinator {
 
   private readonly slowRequestThresholdMilliseconds: number;
 
+  private readonly maximumPendingRequests: number;
+
   constructor(
     minimumIntervalMilliseconds = 2_000,
     now: Clock = Date.now,
@@ -46,6 +55,7 @@ export default class RequestCoordinator {
     warningLogger: DebugLogger = console.warn,
     errorLogger: DebugLogger = console.error,
     slowRequestThresholdMilliseconds = 30_000,
+    maximumPendingRequests = 10,
   ) {
     this.minimumIntervalMilliseconds = minimumIntervalMilliseconds;
     this.now = now;
@@ -56,6 +66,7 @@ export default class RequestCoordinator {
     this.warningLogger = warningLogger;
     this.errorLogger = errorLogger;
     this.slowRequestThresholdMilliseconds = slowRequestThresholdMilliseconds;
+    this.maximumPendingRequests = maximumPendingRequests;
   }
 
   private debug(message: string, context: DebugContext) {
@@ -72,6 +83,15 @@ export default class RequestCoordinator {
         queuedRequests: this.queuedRequests,
       });
       return existing;
+    }
+
+    if (this.inFlight.size >= this.maximumPendingRequests) {
+      this.debug('Codeforces request queue capacity reached.', {
+        method,
+        activeRequests: this.activeRequests,
+        queuedRequests: this.queuedRequests,
+      });
+      return Promise.reject(new RequestQueueCapacityError());
     }
 
     const requestId = this.nextRequestId;

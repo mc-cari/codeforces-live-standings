@@ -19,11 +19,24 @@ export const isSuccessfulCodeforcesResponse = (response: CacheableResponse): boo
   }
 };
 
+const isPermanentClientFailure = (response: CacheableResponse): boolean => {
+  if (response.status !== 400) return false;
+
+  try {
+    const payload = JSON.parse(response.body) as { status?: unknown };
+    return payload.status === 'FAILED';
+  } catch {
+    return false;
+  }
+};
+
 export const getResponseCacheDuration = (
   successDurationMilliseconds: number,
   response: CacheableResponse,
-): number => (
-  isSuccessfulCodeforcesResponse(response)
-    ? successDurationMilliseconds
-    : Math.min(successDurationMilliseconds, FAILURE_CACHE_DURATION_MILLISECONDS)
-);
+): number | undefined => {
+  if (isSuccessfulCodeforcesResponse(response)) return successDurationMilliseconds;
+  if (isPermanentClientFailure(response)) {
+    return Math.min(successDurationMilliseconds, FAILURE_CACHE_DURATION_MILLISECONDS);
+  }
+  return undefined;
+};

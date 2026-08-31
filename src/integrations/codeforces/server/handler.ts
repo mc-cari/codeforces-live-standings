@@ -140,7 +140,8 @@ const getCodeforcesResponse = async (method: string, parameters: URLSearchParams
 
   return requestCoordinator.run(cacheKey, async () => {
     const response = await fetchCodeforces(method, new URLSearchParams(parameters));
-    responseCache.set(cacheKey, response, getResponseCacheDuration(cacheDuration(method), response));
+    const duration = getResponseCacheDuration(cacheDuration(method), response);
+    if (duration !== undefined) responseCache.set(cacheKey, response, duration);
     return response;
   });
 };

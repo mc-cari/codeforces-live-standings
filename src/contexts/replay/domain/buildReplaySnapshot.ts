@@ -1,28 +1,28 @@
 import getName from '@/src/shared/domain/party';
 import type {
-  CodeforcesRanklistRowDto,
-  CodeforcesPresentedSubmissionDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '@/src/integrations/codeforces/contracts';
+  ReplayPresentedSubmission,
+  ReplayRanklistRow,
+  ReplayStandings,
+  ReplaySubmission,
+} from './models';
 import { MAX_SUBMISSIONS_IN_MEMORY } from '@/src/shared/config/contestTiming';
 import calculateReplayPenalty, { countRejectedAttempt } from './scoring';
 
 type ReplaySnapshot = {
   localStandings: Map<string, number>;
-  standings: CodeforcesStandingsDto;
-  submissions: CodeforcesPresentedSubmissionDto[];
+  standings: ReplayStandings;
+  submissions: ReplayPresentedSubmission[];
 };
 
-const compareRows = (first: CodeforcesRanklistRowDto, second: CodeforcesRanklistRowDto) => {
+const compareRows = (first: ReplayRanklistRow, second: ReplayRanklistRow) => {
   if (first.points !== second.points) return second.points - first.points;
   if (first.penalty !== second.penalty) return first.penalty - second.penalty;
   return getName(first.party).localeCompare(getName(second.party));
 };
 
 export const buildReplaySnapshot = (
-  finalStandings: CodeforcesStandingsDto,
-  events: CodeforcesSubmissionDto[],
+  finalStandings: ReplayStandings,
+  events: ReplaySubmission[],
   elapsedSeconds: number,
 ): ReplaySnapshot => {
   const solvedProblems = new Map<string, Set<string>>();
@@ -44,7 +44,7 @@ export const buildReplaySnapshot = (
     getName(row.party),
     row.problemResults,
   ]));
-  const releasedSubmissions: CodeforcesSubmissionDto[] = [];
+  const releasedSubmissions: ReplaySubmission[] = [];
 
   events.forEach((event) => {
     if (event.relativeTimeSeconds > elapsedSeconds) return;
@@ -98,7 +98,7 @@ export const buildReplaySnapshot = (
     getName(row.party),
     row.problemResults.filter((result) => result.points > 0).length,
   ]));
-  const rankedSubmissions: CodeforcesPresentedSubmissionDto[] = releasedSubmissions
+  const rankedSubmissions: ReplayPresentedSubmission[] = releasedSubmissions
     .reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((submission) => ({
     ...submission,
     numberOfProblems: solvedCount.get(getName(submission.author)) as number,

@@ -4,10 +4,10 @@ import React, {
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import type {
-  CodeforcesPartyDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '@/src/integrations/codeforces/contracts';
+  ReplayParty,
+  ReplayStandings,
+  ReplaySubmission,
+} from '../domain/models';
 import LiveSubmissionsList from '@/components/LiveSubmissionsList';
 import StandingsList from '@/components/standings/StandingsList';
 import ContestLoading from '@/components/ContestLoading';
@@ -51,8 +51,8 @@ export default function ReplayPage() {
   } = router.query;
   const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
   const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
-  const [finalStandings, setFinalStandings] = useState<CodeforcesStandingsDto>();
-  const [events, setEvents] = useState<CodeforcesSubmissionDto[]>([]);
+  const [finalStandings, setFinalStandings] = useState<ReplayStandings>();
+  const [events, setEvents] = useState<ReplaySubmission[]>([]);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [speed, setSpeed] = useState(1);
@@ -67,15 +67,20 @@ export default function ReplayPage() {
   const judgingJobs = useRef<Map<number, JudgingJob>>(new Map());
   const previousJudgingTick = useRef<number | undefined>(undefined);
   const [testingSubmissions, setTestingSubmissions] = useState<Map<number, number>>(new Map());
+  const testingSubmissionsRef = useRef<Map<number, number>>(new Map());
   const clearJudging = useCallback(() => {
     judgingJobs.current.clear();
-    setTestingSubmissions(new Map());
+    const next = new Map<number, number>();
+    testingSubmissionsRef.current = next;
+    setTestingSubmissions(next);
   }, []);
 
   useEffect(() => {
+    if (!router.isReady) return undefined;
     let isActive = true;
     let finishTimer: number | undefined;
     const controller = new AbortController();
+    const hasReplayParameters = Boolean(contestId && userHandles.length > 0 && contestType);
     const progressTimer = window.setInterval(() => {
       setLoadingProgress((current) => {
         if (current >= LOADING_PROGRESS.estimatedMaximum) return current;
@@ -88,26 +93,29 @@ export default function ReplayPage() {
     }, LOADING_PROGRESS.tickMilliseconds);
 
     const loadReplay = async () => {
-      if (!contestId || userHandles.length === 0 || !contestType) return;
-
       try {
         setIsLoading(true);
         setLoadingProgress(LOADING_PROGRESS.initial);
         setLoadingStage('Loading contest data...');
         setError('');
+        if (!hasReplayParameters) {
+          throw new Error('Replay requires a contest, contest type, and participant handles');
+        }
         const markLoaded = (progress: number, stage: string) => {
           if (!isActive) return;
           setLoadingProgress((current) => Math.max(current, progress));
           setLoadingStage(stage);
         };
         if (contestId === '1735' && getQueryValue(demo) === 'true') {
-          const response = await fetch('/demo/1735-v1.json');
+          const response = await fetch('/demo/1735-v1.json', { signal: controller.signal });
+          if (!isActive) return;
           if (!response.ok) throw new Error('Unable to load demo replay');
           const snapshot = await response.json() as {
-            standings: CodeforcesStandingsDto;
-            submissions: CodeforcesSubmissionDto[];
+            standings: ReplayStandings;
+            submissions: ReplaySubmission[];
             userRanks: Record<string, string>;
           };
+          if (!isActive) return;
           const demoEvents = [...snapshot.submissions].sort((first, second) => (
             first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
           ));
@@ -150,11 +158,12 @@ export default function ReplayPage() {
         const [standingsData, allSelectedEvents, users] = await Promise.all([
           standingsRequest, statusRequest, usersRequest,
         ]);
-        const isSelectedParticipant = (party: CodeforcesPartyDto) => party.members
+        if (!isActive) return;
+        const isSelectedParticipant = (party: ReplayParty) => party.members
           .some((member) => userHandles.some((handle) => (
-            handle.toLocaleLowerCase() === member.handle.toLocaleLowerCase()
+            handle.toLowerCase() === member.handle.toLowerCase()
           )));
-        const officialStandings: CodeforcesStandingsDto = {
+        const officialStandings: ReplayStandings = {
           ...standingsData,
           rows: standingsData.rows.filter((row) => isSelectedParticipant(row.party)),
         };
@@ -201,10 +210,14 @@ export default function ReplayPage() {
         window.clearInterval(progressTimer);
         if (isActive) {
           setLoadingProgress(LOADING_PROGRESS.complete);
-          finishTimer = window.setTimeout(
-            () => setIsLoading(false),
-            LOADING_PROGRESS.completionDelayMilliseconds,
-          );
+          if (!hasReplayParameters) {
+            setIsLoading(false);
+          } else {
+            finishTimer = window.setTimeout(
+              () => setIsLoading(false),
+              LOADING_PROGRESS.completionDelayMilliseconds,
+            );
+          }
         }
       }
     };
@@ -215,7 +228,7 @@ export default function ReplayPage() {
       window.clearInterval(progressTimer);
       if (finishTimer) window.clearTimeout(finishTimer);
     };
-  }, [autoplay, contestId, contestType, demo, requestedSpeed, startMinute, startTime, userHandles]);
+  }, [autoplay, contestId, contestType, demo, requestedSpeed, router.isReady, startMinute, startTime, userHandles]);
 
   useEffect(() => {
     if (!isPlaying || !finalStandings) return undefined;
@@ -224,14 +237,12 @@ export default function ReplayPage() {
       const now = performance.now();
       const elapsed = ((now - (previousTick.current as number)) / 1000) * speed;
       previousTick.current = now;
-      setElapsedSeconds((current) => {
-        const next = Math.min(finalStandings.contest.durationSeconds, current + elapsed);
-        if (next === finalStandings.contest.durationSeconds) setIsPlaying(false);
-        return next;
-      });
+      const next = Math.min(finalStandings.contest.durationSeconds, elapsedSeconds + elapsed);
+      setElapsedSeconds(() => next);
+      if (next === finalStandings.contest.durationSeconds) setIsPlaying(false);
     }, REPLAY_PLAYBACK_TICK_MILLISECONDS);
     return () => window.clearInterval(timer);
-  }, [finalStandings, isPlaying, speed]);
+  }, [elapsedSeconds, finalStandings, isPlaying, speed]);
 
   useBrowserLayoutEffect(() => {
     const previousTime = previousReplayTime.current;
@@ -275,24 +286,23 @@ export default function ReplayPage() {
       const now = performance.now();
       const elapsed = now - (previousJudgingTick.current as number);
       previousJudgingTick.current = now;
-      setTestingSubmissions((current) => {
-        const next = new Map(current);
-        judgingJobs.current.forEach((job, submissionId) => {
-          job.progress += (elapsed * Math.sqrt(speed)) / job.duration;
-          if (job.progress >= 1) {
-            judgingJobs.current.delete(submissionId);
-            next.delete(submissionId);
-            return;
-          }
-          const milestones = Math.min(
-            REPLAY_JUDGING_MAX_MILESTONES,
-            Math.max(REPLAY_JUDGING_MIN_MILESTONES, Math.ceil(job.totalTests / 3)),
-          );
-          const stage = Math.max(1, Math.ceil(job.progress * milestones));
-          next.set(submissionId, Math.max(1, Math.ceil((stage * job.totalTests) / milestones)));
-        });
-        return next;
+      const next = new Map(testingSubmissionsRef.current);
+      judgingJobs.current.forEach((job, submissionId) => {
+        job.progress += (elapsed * Math.sqrt(speed)) / job.duration;
+        if (job.progress >= 1) {
+          judgingJobs.current.delete(submissionId);
+          next.delete(submissionId);
+          return;
+        }
+        const milestones = Math.min(
+          REPLAY_JUDGING_MAX_MILESTONES,
+          Math.max(REPLAY_JUDGING_MIN_MILESTONES, Math.ceil(job.totalTests / 3)),
+        );
+        const stage = Math.max(1, Math.ceil(job.progress * milestones));
+        next.set(submissionId, Math.max(1, Math.ceil((stage * job.totalTests) / milestones)));
       });
+      testingSubmissionsRef.current = next;
+      setTestingSubmissions(next);
     }, REPLAY_JUDGING_TICK_MILLISECONDS);
     return () => window.clearInterval(timer);
   }, [isPlaying, speed, testingSubmissions.size]);

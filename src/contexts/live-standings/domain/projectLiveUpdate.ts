@@ -6,6 +6,7 @@ import type {
 } from '@/src/integrations/codeforces/contracts';
 import { MAX_SUBMISSIONS_IN_MEMORY } from '../../../shared/config/contestTiming.ts';
 import getName from '../../../shared/domain/party.ts';
+import { participantIdentity } from '../../../shared/domain/participantHandles.ts';
 import { addMissingParticipantRows } from '../../../shared/domain/standings.ts';
 
 export type LiveProjection = {
@@ -15,8 +16,6 @@ export type LiveProjection = {
   newSubmissionCount: number;
   isFinished: boolean;
 };
-
-const participantIdentity = (handle: string) => handle.toLocaleLowerCase();
 
 const hasSelectedMember = (party: CodeforcesPartyDto, selected: Set<string>) => (
   party.members.some((member) => selected.has(participantIdentity(member.handle)))
@@ -93,10 +92,7 @@ export const projectLiveUpdate = (
     .reverse()
     .slice(0, MAX_SUBMISSIONS_IN_MEMORY);
 
-  const newSubmissionCount = Math.min(
-    selectedRemote.filter((submission) => !previousIds.has(submission.id)).length,
-    MAX_SUBMISSIONS_IN_MEMORY,
-  );
+  const newSubmissionCount = submissions.filter((submission) => !previousIds.has(submission.id)).length;
 
   return {
     standings,

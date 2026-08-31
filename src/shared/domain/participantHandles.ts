@@ -16,6 +16,8 @@ const fromBase64Url = (value: string) => {
   return decodeBase64(base64.padEnd(Math.ceil(base64.length / 4) * 4, '='));
 };
 
+export const participantIdentity = (handle: string) => handle.toLowerCase();
+
 export const encodeHandles = (handles: string[]) => (
   toBase64Url(normalizeHandles(handles).join(';'))
 );
@@ -38,10 +40,10 @@ export const normalizeHandles = (
   handles: string[],
   existingHandles: string[] = [],
 ): string[] => {
-  const knownHandles = new Set(existingHandles.map((handle) => handle.toLocaleLowerCase()));
+  const knownHandles = new Set(existingHandles.map(participantIdentity));
   return handles.reduce<string[]>((normalized, handle) => {
     const value = handle.trim();
-    const identity = value.toLocaleLowerCase();
+    const identity = participantIdentity(value);
     if (value && !knownHandles.has(identity)) {
       knownHandles.add(identity);
       normalized.push(value);

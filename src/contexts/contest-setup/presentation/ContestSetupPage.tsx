@@ -112,13 +112,10 @@ export default function ContestSetupPage() {
   };
 
   const addHandles = (handlesToAdd : string[]) => {
-    const newHandles = normalizeParticipantHandles(handlesToAdd, usersHandles);
-
-    if (newHandles.length > 0) {
-      setUsersHandles((oldUsers) => [...oldUsers, ...newHandles]);
-    }
-
-    return newHandles.length;
+    setUsersHandles((oldUsers) => [
+      ...oldUsers,
+      ...normalizeParticipantHandles(handlesToAdd, oldUsers),
+    ]);
   };
 
   const addInputHandles = () => {
@@ -143,12 +140,8 @@ export default function ContestSetupPage() {
       setFriendImportError('');
       setFriendImportMessage('');
       const importedHandles = await codeforcesContestSetupGateway.importFriends({ apiKey, apiSecret });
-      const addedCount = addHandles(importedHandles);
-      setFriendImportMessage(
-        addedCount === 0
-          ? 'All friends from that list are already added'
-          : `Added ${addedCount} friend handle${addedCount === 1 ? '' : 's'}`,
-      );
+      addHandles(importedHandles);
+      setFriendImportMessage('Friend handles imported');
     } catch (error) {
       setFriendImportError(error instanceof Error ? error.message : 'Unable to import friends');
     } finally {
@@ -543,7 +536,9 @@ export default function ContestSetupPage() {
                             <span className="text-white">{user}</span>
                             <button
                               className="text-red-400 transition-colors hover:text-red-300"
-                              onClick={() => setUsersHandles(usersHandles.filter((userOld) => userOld !== user))}
+                              onClick={() => setUsersHandles((currentUsers) => (
+                                currentUsers.filter((userOld) => userOld !== user)
+                              ))}
                               type="button"
                             >
                               Remove

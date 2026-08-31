@@ -35,6 +35,7 @@ export default function LiveStandingsPage() {
   const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
   const [isContestReady, setIsContestReady] = useState(false);
   const [isContestFinished, setIsContestFinished] = useState(false);
+  const [isUpdateStale, setIsUpdateStale] = useState(false);
   const hasLoadedInitialData = useRef(false);
   const activeRequest = useRef<AbortController | undefined>(undefined);
   const submissionsRef = useRef<CodeforcesPresentedSubmissionDto[]>([]);
@@ -90,6 +91,7 @@ export default function LiveStandingsPage() {
       setGlobalStandings(projection.standings);
       setLocalStandings(projection.localStandings);
       setIsContestFinished(projection.isFinished);
+      setIsUpdateStale(false);
       if (isInitialLoad) {
         hasLoadedInitialData.current = true;
         setLoadingProgress(LOADING_PROGRESS.complete);
@@ -98,6 +100,7 @@ export default function LiveStandingsPage() {
     } catch (error) {
       if (controller.signal.aborted) return;
       if (isInitialLoad) setLoadingStage('Unable to load contest data');
+      else setIsUpdateStale(true);
     }
   };
 
@@ -199,6 +202,14 @@ export default function LiveStandingsPage() {
 
   return (
     <div className="flex flex-row bg-black text-white min-h-screen">
+      {isUpdateStale && (
+        <div
+          className="fixed top-0 left-0 right-0 z-10 px-4 py-2 text-center text-sm text-yellow-100 bg-yellow-900/90"
+          role="status"
+        >
+          Live updates are unavailable. Showing the latest standings.
+        </div>
+      )}
       <div className="flex h-screen w-2/5 p-4">
         <div className="w-full bg-gray-900/50 rounded-lg border border-gray-800 shadow-xl overflow-hidden">
           <LiveSubmissionsList

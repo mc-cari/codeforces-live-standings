@@ -1,15 +1,15 @@
 import type {
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-  CodeforcesUserDto,
-} from '@/src/integrations/codeforces/contracts';
+  ReplayStandings,
+  ReplaySubmission,
+  ReplayUser,
+} from '../domain/models';
 
 export interface ReplayGateway {
-  getStandings(contestId: string, signal?: AbortSignal): Promise<CodeforcesStandingsDto>;
+  getStandings(contestId: string, signal?: AbortSignal): Promise<ReplayStandings>;
   getSubmissions(
     contestId: string,
     handles: string[],
     signal?: AbortSignal,
-  ): Promise<CodeforcesSubmissionDto[]>;
-  getUsers(handles: string[], signal?: AbortSignal): Promise<CodeforcesUserDto[]>;
+  ): Promise<ReplaySubmission[]>;
+  getUsers(handles: string[], signal?: AbortSignal): Promise<ReplayUser[]>;
 }

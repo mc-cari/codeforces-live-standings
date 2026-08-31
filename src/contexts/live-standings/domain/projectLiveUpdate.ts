@@ -1,28 +1,23 @@
-import type {
-  CodeforcesPartyDto,
-  CodeforcesPresentedSubmissionDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '@/src/integrations/codeforces/contracts';
+import type { Party, Standings, Submission } from '../../../shared/domain/contest.ts';
 import { MAX_SUBMISSIONS_IN_MEMORY } from '../../../shared/config/contestTiming.ts';
 import getName from '../../../shared/domain/party.ts';
 import { participantIdentity } from '../../../shared/domain/participantHandles.ts';
 import { addMissingParticipantRows } from '../../../shared/domain/standings.ts';
 
 export type LiveProjection = {
-  standings: CodeforcesStandingsDto;
+  standings: Standings;
   localStandings: Map<string, number>;
-  submissions: CodeforcesPresentedSubmissionDto[];
+  submissions: Submission[];
   newSubmissionCount: number;
   isFinished: boolean;
 };
 
-const hasSelectedMember = (party: CodeforcesPartyDto, selected: Set<string>) => (
+const hasSelectedMember = (party: Party, selected: Set<string>) => (
   party.members.some((member) => selected.has(participantIdentity(member.handle)))
 );
 
 const calculateLocalStandings = (
-  standings: CodeforcesStandingsDto,
+  standings: Standings,
   handles: string[],
 ) => {
   const positions = new Map(handles.map((handle) => [handle, handles.length]));
@@ -48,9 +43,9 @@ const calculateLocalStandings = (
 };
 
 export const projectLiveUpdate = (
-  officialStandings: CodeforcesStandingsDto,
-  remoteSubmissions: CodeforcesSubmissionDto[],
-  previousSubmissions: CodeforcesSubmissionDto[],
+  officialStandings: Standings,
+  remoteSubmissions: Submission[],
+  previousSubmissions: Submission[],
   selectedHandles: string[],
 ): LiveProjection => {
   const selected = new Set(selectedHandles.map(participantIdentity));
@@ -64,7 +59,7 @@ export const projectLiveUpdate = (
   const standings = addMissingParticipantRows(filteredStandings, selectedRemote, getName);
   const localStandings = calculateLocalStandings(standings, selectedHandles);
   const previousIds = new Set(previousSubmissions.map((submission) => submission.id));
-  const submissionsById = new Map<number, CodeforcesSubmissionDto>();
+  const submissionsById = new Map<number, Submission>();
 
   previousSubmissions.forEach((submission) => submissionsById.set(submission.id, submission));
   selectedRemote.forEach((submission) => submissionsById.set(submission.id, submission));

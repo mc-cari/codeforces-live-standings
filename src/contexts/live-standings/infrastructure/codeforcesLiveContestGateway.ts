@@ -6,6 +6,12 @@ import type {
   CodeforcesSubmissionDto,
   CodeforcesUserDto,
 } from '@/src/integrations/codeforces/contracts';
+import {
+  mapContestDto,
+  mapStandingsDto,
+  mapSubmissionDto,
+  mapUserDto,
+} from '@/src/integrations/codeforces/mapper';
 import type { LiveContestGateway } from '../application/ports';
 
 const readResponse = async <Result>(response: Response, message: string): Promise<Result> => {
@@ -19,12 +25,12 @@ const readResponse = async <Result>(response: Response, message: string): Promis
 export const codeforcesLiveContestGateway: LiveContestGateway = {
   async getContest(contestId, signal) {
     const response = await codeforcesFetch('contest.info', { contestId }, { signal });
-    return readResponse<CodeforcesContestDto>(response, 'Unable to load contest information');
+    return mapContestDto(await readResponse<CodeforcesContestDto>(response, 'Unable to load contest information'));
   },
 
   async getStandings(contestId, signal) {
     const response = await codeforcesFetch('contest.standings', { contestId }, { signal });
-    return readResponse<CodeforcesStandingsDto>(response, 'Failed to fetch standings data');
+    return mapStandingsDto(await readResponse<CodeforcesStandingsDto>(response, 'Failed to fetch standings data'));
   },
 
   async getSubmissions(contestId, handles, signal) {
@@ -32,11 +38,13 @@ export const codeforcesLiveContestGateway: LiveContestGateway = {
       contestId,
       handles: handles.join(';'),
     }, { signal });
-    return readResponse<CodeforcesSubmissionDto[]>(response, 'Failed to fetch submissions data');
+    const submissions = await readResponse<CodeforcesSubmissionDto[]>(response, 'Failed to fetch submissions data');
+    return submissions.map(mapSubmissionDto);
   },
 
   async getUsers(handles, signal) {
     const response = await codeforcesFetch('user.info', { handles: handles.join(';') }, { signal });
-    return readResponse<CodeforcesUserDto[]>(response, 'Failed to fetch user information');
+    const users = await readResponse<CodeforcesUserDto[]>(response, 'Failed to fetch user information');
+    return users.map(mapUserDto);
   },
 };

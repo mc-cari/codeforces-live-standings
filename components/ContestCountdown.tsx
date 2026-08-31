@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+import type { Contest } from '@/src/shared/domain/contest';
 import {
   formatCountdown,
   secondsUntilContest,
 } from '@/src/contexts/contest-setup/domain/contestConfiguration';
 
 type ContestCountdownProps = {
-  contest: CodeforcesContestDto;
+  contest: Contest;
   onComplete: () => void;
 };
 
@@ -25,18 +25,17 @@ export default function ContestCountdown({ contest, onComplete }: ContestCountdo
   }, [contest, onComplete]);
 
   return (
-    <main className="flex items-center justify-center min-h-screen px-6 text-white bg-black">
+    <main className="flex min-h-screen items-center justify-center bg-[#07111f] px-6 text-white">
       <section
         className={
-          'w-full max-w-2xl p-10 text-center border border-gray-700 '
-          + 'shadow-2xl rounded-2xl bg-gray-900/80'
+          'broadcast-panel w-full max-w-2xl rounded-sm p-10 text-center'
         }
       >
-        <h1 className="mb-6 text-3xl font-bold">{contest.name}</h1>
-        <p className="mb-3 text-sm font-medium tracking-widest text-blue-300 uppercase">
+        <h1 className="mb-8 text-4xl font-semibold uppercase font-broadcast">{contest.name}</h1>
+        <p className="mb-3 text-sm font-medium uppercase tracking-widest text-[#9fc8ff]">
           Contest starts in
         </p>
-        <div className="font-mono text-5xl font-semibold tracking-tight text-white sm:text-7xl">
+        <div className="text-5xl font-semibold tracking-tight text-white font-data sm:text-7xl">
           {formatCountdown(remainingSeconds)}
         </div>
       </section>

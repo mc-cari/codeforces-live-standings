@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type {
-  CodeforcesPartyDto,
-  CodeforcesRanklistRowDto,
-} from '../../../integrations/codeforces/contracts.ts';
+import type { RanklistRow } from '../../../shared/domain/contest.ts';
+import type { PartyNameSource } from '../../../shared/domain/party.ts';
 import {
   normalizeImportedHandles,
   normalizeParticipantHandles,
@@ -25,14 +23,14 @@ test('rejects malformed friend lists', () => {
   assert.throws(() => normalizeImportedHandles(['alice', 42]), /invalid friend list/);
 });
 
-const row = (handle: string, participantType: string): CodeforcesRanklistRowDto => ({
+const row = (handle: string, participantType: string): RanklistRow => ({
   party: {
     members: [{ handle, name: handle }],
     participantType,
-  } as CodeforcesPartyDto,
-} as CodeforcesRanklistRowDto);
+  } as PartyNameSource,
+} as RanklistRow);
 
-const getHandle = (party: CodeforcesPartyDto) => party.members[0].handle;
+const getHandle = (party: PartyNameSource) => party.members[0].handle;
 
 test('top imports preserve the supplied standings order', () => {
   const rows = [

@@ -1,17 +1,17 @@
 import React from 'react';
-import type { CodeforcesStandingsDto } from '@/src/integrations/codeforces/contracts';
+import type { Standings } from '@/src/shared/domain/contest';
 import NormalPointsHeader from './NormalPointsHeader';
 import EducationalPointsHeader from './EducationalPointsHeader';
 
 export default function Header({
   globalStandings, contestType,
-} : { globalStandings: CodeforcesStandingsDto, contestType: string }) {
+} : { globalStandings: Standings, contestType: string }) {
   return (
-    <div className="flex flex-row h-14 w-full border-b-2 border-gray-800">
+    <div className="flex h-14 w-full flex-row border-b border-[#25364d] bg-[#13243a]">
       <div
         className={
-          'bg-gradient-to-r from-red-600 to-red-500 w-1/3 text-lg px-1 flex '
-          + 'items-center justify-center font-semibold tracking-wide shadow-lg'
+          'flex w-1/3 items-center justify-center bg-[#7d2633] px-1 font-broadcast '
+          + 'text-xl font-semibold tracking-[0.08em]'
         }
       >
         CURRENT STANDINGS
@@ -26,7 +26,7 @@ export default function Header({
           rel="noopener noreferrer"
           className={
             'flex-1 text-xl flex items-center justify-center font-semibold '
-            + 'bg-gray-800/30 hover:bg-gray-700/30 transition-colors'
+            + 'bg-[#13243a] hover:bg-[#1b304a] transition-colors'
           }
           key={problem.index}
           aria-label={`Open problem ${problem.index}: ${problem.name}`}

@@ -60,6 +60,15 @@ Start the development server with:
 pnpm dev
 ```
 
+Run domain and browser tests with:
+
+```sh
+pnpm test
+```
+
+The Playwright suite mocks Codeforces responses, covers desktop and mobile layouts, and verifies
+that friend-import credentials are used only for the browser-to-Codeforces request.
+
 ### API behavior and caching
 
 The browser calls the app's `/api/codeforces` backend. That backend uses one bulk

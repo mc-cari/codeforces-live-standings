@@ -7,7 +7,13 @@ const config = [
     rules: {
       'jsx-a11y/label-has-associated-control': 'off',
       'no-param-reassign': 'off',
-      'max-len': ['error', { code: 120 }],
+      'max-len': ['error', {
+        code: 140,
+        ignoreComments: true,
+        ignoreStrings: true,
+        ignoreTemplateLiterals: true,
+        ignoreUrls: true,
+      }],
     },
   },
 ];

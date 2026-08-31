@@ -4,6 +4,7 @@ import type {
   CodeforcesApiResponse,
   CodeforcesContestDto,
 } from '@/src/integrations/codeforces/contracts';
+import { mapContestDto } from '@/src/integrations/codeforces/mapper';
 import type { ContestSetupGateway } from '../application/ports';
 import { normalizeImportedHandles } from '../domain/participantSelection';
 
@@ -18,12 +19,13 @@ const readResponse = async <Result>(response: Response, fallback: string): Promi
 export const codeforcesContestSetupGateway: ContestSetupGateway = {
   async listContests(signal) {
     const response = await codeforcesFetch('contest.list', { gym: false }, { signal });
-    return readResponse<CodeforcesContestDto[]>(response, 'Unable to load upcoming contests');
+    const contests = await readResponse<CodeforcesContestDto[]>(response, 'Unable to load upcoming contests');
+    return contests.map(mapContestDto);
   },
 
   async findContest(contestId, signal) {
     const response = await codeforcesFetch('contest.info', { contestId }, { signal });
-    return readResponse<CodeforcesContestDto>(response, 'Contest not found');
+    return mapContestDto(await readResponse<CodeforcesContestDto>(response, 'Contest not found'));
   },
 
   async importParticipants(contestId, count, selection) {

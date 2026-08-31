@@ -214,8 +214,15 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
       }
 
       const standingsResponse = parseCodeforcesResponse<CodeforcesStandingsDto>(body);
+      const participantRows = standingsResponse.result?.rows.map(({ party }) => ({
+        party: {
+          members: party.members.map(({ handle }) => ({ handle })),
+          participantType: party.participantType,
+          teamName: party.teamName,
+        },
+      })) || [];
       const handles = selectParticipantHandles(
-        standingsResponse.result?.rows || [],
+        participantRows,
         count,
         selection as ParticipantSelection,
         getName,

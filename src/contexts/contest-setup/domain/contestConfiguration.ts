@@ -1,3 +1,5 @@
+import type { Contest } from '@/src/shared/domain/contest';
+
 export type SupportedContestType = 'normal' | 'educational';
 export type ContestRoute = 'standings' | 'replay';
 
@@ -8,7 +10,7 @@ export type ContestConfiguration = {
   unsupportedReason?: string;
 };
 
-export const getContestConfiguration = (contest: CodeforcesContestDto): ContestConfiguration => {
+export const getContestConfiguration = (contest: Contest): ContestConfiguration => {
   if (contest.type === 'IOI') {
     return {
       route: contest.phase === 'FINISHED' ? 'replay' : 'standings',
@@ -27,7 +29,7 @@ export const getContestConfiguration = (contest: CodeforcesContestDto): ContestC
   };
 };
 
-export const secondsUntilContest = (contest: CodeforcesContestDto, nowMilliseconds = Date.now()) => (
+export const secondsUntilContest = (contest: Contest, nowMilliseconds = Date.now()) => (
   Math.max(0, contest.startTimeSeconds - Math.floor(nowMilliseconds / 1000))
 );
 
@@ -41,6 +43,3 @@ export const formatCountdown = (totalSeconds: number) => {
     ? `${days}d ${hours}:${minutes}:${remainingSeconds}`
     : `${hours}:${minutes}:${remainingSeconds}`;
 };
-import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
-
-// Contest setup policy is independent from transport and presentation concerns.

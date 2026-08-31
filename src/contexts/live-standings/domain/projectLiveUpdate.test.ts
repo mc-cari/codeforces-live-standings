@@ -1,13 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type {
-  CodeforcesPartyDto,
-  CodeforcesStandingsDto,
-  CodeforcesSubmissionDto,
-} from '../../../integrations/codeforces/contracts.ts';
+import type { Party, Standings, Submission } from '../../../shared/domain/contest.ts';
 import { projectLiveUpdate } from './projectLiveUpdate.ts';
 
-const party = (handle: string): CodeforcesPartyDto => ({
+const party = (handle: string): Party => ({
   contestId: 1,
   members: [{ handle, name: handle }],
   participantType: 'CONTESTANT',
@@ -19,7 +15,7 @@ const party = (handle: string): CodeforcesPartyDto => ({
   rank: 0,
 });
 
-const standings: CodeforcesStandingsDto = {
+const standings: Standings = {
   contest: {
     id: 1,
     name: 'Round',
@@ -51,7 +47,7 @@ const standings: CodeforcesStandingsDto = {
   }],
 };
 
-const submission = (id: number): CodeforcesSubmissionDto => ({
+const submission = (id: number): Submission => ({
   id,
   contestId: 1,
   creationTimeSeconds: id,

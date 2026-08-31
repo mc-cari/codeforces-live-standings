@@ -1,4 +1,5 @@
 import React from 'react';
+import type { CodeforcesStandingsDto } from '@/src/integrations/codeforces/contracts';
 import ProblemStatusEdu from '../ProblemStatusEdu';
 import ProblemStatusNormal from '../ProblemStatusNormal';
 import Position from '../Position';
@@ -11,7 +12,7 @@ import EducationalPoints from './EducationalPoints';
 export default function StandingsList({
   localStandings, globalStandings, contestType, userRank,
 } :
-{ localStandings: Map<string, number>, globalStandings: Standings, contestType: string,
+{ localStandings: Map<string, number>, globalStandings: CodeforcesStandingsDto, contestType: string,
   userRank: Map<string, string> }) {
   const problemsSolved : Map<string, number> = new Map<string, number>();
 

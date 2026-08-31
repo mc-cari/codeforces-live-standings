@@ -1,10 +1,11 @@
 const CODEFORCES_API_URL = 'https://codeforces.com/api/';
+const FRIENDS_REQUEST_TIMEOUT_MILLISECONDS = 30_000;
 
 const toHex = (bytes: Uint8Array) => Array.from(bytes)
   .map((byte) => byte.toString(16).padStart(2, '0'))
   .join('');
 
-const createSignature = async (
+export const createBrowserSignature = async (
   method: string,
   parameters: URLSearchParams,
   apiSecret: string,
@@ -28,8 +29,10 @@ export const fetchCodeforcesFriends = async (
 ) => {
   const method = 'user.friends';
   const parameters = new URLSearchParams({ apiKey });
-  const apiSignature = await createSignature(method, parameters, apiSecret);
+  const apiSignature = await createBrowserSignature(method, parameters, apiSecret);
   parameters.set('apiSig', apiSignature);
 
-  return fetch(`${CODEFORCES_API_URL}${method}?${parameters.toString()}`);
+  return fetch(`${CODEFORCES_API_URL}${method}?${parameters.toString()}`, {
+    signal: AbortSignal.timeout(FRIENDS_REQUEST_TIMEOUT_MILLISECONDS),
+  });
 };

@@ -3,10 +3,17 @@ import React, {
 } from 'react';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
+import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
+import type {
+  CodeforcesPartyDto,
+  CodeforcesPresentedSubmissionDto,
+  CodeforcesStandingsDto,
+  CodeforcesSubmissionDto,
+  CodeforcesUserDto,
+} from '@/src/integrations/codeforces/contracts';
 import LiveSubmissionsList from '../../../components/LiveSubmissionsList';
 import StandingsList from '../../../components/standings/StandingsList';
 import ContestLoading from '../../../components/ContestLoading';
-import codeforcesFetch from '../../../utils/codeforcesFetch';
 import getName from '../../../utils/getName';
 import { addMissingParticipantRows } from '../../../utils/participantStandings';
 import { buildReplaySnapshot } from '../../../utils/replay';
@@ -67,8 +74,8 @@ export default function Replay() {
   } = router.query;
   const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
   const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
-  const [finalStandings, setFinalStandings] = useState<Standings>();
-  const [events, setEvents] = useState<Submission[]>([]);
+  const [finalStandings, setFinalStandings] = useState<CodeforcesStandingsDto>();
+  const [events, setEvents] = useState<CodeforcesSubmissionDto[]>([]);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [speed, setSpeed] = useState(1);
@@ -119,8 +126,8 @@ export default function Replay() {
           const response = await fetch('/demo/1735-v1.json');
           if (!response.ok) throw new Error('Unable to load demo replay');
           const snapshot = await response.json() as {
-            standings: Standings;
-            submissions: Submission[];
+            standings: CodeforcesStandingsDto;
+            submissions: CodeforcesSubmissionDto[];
             userRanks: Record<string, string>;
           };
           const demoEvents = snapshot.submissions.sort((first, second) => (
@@ -164,16 +171,16 @@ export default function Replay() {
           standingsRequest, statusRequest, usersRequest,
         ]);
         if (!standingsResponse.ok) throw new Error('Unable to load contest standings');
-        const standingsData : Standings = (await standingsResponse.json()).result;
-        const isSelectedParticipant = (party: Party) => party.members
+        const standingsData : CodeforcesStandingsDto = (await standingsResponse.json()).result;
+        const isSelectedParticipant = (party: CodeforcesPartyDto) => party.members
           .some((member) => userHandles.includes(member.handle));
-        const officialStandings: Standings = {
+        const officialStandings: CodeforcesStandingsDto = {
           ...standingsData,
           rows: standingsData.rows.filter((row) => isSelectedParticipant(row.party)),
         };
 
         if (!statusResponse.ok) throw new Error('Unable to load contest submissions');
-        const allSelectedEvents: Submission[] = (await statusResponse.json()).result;
+        const allSelectedEvents: CodeforcesSubmissionDto[] = (await statusResponse.json()).result;
         const replayEvents = allSelectedEvents
           .filter((submission) => (
             submission.relativeTimeSeconds >= 0
@@ -202,9 +209,10 @@ export default function Replay() {
 
         if (usersResponse.ok) {
           const ranks = new Map<string, string>();
-          ((await usersResponse.json()).result as User[]).forEach((user) => {
-            ranks.set(user.handle, user.rank);
-            ranks.set(`${user.handle} (practice)`, user.rank);
+          ((await usersResponse.json()).result as CodeforcesUserDto[]).forEach((user) => {
+            const rank = user.rank || 'unrated';
+            ranks.set(user.handle, rank);
+            ranks.set(`${user.handle} (practice)`, rank);
           });
           setUserRank(ranks);
         }
@@ -322,7 +330,8 @@ export default function Replay() {
   ), [elapsedSeconds, finalStandings, settledEvents]);
   const cinematicSubmissions = useMemo(() => {
     if (!snapshot) return [];
-    const testingRows = events.filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
+    const testingRows: CodeforcesPresentedSubmissionDto[] = events
+      .filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
       ...submission,
       author: {
         ...submission.author,

@@ -1,5 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type {
+  CodeforcesPartyDto,
+  CodeforcesRanklistRowDto,
+} from '../src/integrations/codeforces/contracts.ts';
 import { normalizeImportedHandles, selectParticipantHandles } from './participantImport.ts';
 
 test('normalizes and deduplicates friend handles returned by Codeforces', () => {
@@ -10,14 +14,14 @@ test('rejects malformed friend lists', () => {
   assert.throws(() => normalizeImportedHandles(['alice', 42]), /invalid friend list/);
 });
 
-const row = (handle: string, participantType: string): RanklistRow => ({
+const row = (handle: string, participantType: string): CodeforcesRanklistRowDto => ({
   party: {
     members: [{ handle, name: handle }],
     participantType,
-  } as Party,
-} as RanklistRow);
+  } as CodeforcesPartyDto,
+} as CodeforcesRanklistRowDto);
 
-const getHandle = (party: Party) => party.members[0].handle;
+const getHandle = (party: CodeforcesPartyDto) => party.members[0].handle;
 
 test('top imports preserve the supplied standings order', () => {
   const rows = [

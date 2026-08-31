@@ -40,9 +40,12 @@ export default class ExpiringCache<Value> {
   }
 
   get(key: string): Value | undefined {
-    this.deleteExpiredEntries();
     const entry = this.entries.get(key);
     if (!entry) return undefined;
+    if (entry.expiresAt <= this.now()) {
+      this.delete(key);
+      return undefined;
+    }
     this.entries.delete(key);
     this.entries.set(key, entry);
     return entry.value;
@@ -50,9 +53,9 @@ export default class ExpiringCache<Value> {
 
   set(key: string, value: Value, durationMilliseconds: number) {
     this.deleteExpiredEntries();
-    this.delete(key);
     const weight = Math.max(0, this.getWeight(value));
     if (weight > this.maximumWeight) return;
+    this.delete(key);
     while (this.currentWeight + weight > this.maximumWeight) {
       const oldestKey = this.entries.keys().next().value as string | undefined;
       if (!oldestKey) break;

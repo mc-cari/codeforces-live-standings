@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
-import codeforcesFetch from '../utils/codeforcesFetch';
-import { fetchCodeforcesFriends } from '../utils/codeforcesFriends';
+import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
+import { fetchCodeforcesFriends } from '@/src/integrations/codeforces/browser/friends';
+import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
 import { encodeHandles } from '../utils/handlesQuery';
 import { normalizeImportedHandles, type ParticipantSelection } from '../utils/participantImport';
 import { getContestConfiguration } from '../utils/contestConfiguration';
@@ -18,7 +19,7 @@ const demoHandles = [
 export default function Home() {
   const [handleText, setHandleText] = useState<string>('');
   const [contestIdInput, setContestIdInput] = useState('');
-  const [contestInfo, setContestInfo] = useState<Contest>();
+  const [contestInfo, setContestInfo] = useState<CodeforcesContestDto>();
   const [contestLookupState, setContestLookupState] = useState<'idle' | 'loading' | 'error'>('idle');
   const [contestLookupError, setContestLookupError] = useState('');
   const [usersHandles, setUsersHandles] = useState<string[]>([]);
@@ -32,7 +33,7 @@ export default function Home() {
   const [isImportingFriends, setIsImportingFriends] = useState(false);
   const [friendImportMessage, setFriendImportMessage] = useState('');
   const [friendImportError, setFriendImportError] = useState('');
-  const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
+  const [upcomingContests, setUpcomingContests] = useState<CodeforcesContestDto[]>([]);
   const [isLoadingUpcomingContests, setIsLoadingUpcomingContests] = useState(true);
 
   const Router = useRouter();
@@ -55,7 +56,7 @@ export default function Home() {
         });
         if (!response.ok) throw new Error('Unable to load upcoming contests');
         const payload = await response.json();
-        setUpcomingContests(findUpcomingContests(payload.result as Contest[]));
+        setUpcomingContests(findUpcomingContests(payload.result as CodeforcesContestDto[]));
       } catch (error) {
         if (!controller.signal.aborted) setUpcomingContests([]);
       } finally {
@@ -80,7 +81,7 @@ export default function Home() {
         });
         if (!response.ok) throw new Error('Contest not found');
         const payload = await response.json();
-        setContestInfo(payload.result as Contest);
+        setContestInfo(payload.result as CodeforcesContestDto);
         setContestLookupState('idle');
       } catch (error) {
         if (controller.signal.aborted) return;
@@ -112,7 +113,7 @@ export default function Home() {
     setFriendApiSecretInput('');
   };
 
-  const selectUpcomingContest = (contest: Contest) => {
+  const selectUpcomingContest = (contest: CodeforcesContestDto) => {
     setContestIdInput(String(contest.id));
     setContestInfo(contest);
     setContestLookupError('');

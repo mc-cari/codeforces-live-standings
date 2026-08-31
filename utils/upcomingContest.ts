@@ -1,8 +1,10 @@
+import type { CodeforcesContestDto } from '@/src/integrations/codeforces/contracts';
+
 export const findUpcomingContests = (
-  contests: Contest[],
+  contests: CodeforcesContestDto[],
   nowSeconds = Math.floor(Date.now() / 1000),
   limit = 3,
-): Contest[] => contests
+): CodeforcesContestDto[] => contests
   .filter((contest) => (
     contest.phase === 'CODING'
     || (contest.phase === 'BEFORE' && contest.startTimeSeconds > nowSeconds)

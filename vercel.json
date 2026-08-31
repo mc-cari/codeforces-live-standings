@@ -4,7 +4,7 @@
   "buildCommand": "corepack pnpm run build",
   "functions": {
     "pages/api/codeforces.ts": {
-      "maxDuration": 150
+      "maxDuration": 300
     }
   }
 }

@@ -1,6 +1,7 @@
 import React from 'react';
+import type { CodeforcesProblemResultDto } from '@/src/integrations/codeforces/contracts';
 
-export default function ProblemStatusEdu({ problem } : { problem : ProblemResult }) {
+export default function ProblemStatusEdu({ problem } : { problem : CodeforcesProblemResultDto }) {
   return (
     <div className="h-full">
       {(problem.points > 0 || problem.rejectedAttemptCount > 0)

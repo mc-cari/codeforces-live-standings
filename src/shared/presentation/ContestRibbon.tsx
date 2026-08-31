@@ -65,7 +65,7 @@ export default function ContestRibbon({
           </h1>
         </div>
         <div className="flex items-center gap-2 rounded-sm border border-[#25364d] bg-[#0d1b2a] px-3 py-2">
-          <span className={`h-2 w-2 rounded-full ${tone} ${statusTone === 'live' ? 'animate-pulse' : ''}`} />
+          <span className={`h-2 w-2 rounded-full ${tone} ${statusTone === 'live' ? 'motion-safe:animate-pulse' : ''}`} />
           <div className={status ? undefined : 'flex items-center'}>
             <p className="leading-none broadcast-label">{mode}</p>
             {status && <p className="mt-1 text-xs font-semibold text-white">{status}</p>}

@@ -9,7 +9,7 @@ export default function ContestLoading({ progress, stage }: { progress: number, 
             <p className="broadcast-label">Contest feed</p>
             <h1 className="font-broadcast text-2xl font-semibold uppercase">Opening live desk</h1>
           </div>
-          <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-[#2d8cff]" />
+          <span className="h-2.5 w-2.5 motion-safe:animate-pulse rounded-full bg-[#2d8cff]" />
         </header>
         <div className="p-6 sm:p-10">
           <div className="mb-3 flex items-center justify-between gap-4">
@@ -31,7 +31,7 @@ export default function ContestLoading({ progress, stage }: { progress: number, 
           </div>
           <div className="mt-6 grid grid-cols-5 gap-2" aria-hidden="true">
             {Array.from({ length: 5 }, (_, index) => (
-              <div className="h-12 animate-pulse rounded-sm bg-[#13243a]" key={index} />
+              <div className="h-12 motion-safe:animate-pulse rounded-sm bg-[#13243a]" key={index} />
             ))}
           </div>
         </div>

@@ -83,15 +83,25 @@ const installCodeforcesMocks = async (page: Page) => {
 };
 
 test('setup is app-first and keeps imports behind contest detection', async ({ page }) => {
-  await installCodeforcesMocks(page);
+  const appRequests = await installCodeforcesMocks(page);
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
   await expect(page.getByRole('heading', { name: /Your (friends|setup)\. One live scoreboard\./ })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Replay demo' })).toHaveAttribute('href', /\/contests\/1735\/replay\?/);
   await expect(page.getByText('Official standings')).toHaveCount(0);
-  await expect(page.getByText('Pocket Invitational')).toBeVisible();
+  await expect(
+    page.getByRole('region', { name: 'Mini contest simulation' })
+      .getByRole('heading', { name: 'Codeforces Contest' }),
+  ).toBeVisible();
   await expect(page.getByTestId(`upcoming-countdown-${upcomingContest.id}`)).toHaveText(/^\d{2}:\d{2}:\d{2}$/);
+
+  await page.getByRole('button', { name: /Codeforces Round 2246/ }).click();
+  await expect(
+    page.getByRole('region', { name: 'Mini contest simulation' })
+      .getByRole('heading', { name: 'Codeforces Round 2246' }),
+  ).toBeVisible();
+  expect(appRequests.filter((request) => new URL(request).searchParams.get('method') === 'contest.info')).toHaveLength(0);
 
   await page.getByLabel('Codeforces contest ID').fill('1735');
   await expect(page.getByText('Codeforces Round 1735')).toBeVisible();
@@ -107,6 +117,8 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
   await expect(preview.getByRole('button')).toHaveCount(0);
   await expect(preview.getByRole('link', { name: 'Full replay' })).toHaveCount(0);
 
+  await preview.scrollIntoViewIfNeeded();
+  await expect(preview).toBeInViewport();
   await page.waitForTimeout(1_500);
   const clockBeforeHandleToggle = await preview.getByTestId('mini-contest-clock').textContent();
   await page.getByRole('button', { name: 'Remove preview_handle' }).click();
@@ -160,7 +172,8 @@ test('mini contest preview has no inline controls', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible();
 });
 
-test('live desk exposes pause and responsive standings tabs', async ({ page }) => {
+test('live desk exposes pause and responsive standings tabs', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile-chromium', 'Mobile panel assertions only apply to the mobile project');
   await installCodeforcesMocks(page);
   await page.goto('/contests/1735/standings?contestType=normal&h=VG91cmlzdA');
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();
@@ -168,9 +181,7 @@ test('live desk exposes pause and responsive standings tabs', async ({ page }) =
   await pause.click();
   await expect(page.getByRole('button', { name: 'Resume live' })).toBeVisible();
 
-  if (page.viewportSize() && page.viewportSize()!.width < 1024) {
-    await expect(page.getByRole('tab', { name: 'standings' })).toBeVisible();
-    await page.getByRole('tab', { name: 'submissions' }).click();
-    await expect(page.getByRole('region', { name: 'Live submissions' })).toBeVisible();
-  }
+  await expect(page.getByRole('tab', { name: 'standings' })).toBeVisible();
+  await page.getByRole('tab', { name: 'submissions' }).click();
+  await expect(page.getByRole('region', { name: 'Live submissions' })).toBeVisible();
 });

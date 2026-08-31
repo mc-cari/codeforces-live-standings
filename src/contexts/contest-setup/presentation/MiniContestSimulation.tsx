@@ -93,6 +93,18 @@ const previewSubmissionId = (event: typeof events[number]) => (
   event.second * 10 + event.participantIndex
 );
 
+const previewParticipantSlots = [0, 1, 2, 3];
+
+const selectParticipantSlot = (
+  handle: string,
+  participantSlots: Map<string, number>,
+  usedSlots: Set<number>,
+) => {
+  const knownSlot = participantSlots.get(handle.toLocaleLowerCase());
+  if (knownSlot !== undefined && !usedSlots.has(knownSlot)) return knownSlot;
+  return previewParticipantSlots.find((slot) => !usedSlots.has(slot)) ?? 0;
+};
+
 export default function MiniContestSimulation({
   contestId = 1735, contestName, handles,
 }: MiniContestSimulationProps) {
@@ -111,11 +123,7 @@ export default function MiniContestSimulation({
 
     const usedSlots = new Set<number>();
     return configuredHandles.map((handle) => {
-      const handleKey = handle.toLocaleLowerCase();
-      const knownSlot = participantSlots.get(handleKey);
-      const participantIndex = knownSlot !== undefined && !usedSlots.has(knownSlot)
-        ? knownSlot
-        : [0, 1, 2, 3].find((slot) => !usedSlots.has(slot)) || 0;
+      const participantIndex = selectParticipantSlot(handle, participantSlots, usedSlots);
       usedSlots.add(participantIndex);
       return { handle, participantIndex };
     });
@@ -131,10 +139,7 @@ export default function MiniContestSimulation({
         let changed = false;
         configuredHandles.forEach((handle) => {
           const handleKey = handle.toLocaleLowerCase();
-          const knownSlot = next.get(handleKey);
-          const participantIndex = knownSlot !== undefined && !usedSlots.has(knownSlot)
-            ? knownSlot
-            : [0, 1, 2, 3].find((slot) => !usedSlots.has(slot)) || 0;
+          const participantIndex = selectParticipantSlot(handle, next, usedSlots);
           if (next.get(handleKey) !== participantIndex) {
             next.set(handleKey, participantIndex);
             changed = true;
@@ -186,10 +191,12 @@ export default function MiniContestSimulation({
     };
   }, [displayContestName, previewParticipants, reducedMotion]);
 
-  const visibleEvents = useMemo(
-    () => events.filter((event) => event.participantIndex < previewParticipants.length),
-    [previewParticipants.length],
-  );
+  const visibleEvents = useMemo(() => {
+    const visibleParticipantIndices = new Set(
+      previewParticipants.map(({ participantIndex }) => participantIndex),
+    );
+    return events.filter((event) => visibleParticipantIndices.has(event.participantIndex));
+  }, [previewParticipants]);
 
   const settledEvents = visibleEvents.filter((event) => (
     event.second <= elapsed
@@ -283,7 +290,7 @@ export default function MiniContestSimulation({
       <header className="flex items-center justify-between border-b border-[#25364d] bg-[#081525] px-4 py-3">
         <div>
           <p className="broadcast-label">Live preview</p>
-          <h2 className={`font-broadcast text-xl font-semibold uppercase tracking-wide text-white ${isSetupUpdating ? 'animate-pulse' : ''}`}>
+          <h2 className={`font-broadcast text-xl font-semibold uppercase tracking-wide text-white ${isSetupUpdating ? 'motion-safe:animate-pulse' : ''}`}>
             {displayContestName}
           </h2>
         </div>
@@ -300,7 +307,7 @@ export default function MiniContestSimulation({
       <div aria-live="polite">
         {rows.map((row, index) => (
           <div
-            className={`grid grid-cols-[2rem_minmax(0,1fr)_3rem_3rem_repeat(4,minmax(1.75rem,2.25rem))] items-center border-b border-[#25364d]/70 px-2 py-2 text-center text-sm transition-all ${isSetupUpdating || (!reducedMotion && recentEvents.some((event) => event.participantIndex === row.participantIndex)) ? 'animate-pulse bg-[#0b2642]' : ''}`}
+            className={`grid grid-cols-[2rem_minmax(0,1fr)_3rem_3rem_repeat(4,minmax(1.75rem,2.25rem))] items-center border-b border-[#25364d]/70 px-2 py-2 text-center text-sm transition-all ${isSetupUpdating || (!reducedMotion && recentEvents.some((event) => event.participantIndex === row.participantIndex)) ? 'motion-safe:animate-pulse bg-[#0b2642]' : ''}`}
             key={row.handle}
           >
             <span className="font-data text-[#91a3ba]">{index + 1}</span>
@@ -316,7 +323,7 @@ export default function MiniContestSimulation({
                 event.participantIndex === row.participantIndex && event.problem === problem
               ));
               return (
-                <span className={`mx-auto flex h-7 w-8 items-center justify-center rounded-sm font-data ${stateClass} ${hasRecentEvent && !reducedMotion ? 'animate-pulse ring-2 ring-[#9fc8ff]/70' : ''}`} key={problem}>
+                <span className={`mx-auto flex h-7 w-8 items-center justify-center rounded-sm font-data ${stateClass} ${hasRecentEvent && !reducedMotion ? 'motion-safe:animate-pulse ring-2 ring-[#9fc8ff]/70' : ''}`} key={problem}>
                   {state.solvedAt ? `+${state.attempts > 1 ? state.attempts - 1 : ''}`
                     : state.attempts > 0 ? `-${state.attempts}` : '·'}
                 </span>
@@ -327,9 +334,9 @@ export default function MiniContestSimulation({
       </div>
 
       <div aria-live="polite" className="h-8 overflow-hidden bg-[#081525]">
-        {displayedSubmission ? (
-          <div className="relative h-full">
-            <AnimatePresence initial={false} mode="sync">
+        <div className="relative h-full">
+          <AnimatePresence initial={false} mode="sync">
+            {displayedSubmission && (
               <motion.div
                 animate={{ opacity: 1, y: 0 }}
                 className="absolute inset-x-0 top-0 h-8"
@@ -347,11 +354,12 @@ export default function MiniContestSimulation({
                   userRank={new Map()}
                 />
               </motion.div>
-            </AnimatePresence>
-          </div>
-        ) : (
-          <div className="flex h-full items-center px-4 text-xs text-[#64758c]">Waiting for the first submission…</div>
-        )}
+            )}
+          </AnimatePresence>
+          {!displayedSubmission && (
+            <div className="flex h-full items-center px-4 text-xs text-[#64758c]">Waiting for the first submission…</div>
+          )}
+        </div>
       </div>
     </section>
   );

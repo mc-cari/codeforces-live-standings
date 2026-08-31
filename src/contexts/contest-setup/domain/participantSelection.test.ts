@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import type { Party, RanklistRow } from '../../../shared/domain/contest.ts';
+import type { RanklistRow } from '../../../shared/domain/contest.ts';
+import type { PartyNameSource } from '../../../shared/domain/party.ts';
 import {
   normalizeImportedHandles,
   normalizeParticipantHandles,
@@ -26,10 +27,10 @@ const row = (handle: string, participantType: string): RanklistRow => ({
   party: {
     members: [{ handle, name: handle }],
     participantType,
-  } as Party,
+  } as PartyNameSource,
 } as RanklistRow);
 
-const getHandle = (party: Party) => party.members[0].handle;
+const getHandle = (party: PartyNameSource) => party.members[0].handle;
 
 test('top imports preserve the supplied standings order', () => {
   const rows = [

@@ -19,7 +19,7 @@ export default function LiveSubmission({
       className={`${compact
         ? 'relative grid min-w-0 h-full items-center grid-cols-[2rem_minmax(0,1fr)_3rem_3rem] border-b border-gray-800/30 px-2'
         : 'relative flex min-w-0 h-full flex-row border-b border-gray-800/30'} hover:bg-gray-800/30 transition-all ${
-        isNew || submission.verdict === 'TESTING' ? 'animate-pulse bg-blue-900/20' : ''
+        isNew || submission.verdict === 'TESTING' ? 'motion-safe:animate-pulse bg-blue-900/20' : ''
       } ${compact && isNew ? 'broadcast-submission-enter' : ''}`}
     >
       <a

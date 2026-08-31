@@ -12,7 +12,6 @@ import type {
   CodeforcesStandingsDto,
   CodeforcesSubmissionDto,
 } from '../contracts';
-import { mapStandingsDto } from '../mapper';
 import ExpiringCache from './expiringCache';
 import RequestCoordinator, { RequestQueueCapacityError } from './requestCoordinator';
 import { getResponseCacheDuration, isSuccessfulCodeforcesResponse } from './responseCachePolicy';
@@ -215,10 +214,15 @@ export const codeforcesApiHandler = async (req: NextApiRequest, res: NextApiResp
       }
 
       const standingsResponse = parseCodeforcesResponse<CodeforcesStandingsDto>(body);
-      const mappedStandings = standingsResponse.result
-        ? mapStandingsDto(standingsResponse.result) : undefined;
+      const participantRows = standingsResponse.result?.rows.map(({ party }) => ({
+        party: {
+          members: party.members.map(({ handle }) => ({ handle })),
+          participantType: party.participantType,
+          teamName: party.teamName,
+        },
+      })) || [];
       const handles = selectParticipantHandles(
-        mappedStandings?.rows || [],
+        participantRows,
         count,
         selection as ParticipantSelection,
         getName,

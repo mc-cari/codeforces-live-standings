@@ -70,7 +70,7 @@ export default function ContestSetupPage() {
   }, []);
 
   useEffect(() => {
-    if (!Number.isSafeInteger(contestId) || contestId <= 0) {
+    if (!Number.isSafeInteger(contestId) || contestId <= 0 || contestInfo?.id === contestId) {
       return undefined;
     }
 
@@ -93,13 +93,15 @@ export default function ContestSetupPage() {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [contestId]);
+  }, [contestId, contestInfo?.id]);
 
   const addHandles = (values: string[]) => {
+    const additions = normalizeParticipantHandles(values, handles);
     setHandles((current) => [
       ...current,
       ...normalizeParticipantHandles(values, current),
     ]);
+    return additions.length;
   };
 
   const addTypedHandles = () => {
@@ -147,8 +149,10 @@ export default function ContestSetupPage() {
       setFriendError('');
       setFriendMessage('');
       const imported = await codeforcesContestSetupGateway.importFriends({ apiKey, apiSecret });
-      addHandles(imported);
-      setFriendMessage('Friend handles imported.');
+      const added = addHandles(imported);
+      setFriendMessage(added === 0
+        ? 'Every friend in that list is already selected.'
+        : `Added ${added} friend handle${added === 1 ? '' : 's'}.`);
     } catch (error) {
       setFriendError(error instanceof Error ? error.message : 'Unable to import friends');
     } finally {
@@ -198,12 +202,11 @@ export default function ContestSetupPage() {
 
         <section className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.92fr)_minmax(32rem,1.08fr)]" id="contest-workspace">
           <div className="p-5 rounded-md broadcast-panel sm:p-6">
-            <div className="mb-6 flex items-start justify-between gap-4 border-b border-[#25364d] pb-5">
+            <div className="mb-6 flex items-start gap-4 border-b border-[#25364d] pb-5">
               <div>
                 <p className="broadcast-label">01 / Contest</p>
                 <h2 className="text-3xl font-semibold uppercase font-broadcast">Choose contest</h2>
               </div>
-              <span className={`mt-1 h-2.5 w-2.5 rounded-full ${contestInfo ? 'bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
             </div>
 
             <label className="block mb-2 text-sm font-medium" htmlFor="contest-id">Codeforces contest ID</label>
@@ -288,8 +291,8 @@ export default function ContestSetupPage() {
                     <p className="mb-2 text-xs leading-5 text-[#8fb8c7]">Create an API key for this import and delete it after.</p>
                     <a className="text-xs text-[#7ddfff] underline underline-offset-4" href="https://codeforces.com/settings/api" rel="noreferrer" target="_blank">Get a Codeforces API key</a>
                     <div className="mt-3 space-y-2">
-                      <input aria-label="Codeforces API key" autoComplete="off" className="px-3 text-sm broadcast-input" onChange={(event) => setFriendApiKey(event.target.value)} placeholder="API key" value={friendApiKey} />
-                      <input aria-label="Codeforces API secret" autoComplete="off" className="px-3 text-sm broadcast-input" onChange={(event) => setFriendApiSecret(event.target.value)} placeholder="API secret" type="password" value={friendApiSecret} />
+                      <input aria-label="Codeforces API key" autoComplete="off" className="px-3 text-base broadcast-input sm:text-sm" onChange={(event) => setFriendApiKey(event.target.value)} placeholder="API key" value={friendApiKey} />
+                      <input aria-label="Codeforces API secret" autoComplete="off" className="px-3 text-base broadcast-input sm:text-sm" onChange={(event) => setFriendApiSecret(event.target.value)} placeholder="API secret" type="password" value={friendApiSecret} />
                     </div>
                     <button className="mt-3 w-full rounded-sm border border-[#2386a8] bg-[#0c617d] px-4 py-2.5 text-sm font-semibold hover:bg-[#0e7395]" disabled={isImportingFriends} onClick={importFriends} type="button">
                       {isImportingFriends ? 'Importing…' : 'Import friend list'}
@@ -355,7 +358,7 @@ export default function ContestSetupPage() {
                 <button className="broadcast-panel group rounded-sm p-4 text-left hover:border-[#2d8cff]" key={contest.id} onClick={() => selectContest(contest)} type="button">
                   <div className="flex items-center justify-between mb-4">
                     <span className="font-data text-xs text-[#65adff]">#{contest.id}</span>
-                    <span className={`h-2 w-2 rounded-full ${isLive ? 'animate-pulse bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
+                    <span className={`h-2 w-2 rounded-full ${isLive ? 'motion-safe:animate-pulse bg-[#21c16b]' : 'bg-[#f3b83f]'}`} />
                   </div>
                   <h3 className="min-h-12 font-medium text-white group-hover:text-[#9fc8ff]">{contest.name}</h3>
                   <p className="mt-3 text-sm text-[#91a3ba]">{isLive ? 'Live now' : formatContestStart(contest)}</p>

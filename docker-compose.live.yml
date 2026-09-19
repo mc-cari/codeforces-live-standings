@@ -1,0 +1,22 @@
+services:
+  live-backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      LISTEN_ADDR: :8080
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-https://codeforces-live-standings.mccari.us}
+      CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
+    volumes:
+      - ${LIVE_DATA_DIR:-./.live-data}:/data
+    networks: [live]
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on: [live-backend]
+    networks: [live]
+
+networks:
+  live:

@@ -7,9 +7,17 @@ Website for a dynamic visualization for live standings of [Codeforces](https://c
 
 Website link: [Codeforces Live Standings](https://codeforces-live-standings.mccari.us/).
 
+### Repository layout
+
+- `frontend/` is the independently deployable Next.js application. It owns its package manifest,
+  lockfile, tests, and Vercel configuration.
+- `backend/` is the independently deployable Go live-streaming service. It owns its Go module and
+  container image.
+- `docker-compose.live.yml` is deployment infrastructure for the backend service.
+
 ### Architecture
 
-The application uses pragmatic domain boundaries under `src/contexts`:
+The frontend uses pragmatic domain boundaries under `frontend/src/contexts`:
 
 - `contest-setup` owns contest discovery, configuration, and participant selection.
 - `live-standings` owns polling and immutable live projections.
@@ -34,7 +42,7 @@ The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the 
 
 ### Codeforces API credentials
 
-Create `.env` from `.env.example` and set `CF_API_KEY` and `CF_API_SECRET` to a
+From `frontend/`, create `.env.local` from `.env.example` and set `CF_API_KEY` and `CF_API_SECRET` to a
 Codeforces API key pair.
 
 You can get an API key from https://codeforces.com/settings/api.
@@ -50,6 +58,7 @@ directly to Codeforces; credentials are not sent to this app server or stored.
 Set up the project with:
 
 ```sh
+cd frontend
 corepack enable
 pnpm install
 ```
@@ -57,12 +66,14 @@ pnpm install
 Start the development server with:
 
 ```sh
+cd frontend
 pnpm dev
 ```
 
 Run domain and browser tests with:
 
 ```sh
+cd frontend
 pnpm test
 ```
 
@@ -82,9 +93,46 @@ shared service such as Redis or a database. Cached response bodies are bounded t
 responses do not accumulate indefinitely.
 
 The demo replay is served from the versioned, immutable
-`public/demo/1735-v1.json` snapshot and makes no Codeforces API requests. 
+`frontend/public/demo/1735-v1.json` snapshot and makes no Codeforces API requests.
 Run:
 
 ```sh
+cd frontend
 pnpm generate-demo
 ```
+
+### Live streaming backend
+
+The live standings page can use the Go SSE backend by setting
+`NEXT_PUBLIC_LIVE_API_BASE_URL` to its public URL. The backend is in `backend/` and can be
+run locally with `cd backend && go run .` or deployed with `docker-compose.live.yml` behind a
+named Cloudflare Tunnel.
+
+For the Raspberry Pi deployment, copy the root `.env.example` to `.env`, set the tunnel token,
+and start the stack:
+
+```sh
+cp .env.example .env
+docker compose -f docker-compose.live.yml up -d --build
+```
+
+The tunnel should route its public hostname to `http://live-backend:8080`. The service exposes
+`/healthz` and `/readyz` for health checks.
+
+The backend keeps the active contest projection in memory and persists only new or changed
+submissions plus activation metadata in SQLite. It deliberately does not rewrite the full
+standings response on every poll; this keeps flash-storage writes bounded. Use an SSD for
+continuous operation when possible. RAM/tmpfs may be used for transient data, but the
+authoritative SQLite database should remain durable because Codeforces can omit older
+submissions from later responses.
+
+### Vercel deployment
+
+Configure the existing Vercel project with `frontend` as its Root Directory under
+**Settings → Build and Deployment**. Keep framework detection on Next.js and leave the output
+directory at the framework default. The install/build commands are read from
+`frontend/vercel.json`. Enable the Root Directory's "Skip deployment" option if backend-only
+commits should not deploy the frontend.
+
+Keep `NEXT_PUBLIC_LIVE_API_BASE_URL` in the Vercel project's environment variables and point it
+at the separately deployed Go service. The Go backend is not part of the Vercel project.

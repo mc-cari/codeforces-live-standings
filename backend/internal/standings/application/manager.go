@@ -20,6 +20,7 @@ type Manager struct {
 	config     Config
 	mu         sync.Mutex
 	sessions   map[int]*Session
+	activating int
 }
 
 func NewManager(repository Repository, gateway ContestGateway, config Config) *Manager {
@@ -49,7 +50,7 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 		manager.mu.Unlock()
 		return session, false, nil
 	}
-	active := 0
+	active := manager.activating
 	for _, session := range manager.sessions {
 		finished, _ := session.Status()
 		if !finished {
@@ -60,7 +61,13 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 		manager.mu.Unlock()
 		return nil, false, errors.New("active contest capacity reached")
 	}
+	manager.activating++
 	manager.mu.Unlock()
+	defer func() {
+		manager.mu.Lock()
+		manager.activating--
+		manager.mu.Unlock()
+	}()
 
 	standings, err := manager.gateway.FetchStandings(ctx, id)
 	if err != nil {

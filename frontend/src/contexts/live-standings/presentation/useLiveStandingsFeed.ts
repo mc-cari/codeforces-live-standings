@@ -52,6 +52,7 @@ export const useLiveStandingsFeed = ({
   const [isUpdateStale, setIsUpdateStale] = useState(false);
   const hasLoadedInitialData = useRef(false);
   const activeRequest = useRef<AbortController | undefined>(undefined);
+  const loadingCompletionTimer = useRef<number | undefined>(undefined);
   const submissionsRef = useRef<Submission[]>([]);
   const streamedSubmissionsRef = useRef<Submission[]>([]);
   const useLiveBackend = liveSseGateway.enabled();
@@ -77,12 +78,13 @@ export const useLiveStandingsFeed = ({
     if (updateContestInfo) setContestInfo(projection.standings.contest);
   }, [setContestInfo, userHandles]);
 
-  const completeInitialLoad = useCallback((isCancelled: () => boolean) => {
+  const completeInitialLoad = useCallback(() => {
     if (hasLoadedInitialData.current) return;
     hasLoadedInitialData.current = true;
     setLoadingProgress(LOADING_PROGRESS.complete);
-    window.setTimeout(() => {
-      if (!isCancelled()) setIsLoading(false);
+    loadingCompletionTimer.current = window.setTimeout(() => {
+      loadingCompletionTimer.current = undefined;
+      setIsLoading(false);
     }, LOADING_PROGRESS.completionDelayMilliseconds);
   }, []);
 
@@ -122,7 +124,7 @@ export const useLiveStandingsFeed = ({
       ]);
       if (controller.signal.aborted) return;
       applyProjection(officialStandings, remoteSubmissions);
-      if (isInitialLoad) completeInitialLoad(() => controller.signal.aborted);
+      if (isInitialLoad) completeInitialLoad();
     } catch {
       if (controller.signal.aborted) return;
       if (isInitialLoad) setLoadingStage('Unable to load contest data');
@@ -152,7 +154,13 @@ export const useLiveStandingsFeed = ({
     return () => window.clearTimeout(timer);
   }, [useLiveBackend]);
 
-  useEffect(() => () => activeRequest.current?.abort(), [contestId]);
+  useEffect(() => () => {
+    activeRequest.current?.abort();
+    if (loadingCompletionTimer.current !== undefined) {
+      window.clearTimeout(loadingCompletionTimer.current);
+      loadingCompletionTimer.current = undefined;
+    }
+  }, [contestId]);
 
   useEffect(() => {
     if (!useLiveBackend || !contestId || userHandles.length === 0 || !contestType) {
@@ -168,14 +176,14 @@ export const useLiveStandingsFeed = ({
       applyProjection(mapStandingsDto(snapshot.standings), snapshotSubmissions, true);
       setIsUpdateStale(snapshot.health?.state === 'stale');
       if (snapshot.health?.state === 'finished') setIsContestFinished(true);
-      completeInitialLoad(() => controller.signal.aborted);
+      completeInitialLoad();
     };
     const applyPatch = (patch: LivePatch) => {
       const current = new Map(streamedSubmissionsRef.current.map((submission) => [submission.id, submission]));
       patch.submissionUpserts.map(mapSubmissionDto).forEach((submission) => current.set(submission.id, submission));
       streamedSubmissionsRef.current = [...current.values()];
       applyProjection(mapStandingsDto(patch.standings), streamedSubmissionsRef.current, true);
-      completeInitialLoad(() => controller.signal.aborted);
+      completeInitialLoad();
     };
     const handleState = (state: string, contest?: LiveSnapshot['contest']) => {
       if (contest) setContestInfo((current) => current || mapContestDto(contest));

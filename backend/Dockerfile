@@ -8,7 +8,10 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -trimpath -ldflags='-s -w' -o /out/live-backend .
 
 FROM debian:bookworm-slim
-RUN useradd --system --uid 10001 --home-dir /nonexistent --shell /usr/sbin/nologin live
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --system --uid 10001 --home-dir /nonexistent --shell /usr/sbin/nologin live
 RUN mkdir -p /data && chown live:live /data
 COPY --from=build /out/live-backend /usr/local/bin/live-backend
 USER live

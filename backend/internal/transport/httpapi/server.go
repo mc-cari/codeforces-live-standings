@@ -116,7 +116,13 @@ func (server *Server) activate(w http.ResponseWriter, r *http.Request, id int) {
 	session, _, err := server.manager.Activate(r.Context(), id)
 	if err != nil {
 		status := http.StatusBadGateway
-		if strings.Contains(err.Error(), "capacity") {
+		if strings.HasPrefix(err.Error(), "contest is ") {
+			// A contest that is already finished or not yet eligible is a
+			// client/domain conflict, not an upstream gateway failure. Keeping
+			// it out of the 5xx range also prevents proxies from replacing the
+			// JSON error and its CORS headers with a generic 502 response.
+			status = http.StatusConflict
+		} else if strings.Contains(err.Error(), "capacity") {
 			status = http.StatusTooManyRequests
 		}
 		writeJSON(w, status, map[string]string{"comment": err.Error()})

@@ -41,7 +41,7 @@ func main() {
 
 	upstream := codeforces.NewClient(
 		strings.TrimRight(env("CF_API_BASE_URL", defaultCodeforces), "/")+"/",
-		&http.Client{Timeout: 30 * time.Second},
+		codeforces.NewFreshConnectionHTTPClient(30*time.Second),
 		2100*time.Millisecond,
 	)
 	manager := application.NewManager(repository, upstream, application.Config{

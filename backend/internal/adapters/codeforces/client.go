@@ -28,6 +28,12 @@ type Client struct {
 	nextRequest     time.Time
 }
 
+func NewFreshConnectionHTTPClient(timeout time.Duration) *http.Client {
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DisableKeepAlives = true
+	return &http.Client{Timeout: timeout, Transport: transport}
+}
+
 func NewClient(baseURL string, httpClient *http.Client, minimumInterval time.Duration) *Client {
 	return &Client{baseURL: baseURL, httpClient: httpClient, minimumInterval: minimumInterval}
 }

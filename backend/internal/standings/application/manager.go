@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 )
@@ -73,10 +74,12 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 	if err != nil {
 		return nil, false, err
 	}
-	if standings.Contest.Phase != "BEFORE" && standings.Contest.Phase != "CODING" {
+	finished := strings.EqualFold(standings.Contest.Phase, "FINISHED")
+	if standings.Contest.Phase != "BEFORE" && standings.Contest.Phase != "CODING" && !finished {
 		return nil, false, fmt.Errorf("contest is %s", standings.Contest.Phase)
 	}
-	if err := manager.repository.SaveContest(standings.Contest, time.Now()); err != nil {
+	activatedAt := time.Now()
+	if err := manager.repository.SaveContest(standings.Contest, activatedAt); err != nil {
 		return nil, false, err
 	}
 	stored, err := manager.repository.LoadSubmissions(id)

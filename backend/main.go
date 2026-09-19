@@ -57,7 +57,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    env("LISTEN_ADDR", defaultListen),
-		Handler: httpapi.NewServer(manager, httpapi.Config{AllowedOrigin: os.Getenv("ALLOWED_ORIGIN"), MaxHandles: 200}),
+		Handler: httpapi.NewServer(manager, httpapi.Config{AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200}),
 	}
 	go func() {
 		<-ctx.Done()
@@ -79,4 +79,15 @@ func env(key, fallback string) string {
 		return value
 	}
 	return fallback
+}
+
+func splitCSV(value string) []string {
+	parts := strings.Split(value, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		if trimmed := strings.TrimSpace(part); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }

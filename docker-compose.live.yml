@@ -3,10 +3,12 @@ services:
     build:
       context: ./backend
     restart: unless-stopped
+    ports:
+      - "8090:8080"
     environment:
       DATA_DIR: /data
       LISTEN_ADDR: :8080
-      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-https://codeforces-live-standings.mccari.us}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://codeforces-live-standings.mccari.us,https://codeforces-live-standings-*-mccaris-projects.vercel.app}
       CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
     volumes:
       - ${LIVE_DATA_DIR:-./.live-data}:/data

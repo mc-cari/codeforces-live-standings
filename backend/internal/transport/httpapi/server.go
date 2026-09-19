@@ -14,13 +14,14 @@ import (
 )
 
 type Config struct {
-	AllowedOrigin string
+	AllowedOrigin  string
+	AllowedOrigins []string
 	MaxHandles    int
 }
 
 type Server struct {
 	manager       *application.Manager
-	allowedOrigin string
+	allowedOrigins []string
 	maxHandles    int
 }
 
@@ -28,7 +29,11 @@ func NewServer(manager *application.Manager, config Config) http.Handler {
 	if config.MaxHandles <= 0 {
 		config.MaxHandles = 200
 	}
-	server := &Server{manager: manager, allowedOrigin: config.AllowedOrigin, maxHandles: config.MaxHandles}
+	allowedOrigins := append([]string{}, config.AllowedOrigins...)
+	if len(allowedOrigins) == 0 && config.AllowedOrigin != "" {
+		allowedOrigins = []string{config.AllowedOrigin}
+	}
+	server := &Server{manager: manager, allowedOrigins: allowedOrigins, maxHandles: config.MaxHandles}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", server.health)
 	mux.HandleFunc("/readyz", server.ready)
@@ -38,8 +43,9 @@ func NewServer(manager *application.Manager, config Config) http.Handler {
 
 func (server *Server) cors(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if server.allowedOrigin != "" {
-			w.Header().Set("Access-Control-Allow-Origin", server.allowedOrigin)
+		origin := r.Header.Get("Origin")
+		if server.originAllowed(origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Add("Vary", "Origin")
 		}
 		if r.Method == http.MethodOptions {
@@ -50,6 +56,31 @@ func (server *Server) cors(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
+}
+
+func (server *Server) originAllowed(origin string) bool {
+	if origin == "" {
+		return false
+	}
+	for _, pattern := range server.allowedOrigins {
+		pattern = strings.TrimSpace(pattern)
+		if pattern == origin {
+			return true
+		}
+		if wildcardOriginMatches(pattern, origin) {
+			return true
+		}
+	}
+	return false
+}
+
+func wildcardOriginMatches(pattern, origin string) bool {
+	star := strings.IndexByte(pattern, '*')
+	if star < 0 {
+		return false
+	}
+	prefix, suffix := pattern[:star], pattern[star+1:]
+	return strings.HasPrefix(origin, prefix) && strings.HasSuffix(origin, suffix) && len(origin) >= len(prefix)+len(suffix)
 }
 
 func (server *Server) health(w http.ResponseWriter, _ *http.Request) {

@@ -63,7 +63,7 @@ const standings = {
   }],
 };
 
-const installCodeforcesMocks = async (page: Page) => {
+const installCodeforcesMocks = async (page: Page, detectedContest = contest) => {
   const appRequests: string[] = [];
   await page.route('**/api/codeforces?**', async (route) => {
     const url = new URL(route.request().url());
@@ -71,7 +71,7 @@ const installCodeforcesMocks = async (page: Page) => {
     const method = url.searchParams.get('method');
     const result = {
       'contest.list': [contest, upcomingContest],
-      'contest.info': contest,
+      'contest.info': detectedContest,
       'contest.standings': standings,
       'contest.status': [],
       'participant.import': ['Tourist', 'Benq'],
@@ -133,6 +133,7 @@ test('setup is app-first and keeps imports behind contest detection', async ({ p
 });
 
 test('friend credentials sign a direct request and never reach the app server', async ({ page }) => {
+  const usage = await collectUsage(page);
   const appRequests = await installCodeforcesMocks(page);
   let friendRequest = '';
   await page.route('https://codeforces.com/api/user.friends?**', async (route) => {
@@ -158,6 +159,9 @@ test('friend credentials sign a direct request and never reach the app server', 
   expect(appRequests.join('\n')).not.toContain('browser-key');
   expect(appRequests.join('\n')).not.toContain('super-secret');
   await expect(page.getByLabel('Codeforces API secret')).toHaveValue('');
+  expect(JSON.stringify(usage)).not.toContain('browser-key');
+  expect(JSON.stringify(usage)).not.toContain('super-secret');
+  expect(usage.filter((event) => event.kind === 'view_displayed')).toHaveLength(0);
 });
 
 test('mini contest preview has no inline controls', async ({ page }) => {
@@ -182,4 +186,98 @@ test('live desk exposes synchronization status and responsive standings tabs', a
   await expect(page.getByRole('tab', { name: 'standings' })).toBeVisible();
   await page.getByRole('tab', { name: 'submissions' }).click();
   await expect(page.getByRole('region', { name: 'Live submissions' })).toBeVisible();
+});
+
+
+type UsageEvent = { id: string; kind: string; mode: string; seconds?: number };
+const collectUsage = async (page: Page, fail = false) => {
+  const events: UsageEvent[] = [];
+  await page.route('**/api/telemetry', async (route) => {
+    events.push(route.request().postDataJSON());
+    await route.fulfill({ status: fail ? 503 : 204 });
+  });
+  return events;
+};
+
+for (const phase of ['CODING', 'FINISHED']) {
+  test(`successful ${phase} setup adds one setup and view, refresh adds only views`, async ({ page }) => {
+    const events = await collectUsage(page);
+    await installCodeforcesMocks(page, { ...contest, phase });
+    await page.goto('/');
+    await page.getByLabel('Codeforces contest ID').fill('1735');
+    await expect(page.getByText('Codeforces Round 1735')).toBeVisible();
+    await page.getByPlaceholder('your_handle,second_handle,').fill('Tourist');
+    await page.getByRole('button', { name: 'Add', exact: true }).click();
+    await page.getByRole('button', { name: phase === 'FINISHED' ? 'Start Replay' : 'Start Live Tracking' }).click();
+    await expect(page.getByTestId('contest-ribbon')).toBeVisible();
+    await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
+    expect(events.filter((event) => event.kind === 'setup_completed').map((event) => event.mode))
+      .toEqual([phase === 'FINISHED' ? 'replay' : 'live']);
+    expect(events.filter((event) => event.kind === 'page_view')).toHaveLength(2);
+    await page.reload();
+    await expect(page.getByTestId('contest-ribbon')).toBeVisible();
+    await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(2);
+    expect(events.filter((event) => event.kind === 'setup_completed').map((event) => event.mode))
+      .toEqual([phase === 'FINISHED' ? 'replay' : 'live']);
+    expect(events.filter((event) => event.kind === 'page_view')).toHaveLength(3);
+    expect(JSON.stringify(events)).not.toContain('Tourist');
+    expect(JSON.stringify(events.map((event) => ({ ...event, id: undefined })))).not.toContain('1735');
+  });
+}
+
+test('demo link counts a demo view and controls do not add views', async ({ page }) => {
+  const events = await collectUsage(page);
+  await installCodeforcesMocks(page);
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Replay demo', exact: true }).click();
+  await expect(page.getByTestId('contest-ribbon')).toBeVisible();
+  await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
+  const pause = page.getByRole('button', { name: 'Pause', exact: true });
+  await pause.click();
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  expect(events.filter((event) => event.kind === 'view_displayed').map((event) => event.mode)).toEqual(['demo']);
+  expect(events.filter((event) => event.kind === 'setup_completed')).toHaveLength(0);
+  expect(events.filter((event) => event.kind === 'page_view').map((event) => event.mode)).toEqual(['setup', 'demo']);
+});
+
+test('failed direct replay reports failure and telemetry outage leaves navigation usable', async ({ page }) => {
+  const events = await collectUsage(page, true);
+  await installCodeforcesMocks(page);
+  await page.route('**/demo/1735-v1.json', (route) => route.fulfill({ status: 502 }));
+  await page.goto('/contests/1735/replay?contestType=normal&demo=true&h=VG91cmlzdA');
+  await expect(page.getByText('Unable to load demo replay')).toBeVisible();
+  await expect.poll(() => events.filter((event) => event.kind === 'loading_failed').length).toBe(3);
+  expect(new Set(events.filter((event) => event.kind === 'loading_failed').map((event) => event.id)).size).toBe(1);
+  expect(events.filter((event) => event.kind === 'view_displayed')).toHaveLength(0);
+  await page.goto('/');
+  await expect(page.getByLabel('Codeforces contest ID')).toBeVisible();
+});
+
+test('countdown counts separately and transitions to a single live view', async ({ page }) => {
+  const events = await collectUsage(page);
+  await page.clock.install();
+  await installCodeforcesMocks(page, { ...contest, phase: 'BEFORE', startTimeSeconds: Math.floor(Date.now() / 1000) + 120 });
+  await page.goto('/contests/1735/standings?contestType=normal&h=VG91cmlzdA');
+  await expect(page.getByText('Contest starts in')).toBeVisible();
+  await expect.poll(() => events.filter((event) => event.kind === 'countdown_view').length).toBe(1);
+  expect(events.filter((event) => event.kind === 'view_displayed')).toHaveLength(0);
+  await page.clock.fastForward(121_000);
+  await expect(page.getByTestId('contest-ribbon')).toBeVisible();
+  await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
+  expect(events.find((event) => event.kind === 'view_displayed')?.seconds).toBeLessThan(30);
+  expect(events.filter((event) => event.kind === 'setup_completed')).toHaveLength(0);
+});
+
+test('invalid replay links show validation without a loading failure', async ({ page }) => {
+  const events = await collectUsage(page);
+  let loads = 0;
+  await page.route('**/api/codeforces?**', async (route) => {
+    loads++;
+    await route.fulfill({ status: 502 });
+  });
+  await page.goto('/contests/1735/replay?contestType=normal');
+  await expect(page.getByText('Replay requires a contest, contest type, and participant handles')).toBeVisible();
+  await expect.poll(() => events.filter((event) => event.kind === 'page_view').length).toBe(1);
+  expect(events.filter((event) => event.kind === 'loading_failed')).toHaveLength(0);
+  expect(loads).toBe(0);
 });

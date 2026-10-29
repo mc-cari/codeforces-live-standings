@@ -1,3 +1,5 @@
+import { track } from '@/src/shared/telemetry/telemetry';
+import { useViewTelemetry } from '@/src/shared/telemetry/useViewTelemetry';
 import React, {
   useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState,
 } from 'react';
@@ -61,6 +63,8 @@ export default function ReplayPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const telemetryMode = contestId === '1735' && getQueryValue(demo) === 'true' ? 'demo' : 'replay';
+  useViewTelemetry(telemetryMode, false, !isLoading && !error && Boolean(finalStandings));
   const [isTruncated, setIsTruncated] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(LOADING_PROGRESS.initial);
   const [loadingStage, setLoadingStage] = useState('Preparing replay...');
@@ -207,6 +211,7 @@ export default function ReplayPage() {
         }
       } catch (loadError) {
         if (isActive) {
+          if (hasReplayParameters) track({ kind: 'loading_failed', mode: telemetryMode });
           setError(loadError instanceof Error ? loadError.message : 'Unable to load replay data');
         }
       } finally {
@@ -231,7 +236,7 @@ export default function ReplayPage() {
       window.clearInterval(progressTimer);
       if (finishTimer) window.clearTimeout(finishTimer);
     };
-  }, [autoplay, contestId, contestType, demo, requestedSpeed, router.isReady, startMinute, startTime, userHandles]);
+  }, [autoplay, contestId, contestType, demo, requestedSpeed, router.isReady, startMinute, startTime, userHandles, telemetryMode]);
 
   useEffect(() => {
     if (!isPlaying || !finalStandings) return undefined;

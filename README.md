@@ -106,7 +106,9 @@ pnpm generate-demo
 The live standings page can use the Go SSE backend by setting
 `NEXT_PUBLIC_LIVE_API_BASE_URL` to its public URL. The backend is in `backend/` and can be
 run locally with `cd backend && go run .` or deployed with `docker-compose.live.yml` behind a
-named Cloudflare Tunnel.
+named Cloudflare Tunnel. Local runs bind metrics to `127.0.0.1:9090` by default; set
+`METRICS_LISTEN_ADDR` explicitly to a private-network address for remote scraping.
+Compose sets `:9090` inside the container without publishing the metrics port.
 
 For the Raspberry Pi deployment, copy the root `.env.example` to `.env`, set the tunnel token,
 and start the stack:
@@ -136,3 +138,10 @@ commits should not deploy the frontend.
 
 Keep `NEXT_PUBLIC_LIVE_API_BASE_URL` in the Vercel project's environment variables and point it
 at the separately deployed Go service. The Go backend is not part of the Vercel project.
+
+### Usage metrics with Grafana Alloy
+
+Optional production telemetry records page views, completed setups, displayed scoreboards,
+countdowns, and basic loading reliability. Lifetime usage totals are persisted in SQLite;
+Alloy scrapes a private metrics listener and forwards to your existing Grafana destination.
+See [deployment, dashboard import, and metric definitions](monitoring/README.md).

@@ -1,0 +1,10 @@
+// Append to the existing Alloy configuration. Replace "existing" with the
+// label of your existing prometheus.remote_write component.
+prometheus.scrape "cf_live_standings" {
+  targets = [{
+    __address__ = "cf-live-standings-metrics:9090",
+    job = "cf-live-standings",
+  }]
+  scrape_interval = "15s"
+  forward_to = [prometheus.remote_write.existing.receiver]
+}

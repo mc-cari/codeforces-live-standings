@@ -1,0 +1,12 @@
+# Merge with docker-compose.live.yml. No metrics port is published to the host.
+services:
+  live-backend:
+    networks:
+      live: {}
+      alloy:
+        aliases: [cf-live-standings-metrics]
+
+networks:
+  alloy:
+    external: true
+    name: ${ALLOY_NETWORK:-monitoring}

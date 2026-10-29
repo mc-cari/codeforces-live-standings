@@ -10,9 +10,10 @@ import (
 )
 
 type Config struct {
-	PollInterval      time.Duration
-	RetentionPeriod   time.Duration
-	MaxActiveContests int
+	SubmissionHistoryObserver SubmissionHistoryObserver
+	PollInterval              time.Duration
+	RetentionPeriod           time.Duration
+	MaxActiveContests         int
 }
 
 type Manager struct {
@@ -38,7 +39,7 @@ func (manager *Manager) Restore(ctx context.Context) error {
 		if err != nil {
 			return err
 		}
-		session := newSession(manager.repository, manager.gateway, manager.config.PollInterval, record.Contest, nil, record.Revision, stored)
+		session := newSession(manager.repository, manager.gateway, manager.config.PollInterval, record.Contest, nil, record.Revision, stored, manager.config.SubmissionHistoryObserver)
 		manager.sessions[record.Contest.ID] = session
 		go session.Run(ctx)
 	}
@@ -86,7 +87,7 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 	if err != nil {
 		return nil, false, err
 	}
-	session := newSession(manager.repository, manager.gateway, manager.config.PollInterval, standings.Contest, &standings, 0, stored)
+	session := newSession(manager.repository, manager.gateway, manager.config.PollInterval, standings.Contest, &standings, 0, stored, manager.config.SubmissionHistoryObserver)
 	manager.mu.Lock()
 	if existing := manager.sessions[id]; existing != nil {
 		manager.mu.Unlock()

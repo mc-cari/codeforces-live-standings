@@ -16,6 +16,7 @@ import (
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
 )
 
 type stagedGateway struct {
@@ -80,7 +81,8 @@ func TestLateSubscriberGetsReconciledSubmissionHistory(t *testing.T) {
 		RetentionPeriod:   time.Hour,
 		MaxActiveContests: 3,
 	})
-	server := httptest.NewServer(NewServer(manager, Config{MaxHandles: 20}))
+	metrics := telemetry.New(repository)
+	server := httptest.NewServer(NewServer(manager, Config{MaxHandles: 20, Metrics: metrics, TelemetryToken: "test-token"}))
 	defer server.Close()
 	t.Cleanup(manager.Stop)
 
@@ -108,6 +110,19 @@ func TestLateSubscriberGetsReconciledSubmissionHistory(t *testing.T) {
 	firstEvent := readEvent(t, firstReader)
 	if firstEvent["event"] != "snapshot" || strings.Contains(firstEvent["data"], `"id":101`) {
 		t.Fatalf("unexpected initial snapshot: %#v", firstEvent)
+	}
+	metricResponse := httptest.NewRecorder()
+	metrics.Handler().ServeHTTP(metricResponse, httptest.NewRequest("GET", "/metrics", nil))
+	if !strings.Contains(metricResponse.Body.String(), "cf_backend_sse_connections 1") {
+		t.Fatal(metricResponse.Body.String())
+	}
+	publicMetrics, err := http.Get(server.URL + "/metrics")
+	if err != nil {
+		t.Fatal(err)
+	}
+	publicMetrics.Body.Close()
+	if publicMetrics.StatusCode != 404 {
+		t.Fatal("metrics exposed on application listener")
 	}
 	close(gateway.releaseFirstStatus)
 	patchEvent := readEvent(t, firstReader)
@@ -137,6 +152,18 @@ func TestLateSubscriberGetsReconciledSubmissionHistory(t *testing.T) {
 			t.Fatalf("late snapshot lost reconciled submissions: %#v", lateEvent)
 		}
 		time.Sleep(10 * time.Millisecond)
+	}
+	deadline = time.Now().Add(time.Second)
+	for {
+		response := httptest.NewRecorder()
+		metrics.Handler().ServeHTTP(response, httptest.NewRequest("GET", "/metrics", nil))
+		if strings.Contains(response.Body.String(), "cf_backend_sse_connections 0") {
+			break
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("SSE gauge did not return to zero")
+		}
+		time.Sleep(time.Millisecond)
 	}
 }
 

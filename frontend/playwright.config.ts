@@ -12,7 +12,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm dev',
-    env: { NEXT_PUBLIC_TELEMETRY_ENABLED: 'true', NEXT_PUBLIC_LIVE_API_BASE_URL: '' },
+    env: { NEXT_PUBLIC_LIVE_API_BASE_URL: '' },
     url: 'http://127.0.0.1:3000',
     reuseExistingServer: false,
     timeout: 120_000,

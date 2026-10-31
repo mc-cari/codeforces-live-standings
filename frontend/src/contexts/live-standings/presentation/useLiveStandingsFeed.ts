@@ -1,3 +1,4 @@
+import { track } from '@/src/shared/telemetry/telemetry';
 import {
   useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction,
 } from 'react';
@@ -127,7 +128,10 @@ export const useLiveStandingsFeed = ({
       if (isInitialLoad) completeInitialLoad();
     } catch {
       if (controller.signal.aborted) return;
-      if (isInitialLoad) setLoadingStage('Unable to load contest data');
+      if (isInitialLoad) {
+        track({ kind: 'loading_failed', mode: 'live' });
+        setLoadingStage('Unable to load contest data');
+      }
       else setIsUpdateStale(true);
     }
   };
@@ -163,7 +167,7 @@ export const useLiveStandingsFeed = ({
   }, [contestId]);
 
   useEffect(() => {
-    if (!useLiveBackend || !contestId || userHandles.length === 0 || !contestType) {
+    if ((!isContestReady && contestError === undefined) || !useLiveBackend || !contestId || userHandles.length === 0 || !contestType) {
       return undefined;
     }
     const controller = new AbortController();
@@ -201,10 +205,14 @@ export const useLiveStandingsFeed = ({
           applySnapshot,
           applyPatch,
           handleState,
-          () => setIsUpdateStale(true),
+          () => {
+            if (!hasLoadedInitialData.current) track({ kind: 'loading_failed', mode: 'live' });
+            setIsUpdateStale(true);
+          },
         );
       } catch (error) {
         if (!controller.signal.aborted) {
+          if (!hasLoadedInitialData.current) track({ kind: 'loading_failed', mode: 'live' });
           setLoadingStage(error instanceof Error ? error.message : 'Unable to connect to live backend');
           setIsUpdateStale(true);
         }
@@ -218,6 +226,8 @@ export const useLiveStandingsFeed = ({
     };
   }, [
     applyProjection,
+    isContestReady,
+    contestError,
     completeInitialLoad,
     contestId,
     contestType,

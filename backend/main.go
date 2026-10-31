@@ -14,6 +14,7 @@ import (
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/codeforces"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/transport/httpapi"
 )
 
@@ -39,15 +40,18 @@ func main() {
 	}
 	defer repository.Close()
 
+	metrics := telemetry.New(repository)
 	upstream := codeforces.NewClient(
 		strings.TrimRight(env("CF_API_BASE_URL", defaultCodeforces), "/")+"/",
 		codeforces.NewFreshConnectionHTTPClient(30*time.Second),
 		2100*time.Millisecond,
+		codeforces.WithRequestObserver(metrics),
 	)
 	manager := application.NewManager(repository, upstream, application.Config{
-		PollInterval:      4200 * time.Millisecond,
-		RetentionPeriod:   retentionPeriod,
-		MaxActiveContests: 3,
+		PollInterval:              4200 * time.Millisecond,
+		RetentionPeriod:           retentionPeriod,
+		MaxActiveContests:         3,
+		SubmissionHistoryObserver: metrics,
 	})
 	if err := manager.Restore(ctx); err != nil {
 		slog.Error("restore active contests failed", "error", err)
@@ -55,15 +59,44 @@ func main() {
 	}
 	go manager.RunCleanup(ctx, time.Hour)
 
+	metricsMux := http.NewServeMux()
+	metricsMux.Handle("/metrics", metrics.Handler())
+	metricsServer := &http.Server{Addr: env("METRICS_LISTEN_ADDR", "127.0.0.1:9090"), Handler: metricsMux, ReadHeaderTimeout: 5 * time.Second}
+	go func() {
+		if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("metrics listener failed", "error", err)
+		}
+	}()
+	go func() {
+		cleanup := func() {
+			if err := repository.CleanupReceipts(ctx, time.Now().Add(-24*time.Hour)); err != nil {
+				slog.Error("telemetry receipt cleanup failed", "error", err)
+			}
+		}
+		cleanup()
+		ticker := time.NewTicker(time.Hour)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				cleanup()
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
 	server := &http.Server{
 		Addr:    env("LISTEN_ADDR", defaultListen),
-		Handler: httpapi.NewServer(manager, httpapi.Config{AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200}),
+		Handler: httpapi.NewServer(manager, httpapi.Config{Metrics: metrics, TelemetryToken: os.Getenv("TELEMETRY_TOKEN"), AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200}),
 	}
+	shutdownDone := make(chan struct{})
 	go func() {
+		defer close(shutdownDone)
 		<-ctx.Done()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 		_ = server.Shutdown(shutdownCtx)
+		_ = metricsServer.Shutdown(shutdownCtx)
 		manager.Stop()
 	}()
 
@@ -72,6 +105,7 @@ func main() {
 		slog.Error("server stopped", "error", err)
 		os.Exit(1)
 	}
+	<-shutdownDone
 }
 
 func env(key, fallback string) string {

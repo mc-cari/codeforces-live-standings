@@ -176,7 +176,7 @@ export default function ContestSetupPage() {
       <header className="border-b border-[#25364d] bg-[#07111f]/95">
         <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6">
           <Link className="font-broadcast text-xl font-bold uppercase tracking-[0.08em]" href="/">
-            CF <span className="text-[#65adff]">Live Desk</span>
+            CF <span className="text-[#65adff]">LIVE STANDINGS</span>
           </Link>
           <nav className="flex items-center gap-5 text-sm text-[#91a3ba]" aria-label="Primary navigation">
             <Link

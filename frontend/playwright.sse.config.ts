@@ -11,6 +11,6 @@ export default defineConfig({
     url: 'http://127.0.0.1:3001',
     reuseExistingServer: false,
     timeout: 120_000,
-    env: { NEXT_PUBLIC_TELEMETRY_ENABLED: 'true', NEXT_PUBLIC_LIVE_API_BASE_URL: 'http://127.0.0.1:3001' },
+    env: { NEXT_PUBLIC_LIVE_API_BASE_URL: 'http://127.0.0.1:3001' },
   },
 });

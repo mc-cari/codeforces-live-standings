@@ -32,7 +32,7 @@ export async function deliver(
 }
 
 export function track(event: TelemetryEvent): void {
-  if (process.env.NEXT_PUBLIC_TELEMETRY_ENABLED === 'true') void deliver(event);
+  void deliver(event);
 }
 
 export function pageMode(path: string): Mode | 'setup' | undefined {

@@ -17,13 +17,14 @@ Overload can drop usage events; delivery remains best effort.
 1. Generate a shared token with `openssl rand -hex 32`. Set `TELEMETRY_TOKEN` on
    both the Go service and the Next.js server. Never use a `NEXT_PUBLIC_` prefix
    for this token.
-2. Set Next.js `TELEMETRY_API_BASE_URL` to the reachable Go application URL, e.g.
-   `https://your-live-backend.example.com`. It is independent of the browser SSE
-   base URL and also works when live standings use browser polling. Keep the
+2. Set Next.js `NEXT_PUBLIC_LIVE_API_BASE_URL` to the reachable Go application
+   URL, e.g. `https://your-live-backend.example.com`. The telemetry proxy uses
+   this same URL server-side and forwards to `/v1/telemetry`; the browser still
+   sends events only to the same-origin `/api/telemetry` route. Keep the
    Cloudflare tunnel route at `http://live-backend:8080`.
-3. Set `NEXT_PUBLIC_TELEMETRY_ENABLED=true` for the production frontend build and
-   redeploy. Leave it false in preview and development environments. Collection
-   never blocks loading/navigation and makes at most three delivery attempts.
+3. Telemetry collection is on by default. Redeploy the frontend after configuring
+   the backend URL and shared token. Collection never blocks loading/navigation
+   and makes at most three delivery attempts.
 4. Set `ALLOY_NETWORK` to the existing Docker network containing Alloy
    (`grafanacloud_default` on the current host). Start:
 

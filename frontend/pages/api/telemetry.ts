@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     if (origin && new URL(origin).host !== req.headers.host) { res.status(403).end(); return; }
   } catch { res.status(403).end(); return; }
-  const base = process.env.TELEMETRY_API_BASE_URL;
+  const base = process.env.NEXT_PUBLIC_LIVE_API_BASE_URL;
   const token = process.env.TELEMETRY_TOKEN;
   if (!base || !token) { res.status(503).end(); return; }
   try {

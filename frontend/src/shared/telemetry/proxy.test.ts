@@ -17,7 +17,7 @@ const response = () => {
 };
 
 test('proxy authenticates server-side, rejects cross-origin requests, and fails without affecting pages', async () => {
-  const previousBase = process.env.TELEMETRY_API_BASE_URL;
+  const previousBase = process.env.NEXT_PUBLIC_LIVE_API_BASE_URL;
   const previousToken = process.env.TELEMETRY_TOKEN;
   let receivedToken = '';
   let receivedBody = '';
@@ -32,7 +32,7 @@ test('proxy authenticates server-side, rejects cross-origin requests, and fails 
   try {
     const address = upstream.address();
     assert.ok(address && typeof address === 'object');
-    process.env.TELEMETRY_API_BASE_URL = `http://127.0.0.1:${address.port}`;
+    process.env.NEXT_PUBLIC_LIVE_API_BASE_URL = `http://127.0.0.1:${address.port}`;
     process.env.TELEMETRY_TOKEN = 'server-only-token';
     const body = { id: 'proxy-event-0000001', kind: 'page_view', mode: 'setup' };
     const req = { method: 'POST', headers: { host: 'app.example', origin: 'https://app.example' }, body } as Request;
@@ -64,8 +64,8 @@ test('proxy authenticates server-side, rejects cross-origin requests, and fails 
     assert.equal(outage.result.code, 503);
   } finally {
     upstream.close();
-    if (previousBase === undefined) delete process.env.TELEMETRY_API_BASE_URL;
-    else process.env.TELEMETRY_API_BASE_URL = previousBase;
+    if (previousBase === undefined) delete process.env.NEXT_PUBLIC_LIVE_API_BASE_URL;
+    else process.env.NEXT_PUBLIC_LIVE_API_BASE_URL = previousBase;
     if (previousToken === undefined) delete process.env.TELEMETRY_TOKEN;
     else process.env.TELEMETRY_TOKEN = previousToken;
   }

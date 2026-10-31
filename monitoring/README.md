@@ -22,9 +22,9 @@ Overload can drop usage events; delivery remains best effort.
    this same URL server-side and forwards to `/v1/telemetry`; the browser still
    sends events only to the same-origin `/api/telemetry` route. Keep the
    Cloudflare tunnel route at `http://live-backend:8080`.
-3. Telemetry collection is on by default. Redeploy the frontend after configuring
-   the backend URL and shared token. Collection never blocks loading/navigation
-   and makes at most three delivery attempts.
+3. Redeploy the frontend after configuring the backend URL and shared token.
+   Collection never blocks loading/navigation and makes at most three delivery
+   attempts.
 4. Set `ALLOY_NETWORK` to the existing Docker network containing Alloy
    (`grafanacloud_default` on the current host). Start:
 
@@ -142,7 +142,7 @@ telemetry; browser-only polling does not contribute.
 ## Verification
 
 Run backend `go test -race ./...` and frontend `pnpm test`, `pnpm lint`, and
-`pnpm build`. The browser suite explicitly enables telemetry and mocks delivery.
+`pnpm build`. Browser tests mock requests to `/api/telemetry`.
 
 For an isolated Docker integration check:
 

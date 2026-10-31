@@ -1,0 +1,10 @@
+**/.git
+**/node_modules
+**/.next
+**/.gradle
+**/.kotlin
+**/build
+**/.env
+**/.env.*
+.live-data
+.live-v3-data

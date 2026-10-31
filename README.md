@@ -145,3 +145,11 @@ Optional production telemetry records page views, completed setups, displayed sc
 countdowns, and basic loading reliability. Lifetime usage totals are persisted in SQLite;
 Alloy scrapes a private metrics listener and forwards to your existing Grafana destination.
 See [deployment, dashboard import, and metric definitions](monitoring/README.md).
+
+## Alternative live-v3 backend
+
+The opt-in [Kotlin live-v3 backend](backend-live-v3/README.md) implements the same
+activation/SSE API with live-v3 ingestion and scoring, durable history, and friend
+filtering. The Go backend remains independent. See the
+[architecture diagram](docs/architecture/live-v3-architecture.png) and setup guide
+for the pinned fork, separate data volume, tests, and provider selection.

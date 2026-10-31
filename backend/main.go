@@ -40,12 +40,13 @@ func main() {
 	}
 	defer repository.Close()
 
+	metrics := telemetry.New(repository)
 	upstream := codeforces.NewClient(
 		strings.TrimRight(env("CF_API_BASE_URL", defaultCodeforces), "/")+"/",
 		codeforces.NewFreshConnectionHTTPClient(30*time.Second),
 		2100*time.Millisecond,
+		codeforces.WithRequestObserver(metrics),
 	)
-	metrics := telemetry.New(repository)
 	manager := application.NewManager(repository, upstream, application.Config{
 		PollInterval:              4200 * time.Millisecond,
 		RetentionPeriod:           retentionPeriod,

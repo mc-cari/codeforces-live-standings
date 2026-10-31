@@ -315,7 +315,7 @@ func TestLivePollTracksPartialUpstreamHistory(t *testing.T) {
 	}
 	defer store.Close()
 	metrics := telemetry.New(store)
-	manager := application.NewManager(store, codeforces.NewClient(upstream.URL+"/", upstream.Client(), 0), application.Config{
+	manager := application.NewManager(store, codeforces.NewClient(upstream.URL+"/", upstream.Client(), 0, codeforces.WithRequestObserver(metrics)), application.Config{
 		PollInterval: time.Millisecond, MaxActiveContests: 1, SubmissionHistoryObserver: metrics,
 	})
 	session, _, err := manager.Activate(context.Background(), 42)
@@ -338,6 +338,12 @@ func TestLivePollTracksPartialUpstreamHistory(t *testing.T) {
 			if !strings.Contains(res.Body.String(), "cf_codeforces_submission_omissions_total 1") {
 				t.Fatal(res.Body.String())
 			}
+			for _, method := range []string{"contest.status", "contest.standings"} {
+				prefix := fmt.Sprintf(`cf_codeforces_request_duration_seconds_count{method="%s",outcome="success"} `, method)
+				if !strings.Contains(res.Body.String(), prefix) || strings.Contains(res.Body.String(), prefix+"0\n") {
+					t.Fatalf("live call latency missing: %s", res.Body.String())
+				}
+			}
 			history, err := store.LoadSubmissions(42)
 			if err != nil {
 				t.Fatal(err)
@@ -351,5 +357,29 @@ func TestLivePollTracksPartialUpstreamHistory(t *testing.T) {
 			t.Fatalf("partial response not observed: %s", res.Body.String())
 		}
 		time.Sleep(time.Millisecond)
+	}
+}
+
+func TestCodeforcesLatencyMetricsBoundLabels(t *testing.T) {
+	metrics := telemetry.New(&blockingStore{})
+	metrics.ObserveCodeforcesRequest("contest.status", "success", 1500*time.Millisecond, 2*time.Second)
+	metrics.ObserveCodeforcesRequest("contest.status", "timeout", 30*time.Second, 0)
+	metrics.ObserveCodeforcesRequest("secret-url?contestId=42", "arbitrary error", time.Second, 0)
+	res := httptest.NewRecorder()
+	metrics.Handler().ServeHTTP(res, httptest.NewRequest("GET", "/metrics", nil))
+	for _, line := range []string{
+		`cf_codeforces_request_duration_seconds_count{method="contest.status",outcome="success"} 1`,
+		`cf_codeforces_request_duration_seconds_sum{method="contest.status",outcome="success"} 1.5`,
+		`cf_codeforces_request_duration_seconds_count{method="contest.status",outcome="timeout"} 1`,
+		`cf_codeforces_rate_limit_wait_duration_seconds_count{method="contest.status"} 2`,
+		`cf_codeforces_rate_limit_wait_duration_seconds_sum{method="contest.status"} 2`,
+		`cf_codeforces_request_duration_seconds_count{method="other",outcome="other"} 1`,
+	} {
+		if !strings.Contains(res.Body.String(), line) {
+			t.Fatalf("missing %s", line)
+		}
+	}
+	if strings.Contains(res.Body.String(), "secret-url") || strings.Contains(res.Body.String(), "arbitrary error") {
+		t.Fatal("unbounded labels exported")
 	}
 }

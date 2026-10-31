@@ -92,12 +92,16 @@ prometheus.remote_write "grafana_cloud" {{
                 'cf_codeforces_submission_responses_total{history="consistent"} 0',
                 'cf_codeforces_submission_responses_total{history="missing_known"} 0',
                 'cf_codeforces_submission_omissions_total 0',
+                'cf_codeforces_request_duration_seconds_count{method="contest.status",outcome="success"} 0',
+                'cf_codeforces_rate_limit_wait_duration_seconds_count{method="contest.status"} 0',
             ):
                 assert metric in exported.splitlines(), metric
             for metric in (
                 'cf_codeforces_submission_responses_total{job="cf-live-standings",history="consistent"}',
                 'cf_codeforces_submission_responses_total{job="cf-live-standings",history="missing_known"}',
                 'cf_codeforces_submission_omissions_total{job="cf-live-standings"}',
+                'cf_codeforces_request_duration_seconds_count{job="cf-live-standings",method="contest.status",outcome="success"}',
+                'cf_codeforces_rate_limit_wait_duration_seconds_count{job="cf-live-standings",method="contest.status"}',
             ):
                 eventually(lambda: any(row["value"][1] == "0" for row in query(metric)))
             expression = 'cf_usage_page_views_total{job="cf-live-standings",mode="live"}'

@@ -11,7 +11,7 @@
   "title": "CF Live Standings \u2014 Usage and reliability",
   "uid": "cf-live-usage",
   "schemaVersion": 39,
-  "version": 2,
+  "version": 3,
   "refresh": "15s",
   "tags": [
     "codeforces",
@@ -766,6 +766,186 @@
       "fieldConfig": {
         "defaults": {
           "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 21,
+      "title": "Codeforces API latency p50",
+      "type": "timeseries",
+      "description": "Go live backend HTTP call duration, including response download and JSON decoding. Includes all outcomes; excludes local rate-limit wait. No data until calls and enough scrapes exist.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum by (le, method) (rate(cf_codeforces_request_duration_seconds_bucket{job=\"cf-live-standings\"}[$__rate_interval])))",
+          "legendFormat": "{{method}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "title": "Codeforces API latency p95",
+      "type": "timeseries",
+      "description": "Go live backend HTTP call duration, including response download and JSON decoding. Includes all outcomes; excludes local rate-limit wait. No data until calls and enough scrapes exist.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 80,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, method) (rate(cf_codeforces_request_duration_seconds_bucket{job=\"cf-live-standings\"}[$__rate_interval])))",
+          "legendFormat": "{{method}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "title": "Codeforces API latency p99",
+      "type": "timeseries",
+      "description": "Go live backend HTTP call duration, including response download and JSON decoding. Includes all outcomes; excludes local rate-limit wait. No data until calls and enough scrapes exist.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.99, sum by (le, method) (rate(cf_codeforces_request_duration_seconds_bucket{job=\"cf-live-standings\"}[$__rate_interval])))",
+          "legendFormat": "{{method}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Codeforces API calls by outcome",
+      "type": "timeseries",
+      "description": "Started backend HTTP calls per second. Excludes calls canceled before HTTP dispatch; includes HTTP/API errors, decoding failures, transport errors, timeouts, and cancellations.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 88,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (method, outcome) (rate(cf_codeforces_request_duration_seconds_count{job=\"cf-live-standings\"}[$__rate_interval]))",
+          "legendFormat": "{{method}} {{outcome}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Codeforces local rate-limit wait p95",
+      "type": "timeseries",
+      "description": "Local request pacing and mutex wait before started HTTP calls. This time is excluded from the Codeforces API latency panels. Calls canceled before dispatch do not contribute.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 96,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (le, method) (rate(cf_codeforces_rate_limit_wait_duration_seconds_bucket{job=\"cf-live-standings\"}[$__rate_interval])))",
+          "legendFormat": "{{method}}",
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
         },
         "overrides": []
       },

@@ -66,6 +66,8 @@ There are no visitor identifiers, cookies, or browser-persisted event queues.
 | `cf_backend_requests_total` | Completed requests by bounded route/method/status, including errors; SSE counted on close | In memory |
 | `cf_backend_request_duration_seconds` | Request latency by bounded route/method, excluding SSE streams | In memory |
 | `cf_backend_sse_connections` | Currently connected SSE clients | In memory |
+| `cf_codeforces_request_duration_seconds` | Backend Codeforces HTTP call histogram by bounded `method` and `outcome`; includes download/decoding, excludes local pacing | In memory |
+| `cf_codeforces_rate_limit_wait_duration_seconds` | Local pacing/mutex wait before started backend calls, by `method` | In memory |
 | `cf_codeforces_submission_responses_total` | Successful backend `contest.status` responses by `history`: `consistent` or `missing_known`, compared with locally retained IDs | In memory |
 | `cf_codeforces_submission_omissions_total` | Number of known IDs absent from successful responses; repeated omissions count again | In memory |
 | `up{job="cf-live-standings"}` | Alloy can scrape the backend metrics listener | Alloy |
@@ -83,6 +85,27 @@ estimates, particularly across scrape gaps, restarts, or short windows. See the
 [Prometheus increase documentation](https://prometheus.io/docs/prometheus/latest/querying/functions/#increase).
 Availability measures the scrape listener, not end-to-end Codeforces reliability.
 Visitor tracking, funnels, infrastructure monitoring, and alerts are deferred.
+
+## Codeforces API latency
+
+The backend records calls to `contest.status` and `contest.standings` from HTTP
+dispatch through response download, decoding, and body close. Local pacing and
+mutex wait are recorded separately, so the intentional 2.1-second request spacing
+does not inflate upstream latency. Calls canceled while still waiting locally,
+and invalid requests that never reach dispatch, do not contribute to either
+histogram. These metrics cover the Go live backend, not the Next.js proxy or
+browser-direct Codeforces calls.
+
+The `outcome` values are `success`, `http_error`, `api_error`, `decode_error`,
+`transport_error`, `timeout`, and `canceled`. HTTP/API rejection, malformed
+responses, network failures and client deadlines all contribute observations.
+Only bounded method/outcome names become labels; request URLs, contest IDs,
+handles, and error text never do. Operational histograms reset on backend restart.
+
+Grafana provides p50/p95/p99 call latency by API method across all outcomes,
+call rate by method/outcome, and p95 local rate-limit wait. Quantiles require
+multiple scrapes; a seeded histogram with no requests may return NaN. The HTTP
+client timeout is currently 30 seconds, and buckets cover that range.
 
 ## Missing upstream submission history
 

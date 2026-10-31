@@ -60,7 +60,7 @@ export default function ReplayPage() {
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [speed, setSpeed] = useState(1);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const telemetryMode = contestId === '1735' && getQueryValue(demo) === 'true' ? 'demo' : 'replay';
@@ -140,7 +140,7 @@ export default function ReplayPage() {
             demoEvents[0]?.relativeTimeSeconds || 0,
           ));
           setSpeed(requestedSpeed);
-          setIsPlaying(getQueryValue(autoplay) === 'true');
+          setIsPlaying(getQueryValue(autoplay) !== 'false');
           setIsTruncated(false);
           markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing demo replay...');
           return;
@@ -197,7 +197,7 @@ export default function ReplayPage() {
           replayStart,
         ));
         setSpeed(requestedSpeed);
-        setIsPlaying(getQueryValue(autoplay) === 'true');
+        setIsPlaying(getQueryValue(autoplay) !== 'false');
         setFinalStandings(selectedStandings);
 
         if (users.length > 0) {

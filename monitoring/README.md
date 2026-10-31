@@ -24,7 +24,8 @@ Overload can drop usage events; delivery remains best effort.
 3. Set `NEXT_PUBLIC_TELEMETRY_ENABLED=true` for the production frontend build and
    redeploy. Leave it false in preview and development environments. Collection
    never blocks loading/navigation and makes at most three delivery attempts.
-4. Set `ALLOY_NETWORK` to the existing Docker network containing Alloy. Start:
+4. Set `ALLOY_NETWORK` to the existing Docker network containing Alloy
+   (`grafanacloud_default` on the current host). Start:
 
    ```sh
    docker compose -f docker-compose.live.yml -f docker-compose.metrics.yml up -d --build
@@ -36,10 +37,11 @@ Overload can drop usage events; delivery remains best effort.
    listener. Direct runs default to `127.0.0.1:9090`; standalone containers
    must set `METRICS_LISTEN_ADDR=:9090` for network scraping. Only attach trusted
    services to the Alloy network.
-5. Append [usage.alloy](usage.alloy) to the existing Alloy configuration. Replace
-   `prometheus.remote_write.existing.receiver` with your existing metrics
-   receiver, validate the complete configuration with `alloy validate`, then
-   reload Alloy. The job is `cf-live-standings` and the scrape interval is 15s.
+5. Append [usage.alloy](usage.alloy) to the existing Alloy configuration at
+   `/home/mc_cari/Projects/GrafanaCloud/config.alloy`, validate the complete
+   configuration with `alloy validate`, then reload Alloy. It forwards to the
+   existing `prometheus.remote_write.grafana_cloud` receiver. The job is
+   `cf-live-standings` and the scrape interval is 15s.
    No separate Prometheus server is required. See the official
    [prometheus.scrape reference](https://grafana.com/docs/alloy/latest/reference/components/prometheus/prometheus.scrape/).
 6. Import [usage-dashboard.json](usage-dashboard.json) into Grafana and choose the

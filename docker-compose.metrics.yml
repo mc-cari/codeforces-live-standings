@@ -9,4 +9,4 @@ services:
 networks:
   alloy:
     external: true
-    name: ${ALLOY_NETWORK:-monitoring}
+    name: ${ALLOY_NETWORK:-grafanacloud_default}

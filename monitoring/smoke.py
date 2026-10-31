@@ -51,9 +51,10 @@ def main():
             config = pathlib.Path(directory)
             config.chmod(0o755)
             (config / "prometheus.yml").write_text("global:\n  scrape_interval: 15s\nscrape_configs: []\n")
-            # Exercise the exact committed scrape component with a test receiver.
+            # Exercise the exact committed scrape component with a test receiver
+            # using the same component label as the production Alloy config.
             (config / "config.alloy").write_text((root / "usage.alloy").read_text() + f'''
-prometheus.remote_write "existing" {{
+prometheus.remote_write "grafana_cloud" {{
   endpoint {{ url = "http://{receiver}:9090/api/v1/write" }}
 }}
 ''')

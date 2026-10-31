@@ -67,7 +67,7 @@ func TestUsageDurabilityAndConcurrentDeduplication(t *testing.T) {
 	if err != nil || inserted {
 		t.Fatalf("duplicate after reopen: %v %v", inserted, err)
 	}
-	if err := repository.CleanupReceipts(now.Add(-24 * time.Hour)); err != nil {
+	if err := repository.CleanupReceipts(context.Background(), now.Add(-24*time.Hour)); err != nil {
 		t.Fatal(err)
 	}
 	var count int64
@@ -75,7 +75,7 @@ func TestUsageDurabilityAndConcurrentDeduplication(t *testing.T) {
 	if count != 16 {
 		t.Fatalf("fresh receipts: %d", count)
 	}
-	if err := repository.CleanupReceipts(now.Add(time.Second)); err != nil {
+	if err := repository.CleanupReceipts(context.Background(), now.Add(time.Second)); err != nil {
 		t.Fatal(err)
 	}
 	repository.database.Model(&eventReceipt{}).Count(&count)

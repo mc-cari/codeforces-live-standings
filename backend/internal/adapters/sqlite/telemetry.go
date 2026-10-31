@@ -9,6 +9,9 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+const receiptCleanupBatchSize = 500
+const receiptCleanupBatchTimeout = 2 * time.Second
+
 type usageTotal struct {
 	Kind  string `gorm:"primaryKey"`
 	Mode  string `gorm:"primaryKey"`
@@ -59,6 +62,25 @@ func (repository *Repository) UsageTotals(ctx context.Context) ([]telemetry.Tota
 	return totals, nil
 }
 
-func (repository *Repository) CleanupReceipts(before time.Time) error {
-	return repository.database.Where("received_at < ?", before.Unix()).Delete(&eventReceipt{}).Error
+func (repository *Repository) CleanupReceipts(ctx context.Context, before time.Time) error {
+	for {
+		batchCtx, cancel := context.WithTimeout(ctx, receiptCleanupBatchTimeout)
+		var ids []string
+		err := repository.database.WithContext(batchCtx).Model(&eventReceipt{}).
+			Where("received_at < ?", before.Unix()).Order("received_at").Limit(receiptCleanupBatchSize).
+			Pluck("id", &ids).Error
+		if err == nil && len(ids) > 0 {
+			err = repository.database.WithContext(batchCtx).Where("id IN ?", ids).Delete(&eventReceipt{}).Error
+		}
+		cancel()
+		if err != nil {
+			return err
+		}
+		if len(ids) == 0 {
+			return nil
+		}
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+	}
 }

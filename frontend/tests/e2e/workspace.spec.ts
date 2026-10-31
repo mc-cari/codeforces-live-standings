@@ -213,13 +213,13 @@ for (const phase of ['CODING', 'FINISHED']) {
     await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
     expect(events.filter((event) => event.kind === 'setup_completed').map((event) => event.mode))
       .toEqual([phase === 'FINISHED' ? 'replay' : 'live']);
-    expect(events.filter((event) => event.kind === 'page_view')).toHaveLength(2);
+    await expect.poll(() => events.filter((event) => event.kind === 'page_view').length).toBe(2);
     await page.reload();
     await expect(page.getByTestId('contest-ribbon')).toBeVisible();
     await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(2);
     expect(events.filter((event) => event.kind === 'setup_completed').map((event) => event.mode))
       .toEqual([phase === 'FINISHED' ? 'replay' : 'live']);
-    expect(events.filter((event) => event.kind === 'page_view')).toHaveLength(3);
+    await expect.poll(() => events.filter((event) => event.kind === 'page_view').length).toBe(3);
     expect(JSON.stringify(events)).not.toContain('Tourist');
     expect(JSON.stringify(events.map((event) => ({ ...event, id: undefined })))).not.toContain('1735');
   });
@@ -232,6 +232,7 @@ test('demo link counts a demo view and controls do not add views', async ({ page
   await page.getByRole('link', { name: 'Replay demo', exact: true }).click();
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();
   await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
+  await expect.poll(() => events.filter((event) => event.kind === 'page_view').length).toBe(2);
   const pause = page.getByRole('button', { name: 'Pause', exact: true });
   await pause.click();
   await page.getByRole('button', { name: 'Play', exact: true }).click();

@@ -69,7 +69,7 @@ func main() {
 	}()
 	go func() {
 		cleanup := func() {
-			if err := repository.CleanupReceipts(time.Now().Add(-24 * time.Hour)); err != nil {
+			if err := repository.CleanupReceipts(ctx, time.Now().Add(-24*time.Hour)); err != nil {
 				slog.Error("telemetry receipt cleanup failed", "error", err)
 			}
 		}

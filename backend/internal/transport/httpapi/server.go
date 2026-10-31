@@ -11,18 +11,22 @@ import (
 	"time"
 
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
 )
 
 type Config struct {
+	Metrics        *telemetry.Metrics
+	TelemetryToken string
 	AllowedOrigin  string
 	AllowedOrigins []string
-	MaxHandles    int
+	MaxHandles     int
 }
 
 type Server struct {
-	manager       *application.Manager
+	metrics        *telemetry.Metrics
+	manager        *application.Manager
 	allowedOrigins []string
-	maxHandles    int
+	maxHandles     int
 }
 
 func NewServer(manager *application.Manager, config Config) http.Handler {
@@ -33,11 +37,15 @@ func NewServer(manager *application.Manager, config Config) http.Handler {
 	if len(allowedOrigins) == 0 && config.AllowedOrigin != "" {
 		allowedOrigins = []string{config.AllowedOrigin}
 	}
-	server := &Server{manager: manager, allowedOrigins: allowedOrigins, maxHandles: config.MaxHandles}
+	server := &Server{metrics: config.Metrics, manager: manager, allowedOrigins: allowedOrigins, maxHandles: config.MaxHandles}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", server.health)
 	mux.HandleFunc("/readyz", server.ready)
 	mux.HandleFunc("/v1/contests/", server.contest)
+	if config.Metrics != nil {
+		mux.HandleFunc("/v1/telemetry", config.Metrics.Ingest(config.TelemetryToken))
+		return config.Metrics.Instrument(server.cors(mux))
+	}
 	return server.cors(mux)
 }
 
@@ -160,6 +168,10 @@ func (server *Server) events(w http.ResponseWriter, r *http.Request, id int) {
 	if !ok {
 		http.Error(w, "streaming unsupported", http.StatusInternalServerError)
 		return
+	}
+	if server.metrics != nil {
+		server.metrics.SSE.Inc()
+		defer server.metrics.SSE.Dec()
 	}
 	heartbeat := time.NewTicker(15 * time.Second)
 	defer heartbeat.Stop()

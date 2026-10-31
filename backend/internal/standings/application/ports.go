@@ -25,3 +25,9 @@ type ContestGateway interface {
 	FetchSubmissions(context.Context, int) ([]domain.Submission, error)
 	FetchStandings(context.Context, int) (domain.Standings, error)
 }
+
+// SubmissionHistoryObserver records successful upstream responses compared with
+// submissions already retained locally. It receives no contest or participant IDs.
+type SubmissionHistoryObserver interface {
+	ObserveSubmissionHistory(missing int)
+}

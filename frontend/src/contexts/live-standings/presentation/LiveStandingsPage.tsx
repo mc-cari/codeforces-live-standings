@@ -1,3 +1,4 @@
+import { useViewTelemetry } from '@/src/shared/telemetry/useViewTelemetry';
 import { useMemo } from 'react';
 import type { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
@@ -28,7 +29,10 @@ export default function LiveStandingsPage() {
     setContestInfo: contest.setContestInfo,
   });
 
-  if (contest.contestInfo?.phase === 'BEFORE' && !contest.isContestReady) {
+  const waiting = contest.contestInfo?.phase === 'BEFORE' && !contest.isContestReady;
+  useViewTelemetry('live', waiting, !waiting && !feed.isLoading && Boolean(feed.globalStandings));
+
+  if (waiting && contest.contestInfo) {
     return (
       <ContestCountdown
         contest={contest.contestInfo}

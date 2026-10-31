@@ -1,3 +1,4 @@
+import { track } from '@/src/shared/telemetry/telemetry';
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import type { Contest } from '@/src/shared/domain/contest';
 import { codeforcesLiveContestGateway } from '../infrastructure/codeforcesLiveContestGateway';
@@ -35,6 +36,7 @@ export const useContestDetails = (
         setContestError(undefined);
       } catch (error) {
         if (!controller.signal.aborted) {
+          track({ kind: 'loading_failed', mode: 'live' });
           setContestError(error instanceof Error ? error.message : 'Unable to load contest');
         }
       }

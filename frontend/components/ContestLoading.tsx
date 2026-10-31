@@ -7,7 +7,7 @@ export default function ContestLoading({ progress, stage }: { progress: number, 
         <header className="flex items-center justify-between border-b border-[#25364d] bg-[#081525] px-5 py-4">
           <div>
             <p className="broadcast-label">Contest feed</p>
-            <h1 className="font-broadcast text-2xl font-semibold uppercase">Opening live desk</h1>
+            <h1 className="font-broadcast text-2xl font-semibold uppercase">Opening live standings</h1>
           </div>
           <span className="h-2.5 w-2.5 motion-safe:animate-pulse rounded-full bg-[#2d8cff]" />
         </header>

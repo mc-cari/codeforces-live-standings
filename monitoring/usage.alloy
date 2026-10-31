@@ -1,0 +1,9 @@
+// Append to /home/mc_cari/Projects/GrafanaCloud/config.alloy.
+prometheus.scrape "cf_live_standings" {
+  targets = [{
+    __address__ = "cf-live-standings-metrics:9090",
+    job = "cf-live-standings",
+  }]
+  scrape_interval = "15s"
+  forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+}

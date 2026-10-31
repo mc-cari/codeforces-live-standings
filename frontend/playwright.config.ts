@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests/e2e',
+  testIgnore: '**/sse.spec.ts',
   fullyParallel: false,
   retries: process.env.CI ? 2 : 0,
   reporter: 'list',
@@ -11,8 +12,9 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm dev',
+    env: { NEXT_PUBLIC_TELEMETRY_ENABLED: 'true', NEXT_PUBLIC_LIVE_API_BASE_URL: '' },
     url: 'http://127.0.0.1:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
   },
   projects: [

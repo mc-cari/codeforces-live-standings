@@ -16,6 +16,6 @@ RUN mkdir -p /data && chown live:live /data
 COPY --from=build /out/live-backend /usr/local/bin/live-backend
 USER live
 VOLUME ["/data"]
-EXPOSE 8080
+EXPOSE 8080 9090
 ENV DATA_DIR=/data LISTEN_ADDR=:8080
 ENTRYPOINT ["/usr/local/bin/live-backend"]

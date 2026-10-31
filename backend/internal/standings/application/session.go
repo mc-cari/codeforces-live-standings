@@ -48,9 +48,11 @@ type Subscription struct {
 }
 
 type Session struct {
-	repository   Repository
-	gateway      ContestGateway
-	pollInterval time.Duration
+	historyObserver   SubmissionHistoryObserver
+	historyIncomplete bool
+	repository        Repository
+	gateway           ContestGateway
+	pollInterval      time.Duration
 
 	mu            sync.RWMutex
 	contest       domain.Contest
@@ -67,8 +69,8 @@ type Session struct {
 	stopOnce      sync.Once
 }
 
-func newSession(repository Repository, gateway ContestGateway, pollInterval time.Duration, contest domain.Contest, standings *domain.Standings, revision int64, stored map[int]domain.Submission) *Session {
-	return &Session{repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
+func newSession(repository Repository, gateway ContestGateway, pollInterval time.Duration, contest domain.Contest, standings *domain.Standings, revision int64, stored map[int]domain.Submission, observer SubmissionHistoryObserver) *Session {
+	return &Session{historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
 }
 
 func (session *Session) Contest() domain.Contest {
@@ -180,6 +182,7 @@ func (session *Session) poll(ctx context.Context) bool {
 	status, statusErr := session.gateway.FetchSubmissions(ctx, contestID)
 	changed := make([]domain.Submission, 0)
 	if statusErr == nil {
+		session.observeSubmissionHistory(status)
 		if count, err := session.repository.SaveSubmissions(contestID, status); err != nil {
 			statusErr = err
 		} else {
@@ -245,6 +248,34 @@ func (session *Session) poll(ctx context.Context) bool {
 		return false
 	}
 	return true
+}
+
+// observeSubmissionHistory compares IDs before merging the latest response.
+// Counts alone cannot detect an older submission replaced by a newly arriving one.
+func (session *Session) observeSubmissionHistory(status []domain.Submission) {
+	returned := make(map[int]struct{}, len(status))
+	for _, submission := range status {
+		returned[submission.ID] = struct{}{}
+	}
+	missing := 0
+	session.mu.RLock()
+	retained := len(session.submissions)
+	contestID := session.contest.ID
+	for id := range session.submissions {
+		if _, ok := returned[id]; !ok {
+			missing++
+		}
+	}
+	session.mu.RUnlock()
+	if session.historyObserver != nil {
+		session.historyObserver.ObserveSubmissionHistory(missing)
+	}
+	if missing > 0 && !session.historyIncomplete {
+		slog.Warn("Codeforces submission history incomplete", "contest", contestID, "missing", missing, "returned", len(returned), "retained", retained)
+	} else if missing == 0 && session.historyIncomplete {
+		slog.Info("Codeforces submission history recovered", "contest", contestID, "returned", len(returned), "retained", retained)
+	}
+	session.historyIncomplete = missing > 0
 }
 
 func (session *Session) broadcast(upserts []domain.Submission) {

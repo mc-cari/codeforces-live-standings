@@ -41,7 +41,7 @@ export default function LiveStandingsWorkspace({
     : isPaused ? 'Synchronizing' : 'Connected';
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#07111f] text-white">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#07111f] text-white">
       <ContestRibbon
         contest={contest || globalStandings?.contest}
         contestId={contestId}
@@ -68,10 +68,10 @@ export default function LiveStandingsWorkspace({
           </button>
         ))}
       </div>
-      <div className="flex min-h-0 grow">
+      <div className="flex min-h-0 flex-1">
         <section
           aria-label="Live submissions"
-          className={`${mobilePanel === 'submissions' ? 'flex' : 'hidden'} h-[calc(100vh-113px)] w-full p-2 lg:flex lg:h-[calc(100vh-64px)] lg:w-2/5 lg:p-3`}
+          className={`${mobilePanel === 'submissions' ? 'flex' : 'hidden'} h-full min-h-0 w-full p-2 lg:flex lg:w-2/5 lg:p-3`}
         >
           <div className="broadcast-panel w-full overflow-hidden rounded-sm">
             <LiveSubmissionsList
@@ -85,7 +85,7 @@ export default function LiveStandingsWorkspace({
         {(localStandings && globalStandings) ? (
           <section
             aria-label="Current standings"
-            className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-[calc(100vh-113px)] w-full p-2 lg:block lg:h-[calc(100vh-64px)] lg:w-3/5 lg:p-3`}
+            className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-full min-h-0 w-full p-2 lg:block lg:w-3/5 lg:p-3`}
           >
             <div className="broadcast-panel h-full w-full overflow-hidden rounded-sm">
               <StandingsList
@@ -97,7 +97,7 @@ export default function LiveStandingsWorkspace({
             </div>
           </section>
         ) : (
-          <div className="h-[calc(100vh-64px)] w-full p-3 lg:w-3/5">
+          <div className="h-full min-h-0 w-full p-3 lg:w-3/5">
             <div className="flex h-full items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 shadow-xl">
               <div className="text-center">
                 <div className="mb-4 inline-block h-16 w-16 animate-spin rounded-full border-b-2 border-t-2 border-blue-500" />

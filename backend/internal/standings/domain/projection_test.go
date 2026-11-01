@@ -2,6 +2,17 @@ package domain
 
 import "testing"
 
+func TestProjectionRetainsFullSelectedHistory(t *testing.T) {
+	all := make(map[int]Submission)
+	for id := 1; id <= 10001; id++ {
+		all[id] = Submission{ID: id, Author: Party{Members: []Member{{Handle: "alpha"}}}}
+	}
+	_, submissions := Project(Contest{ID: 1}, nil, all, NewHandleSet([]string{"alpha"}))
+	if len(submissions) != 10001 {
+		t.Fatalf("history was truncated: got %d submissions", len(submissions))
+	}
+}
+
 func TestProjectionFiltersAnyTeamMember(t *testing.T) {
 	contest := Contest{ID: 1}
 	standings := &Standings{Contest: contest}

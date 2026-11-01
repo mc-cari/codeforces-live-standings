@@ -1,3 +1,6 @@
+import { parseFreeze } from '@/src/shared/freeze/projection';
+import { formatFreezeTime } from '@/src/shared/freeze/FreezeControls';
+import ShareSetupButton from '@/src/shared/presentation/ShareSetupButton';
 import { completeSetup } from '@/src/shared/telemetry/telemetry';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -30,8 +33,11 @@ const formatContestStart = (contest: Contest) => new Intl.DateTimeFormat(undefin
 
 export default function ContestSetupPage() {
   const router = useRouter();
+  const [freezeEnabled, setFreezeEnabled] = useState(false);
+  const [freezeMinutes, setFreezeMinutes] = useState('60');
   const [contestIdInput, setContestIdInput] = useState('');
   const [contestInfo, setContestInfo] = useState<Contest>();
+  const freeze = parseFreeze(freezeEnabled ? freezeMinutes : undefined, undefined, contestInfo?.durationSeconds || 0);
   const [lookupState, setLookupState] = useState<LookupState>('idle');
   const [lookupError, setLookupError] = useState('');
   const [upcomingContests, setUpcomingContests] = useState<Contest[]>([]);
@@ -163,12 +169,14 @@ export default function ContestSetupPage() {
     }
   };
 
+  const canLaunch = Boolean(contestInfo && configuration?.contestType && handles.length > 0 && !freeze.warning);
+  const setupHref = contestInfo && configuration?.contestType
+    ? `/contests/${contestInfo.id}/${configuration.route}?${new URLSearchParams({
+      contestType: configuration.contestType, h: encodeHandles(handles), ...(freezeEnabled ? { freezeMinutes } : {}),
+    })}` : undefined;
   const launch = () => {
-    if (!contestInfo || !configuration?.contestType || handles.length === 0) return;
-    void completeSetup(router.push({
-      pathname: `/contests/${contestInfo.id}/${configuration.route}`,
-      query: { contestType: configuration.contestType, h: encodeHandles(handles) },
-    }), configuration.route === 'replay' ? 'replay' : 'live');
+    if (!canLaunch || !setupHref || !configuration) return;
+    void completeSetup(router.push(setupHref), configuration.route === 'replay' ? 'replay' : 'live');
   };
 
   return (
@@ -317,10 +325,26 @@ export default function ContestSetupPage() {
                 <div className="mt-6">
                   <p className="broadcast-label">03 / Track</p>
                   <h3 className="text-2xl font-semibold uppercase font-broadcast">Launch</h3>
+                  <div className="my-4 border-y border-[#25364d] py-4">
+                    <label className="flex min-h-11 items-center gap-3 text-sm font-semibold">
+                      <input type="checkbox" className="h-4 w-4 accent-[#f3b83f]" checked={freezeEnabled} onChange={(event) => setFreezeEnabled(event.target.checked)} />
+                      Freeze standings
+                    </label>
+                    {freezeEnabled && <>
+                      <label className="flex flex-wrap items-center gap-2 text-sm" htmlFor="freeze-minutes">
+                        Freeze the last
+                        <input id="freeze-minutes" aria-label="Freeze minutes" aria-describedby="freeze-help" aria-invalid={Boolean(freeze.warning)} className="broadcast-input w-20 px-2 font-data" type="number" min="1" step="1" value={freezeMinutes} onChange={(event) => setFreezeMinutes(event.target.value)} />
+                        minutes
+                      </label>
+                      <p id="freeze-help" className="mt-2 text-sm text-[#ffe8a3]">{freeze.warning ? 'Enter whole minutes greater than zero and shorter than the contest.' : `Freezes at ${formatFreezeTime(freeze.cutoff!)} from contest start.`}</p>
+                      <p className="mt-2 text-xs text-[#91a3ba]">Viewer presentation only. Source results remain available on Codeforces and in the browser.</p>
+                    </>}
+                  </div>
                   {configuration?.unsupportedReason && <p className="mb-2 text-sm text-[#f3b83f]">{configuration.unsupportedReason}</p>}
-                  <button className="w-full px-5 py-3 mt-2 rounded-sm broadcast-button" disabled={!configuration?.contestType || handles.length === 0} onClick={launch} type="button">
+                  <button className="w-full px-5 py-3 mt-2 rounded-sm broadcast-button" disabled={!configuration?.contestType || handles.length === 0 || Boolean(freeze.warning)} onClick={launch} type="button">
                     {configuration?.actionLabel || 'Choose a contest'}
                   </button>
+                  <div className="mt-3"><ShareSetupButton href={setupHref} disabled={!canLaunch} /></div>
                 </div>
               </div>
             )}

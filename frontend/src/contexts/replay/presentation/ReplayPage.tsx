@@ -1,3 +1,6 @@
+import { useFreeze } from '@/src/shared/freeze/useFreeze';
+import FreezeControls from '@/src/shared/freeze/FreezeControls';
+import ShareSetupButton from '@/src/shared/presentation/ShareSetupButton';
 import { track } from '@/src/shared/telemetry/telemetry';
 import { useViewTelemetry } from '@/src/shared/telemetry/useViewTelemetry';
 import React, {
@@ -53,7 +56,8 @@ export default function ReplayPage() {
   const {
     contestId, contestType, handles, h, startMinute, startTime, playbackSpeed, autoplay, demo,
   } = router.query;
-  const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
+  const selectedHandlesKey = JSON.stringify(getHandlesFromQuery(handles, h));
+  const userHandles = useMemo<string[]>(() => JSON.parse(selectedHandlesKey), [selectedHandlesKey]);
   const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
   const [finalStandings, setFinalStandings] = useState<ReplayStandings>();
   const [events, setEvents] = useState<ReplaySubmission[]>([]);
@@ -65,7 +69,6 @@ export default function ReplayPage() {
   const [isLoading, setIsLoading] = useState(true);
   const telemetryMode = contestId === '1735' && getQueryValue(demo) === 'true' ? 'demo' : 'replay';
   useViewTelemetry(telemetryMode, false, !isLoading && !error && Boolean(finalStandings));
-  const [isTruncated, setIsTruncated] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(LOADING_PROGRESS.initial);
   const [loadingStage, setLoadingStage] = useState('Preparing replay...');
   const previousTick = useRef<number | undefined>(undefined);
@@ -74,6 +77,7 @@ export default function ReplayPage() {
   const previousJudgingTick = useRef<number | undefined>(undefined);
   const [testingSubmissions, setTestingSubmissions] = useState<Map<number, number>>(new Map());
   const testingSubmissionsRef = useRef<Map<number, number>>(new Map());
+  const [seekVersion, setSeekVersion] = useState(0);
   const [mobilePanel, setMobilePanel] = useState<'standings' | 'submissions'>('standings');
   const clearJudging = useCallback(() => {
     judgingJobs.current.clear();
@@ -141,7 +145,6 @@ export default function ReplayPage() {
           ));
           setSpeed(requestedSpeed);
           setIsPlaying(getQueryValue(autoplay) !== 'false');
-          setIsTruncated(false);
           markLoaded(LOADING_PROGRESS.submissionsLoaded, 'Preparing demo replay...');
           return;
         }
@@ -187,10 +190,8 @@ export default function ReplayPage() {
           replayEvents,
           getName,
         );
-        setIsTruncated(replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY);
-        setEvents(replayEvents.slice(-MAX_SUBMISSIONS_IN_MEMORY));
-        const replayStart = replayEvents.length > MAX_SUBMISSIONS_IN_MEMORY
-          ? replayEvents[replayEvents.length - MAX_SUBMISSIONS_IN_MEMORY].relativeTimeSeconds : 0;
+        setEvents(replayEvents);
+        const replayStart = 0;
         setElapsedSeconds(getStartTime(
           getQueryValue(startTime) || getQueryValue(startMinute),
           selectedStandings.contest.durationSeconds,
@@ -315,16 +316,20 @@ export default function ReplayPage() {
     return () => window.clearInterval(timer);
   }, [isPlaying, speed, testingSubmissions.size]);
 
-  const replayStart = events[0]?.relativeTimeSeconds || 0;
+  const replayStart = 0;
   const availableSpeeds = REPLAY_SPEED_OPTIONS.includes(speed)
     ? REPLAY_SPEED_OPTIONS : [...REPLAY_SPEED_OPTIONS, speed].sort((first, second) => first - second);
   const settledEvents = useMemo(() => (
     events.filter((event) => !testingSubmissions.has(event.id))
   ), [events, testingSubmissions]);
-  const snapshot = useMemo(() => (
+  const replaySnapshot = useMemo(() => (
     finalStandings ? buildReplaySnapshot(finalStandings, settledEvents, elapsedSeconds) : undefined
   ), [elapsedSeconds, finalStandings, settledEvents]);
+  const freeze = useFreeze(finalStandings, events, elapsedSeconds,
+    Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds), 'replay', String(seekVersion));
+  const snapshot = freeze.cutoff !== undefined ? freeze.projection : replaySnapshot;
   const cinematicSubmissions = useMemo(() => {
+    if (freeze.cutoff !== undefined) return snapshot?.submissions || [];
     if (!snapshot) return [];
     const testingRows = events.filter((event) => testingSubmissions.has(event.id)).map((submission) => ({
       ...submission,
@@ -339,7 +344,7 @@ export default function ReplayPage() {
     return [...testingRows, ...snapshot.submissions]
       .sort((first, second) => second.id - first.id)
       .slice(0, MAX_SUBMISSIONS_IN_MEMORY);
-  }, [events, snapshot, testingSubmissions]);
+  }, [events, snapshot, testingSubmissions, freeze.cutoff]);
 
   if (isLoading) {
     return <ContestLoading progress={loadingProgress} stage={loadingStage} />;
@@ -353,14 +358,22 @@ export default function ReplayPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#07111f] text-white">
+    <div className="flex h-screen overflow-hidden flex-col bg-[#07111f] text-white">
       <ContestRibbon
         clock={formatElapsedTime(elapsedSeconds)}
         contest={finalStandings.contest}
         contestId={String(contestId || '')}
         mode="REPLAY"
         statusTone={isPlaying ? 'live' : 'paused'}
+        controls={<ShareSetupButton getUrl={() => {
+          const url = new URL(window.location.href);
+          url.searchParams.set('startTime', String(elapsedSeconds / 60));
+          url.searchParams.set('playbackSpeed', String(speed));
+          url.searchParams.set('autoplay', String(isPlaying));
+          return url.href;
+        }} />}
       />
+      <FreezeControls freeze={freeze} />
       <div className="border-b border-[#25364d] bg-[#0d1b2a] px-3 py-2">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-center gap-3">
           <span className="font-data text-sm text-[#91a3ba]">
@@ -372,6 +385,7 @@ export default function ReplayPage() {
             max={finalStandings.contest.durationSeconds}
             min={replayStart}
             onChange={(event) => {
+              setSeekVersion((version) => version + 1);
               setIsPlaying(false);
               clearJudging();
               setElapsedSeconds(Number(event.target.value));
@@ -399,17 +413,16 @@ export default function ReplayPage() {
             </button>
             <button
               className="rounded-sm border border-[#25364d] bg-[#13243a] px-3 py-2 text-sm font-semibold hover:bg-[#1b304a]"
-              onClick={() => { setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart); }}
+              onClick={() => {
+                setSeekVersion((version) => version + 1);
+                setIsPlaying(false); clearJudging(); setElapsedSeconds(replayStart);
+              }}
               type="button"
             >
               Restart
             </button>
           </div>
-          {isTruncated && (
-            <span className="text-sm text-[#f3b83f]">
-              Latest {MAX_SUBMISSIONS_IN_MEMORY.toLocaleString()} events retained
-            </span>
-          )}
+
       </div>
       </div>
       <div className="grid grid-cols-2 border-b border-[#25364d] bg-[#0d1b2a] lg:hidden" role="tablist">
@@ -426,8 +439,8 @@ export default function ReplayPage() {
           </button>
         ))}
       </div>
-      <div className="flex min-h-0 grow">
-        <section className={`${mobilePanel === 'submissions' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-2/5 lg:p-3`} aria-label="Replay submissions">
+      <div className="flex min-h-0 flex-1">
+        <section className={`${mobilePanel === 'submissions' ? 'block' : 'hidden'} h-full min-h-0 w-full p-2 lg:block lg:w-2/5 lg:p-3`} aria-label="Replay submissions">
           <div className="h-full overflow-hidden rounded-sm broadcast-panel">
             <LiveSubmissionsList
               submissions={cinematicSubmissions as unknown as Submission[]}
@@ -437,9 +450,11 @@ export default function ReplayPage() {
             />
           </div>
         </section>
-        <section className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-[calc(100vh-153px)] w-full p-2 lg:block lg:h-[calc(100vh-105px)] lg:w-3/5 lg:p-3`} aria-label="Replay standings">
+        <section className={`${mobilePanel === 'standings' ? 'block' : 'hidden'} h-full min-h-0 w-full p-2 lg:block lg:w-3/5 lg:p-3`} aria-label="Replay standings">
           <div className="h-full overflow-hidden rounded-sm broadcast-panel">
             <StandingsList
+              pending={freeze.projection?.pending}
+              focused={freeze.focused}
               contestType={contestType as string}
               globalStandings={snapshot.standings as unknown as Standings}
               localStandings={snapshot.localStandings}

@@ -83,9 +83,6 @@ func decorateSubmissions(all map[int]Submission, handles HandleSet, standings St
 		}
 		return result[i].ID > result[j].ID
 	})
-	if len(result) > 10000 {
-		result = result[:10000]
-	}
 	return result
 }
 

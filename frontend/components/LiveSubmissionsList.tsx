@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Standings, Submission } from '@/src/shared/domain/contest';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import LiveSubmission from './LiveSubmission';
 
 export default function LiveSubmissionsList({
@@ -9,6 +9,7 @@ export default function LiveSubmissionsList({
 { submissions : Submission[], newSubmissionsCount : number,
   globalStandings : Standings | undefined,
   userRank : Map<string, string> }) {
+  const reduced = useReducedMotion();
   return (
     <div className="flex flex-col h-full w-full">
       <div
@@ -23,11 +24,11 @@ export default function LiveSubmissionsList({
         <AnimatePresence initial={false}>
           {submissions.map((submission : Submission, index : number) => (
             <motion.div
-              layout="position"
-              initial={{ opacity: 0, y: 32 }}
+              layout={reduced ? false : "position"}
+              initial={reduced ? false : { opacity: 0, y: 32 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.36, ease: 'easeOut' }}
+              transition={{ duration: reduced ? 0 : 0.36, ease: 'easeOut' }}
               className="h-8"
             key={submission.id}
             >

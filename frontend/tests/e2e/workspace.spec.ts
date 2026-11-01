@@ -171,7 +171,7 @@ test('mini contest preview has no inline controls', async ({ page }) => {
   await expect(preview.getByRole('button')).toHaveCount(0);
   await expect(preview.getByRole('link', { name: 'Full replay' })).toHaveCount(0);
 
-  await page.goto('/contests/1735/replay?contestType=normal&demo=true&h=VG91cmlzdA');
+  await page.goto('/contests/1735/replay?contestType=normal&demo=true&autoplay=false&h=VG91cmlzdA');
   await expect(page.getByTestId('contest-ribbon')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible();
 });

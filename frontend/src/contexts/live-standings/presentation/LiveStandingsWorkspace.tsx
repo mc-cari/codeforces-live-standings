@@ -1,4 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useFreeze } from '@/src/shared/freeze/useFreeze';
+import FreezeControls from '@/src/shared/freeze/FreezeControls';
+import { MAX_SUBMISSIONS_IN_MEMORY } from '@/src/shared/config/contestTiming';
 import StandingsList from '@/components/standings/StandingsList';
 import LiveSubmissionsList from '@/components/LiveSubmissionsList';
 import ContestRibbon from '@/src/shared/presentation/ContestRibbon';
@@ -36,6 +39,22 @@ export default function LiveStandingsWorkspace({
   isUpdateStale,
 }: LiveStandingsWorkspaceProps) {
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('standings');
+  const [now, setNow] = useState(() => Date.now() / 1000);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now() / 1000), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const source = globalStandings;
+  const elapsed = source ? (isContestFinished ? source.contest.durationSeconds
+    : Math.max(source.contest.relativeTimeSeconds, now - source.contest.startTimeSeconds)) : 0;
+  const freeze = useFreeze(source, submissions, elapsed, isContestFinished);
+  if (freeze.cutoff !== undefined && freeze.projection) {
+    globalStandings = freeze.projection.standings as Standings;
+    localStandings = freeze.projection.localStandings;
+    submissions = freeze.projection.submissions as Submission[];
+    newSubmissionsCount = 0;
+  }
+  submissions = submissions.slice(0, MAX_SUBMISSIONS_IN_MEMORY);
   const liveStatus = isContestFinished
     ? 'Contest finished'
     : isPaused ? 'Synchronizing' : 'Connected';
@@ -49,6 +68,7 @@ export default function LiveStandingsWorkspace({
         status={liveStatus}
         statusTone={isContestFinished ? 'finished' : 'live'}
       />
+      <FreezeControls freeze={freeze} />
       {isUpdateStale && (
         <div className="border-b border-[#7a5b19] bg-[#3b2c0d] px-4 py-2 text-center text-sm text-[#ffe8a3]" role="status">
           Live updates are unavailable. Showing the latest standings.
@@ -89,6 +109,8 @@ export default function LiveStandingsWorkspace({
           >
             <div className="broadcast-panel h-full w-full overflow-hidden rounded-sm">
               <StandingsList
+                pending={freeze.projection?.pending}
+                focused={freeze.focused}
                 contestType={contestType}
                 globalStandings={globalStandings}
                 localStandings={localStandings}

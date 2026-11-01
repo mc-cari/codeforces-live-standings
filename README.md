@@ -36,6 +36,25 @@ It has support for:
 
 The website works with old contests and live contests and also shows the practice submissions.
 
+### Freeze, reveal, and share
+
+Enable **Freeze standings** during setup to hide results from the last chosen number of minutes.
+The cutoff is measured from contest start; submissions exactly at the cutoff are hidden too.
+Amber cells show pending submission counts, while scores, ranks, and the submission feed use only
+visible results. Freezing is a viewer presentation feature: source results remain available on
+Codeforces and in the browser.
+
+**Unfreeze now** shows all currently available results and persists that choice in the URL.
+After a live contest finishes, or a replay reaches its end, **Start reveal** opens a bottom-up
+ceremony. Use **Next**, or **Auto reveal** to advance every 1.5 seconds; **Pause** stops automatic
+advancement. Reloading restarts the ceremony, and seeking a replay clears reveal progress.
+
+**Share setup** copies a link from setup or either viewer. Links preserve the contest, selected
+participants, `freezeMinutes`, and `freezeView=unfrozen` when used. Replay sharing also includes
+the current playback time, speed, and play state. If clipboard access is unavailable, a selectable
+link appears. Links without freeze settings retain the default unfrozen behavior; invalid freeze
+parameters disable freezing and show a warning.
+
 [Codeforces blog post](https://codeforces.com/blog/entry/114892).
 
 The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are beign updated at the same time, so the API responses are merged with the local status.

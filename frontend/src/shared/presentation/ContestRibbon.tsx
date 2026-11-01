@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { useEffect, useState, type ReactNode } from 'react';
+import ShareSetupButton from './ShareSetupButton';
 
 type ContestRibbonContest = {
   name: string;
@@ -75,7 +76,7 @@ export default function ContestRibbon({
           <p className="broadcast-label">Contest time</p>
           <p className="text-lg text-white font-data">{clock || formatClock(elapsedSeconds)}</p>
         </div>
-        {controls && <div className="flex items-center gap-2">{controls}</div>}
+        <div className="flex min-w-0 items-center gap-2">{controls || <ShareSetupButton />}</div>
       </div>
     </header>
   );

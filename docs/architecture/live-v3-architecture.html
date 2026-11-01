@@ -1,125 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live-v3 backend architecture</title>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+KR:wght@400;500;600&family=Noto+Serif+KR:wght@400&display=swap" rel="stylesheet">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Live standings provider architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --color-paper:   #f5f5f5;   /* white-smoke */
-      --color-ink:     #2d3142;   /* jet-black */
-      --color-muted:   #4f5d75;   /* blue-slate */
-      --color-accent:  #eb6c36;   /* atomic-tangerine */
-      --font-sans:     'Geist', system-ui, sans-serif;
-      --font-serif:    'Instrument Serif', 'Noto Serif KR', serif;
-      --font-mono:     'Geist Mono', ui-monospace, monospace;
-    }
-
-    body {
-      font-family: var(--font-sans);
-      background: var(--color-paper);
-      color: var(--color-ink);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: safe center;
-      padding: 3rem 2rem;
-    }
-
-    .frame { width: 1280px; flex-shrink: 0; }
-
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      margin-bottom: 0.5rem;
-    }
-
-    h1 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      color: var(--color-ink);
-      margin-bottom: 1.5rem;
-    }
-
-    svg { width: 1280px; height: 720px; display: block; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px; background: #f5f5f5; color: #2d3142; font-family: 'Geist', sans-serif; }
+    main { max-width: 1280px; margin: 0 auto; }
+    .eyebrow { color: #2e5aa8; font: 500 12px 'Geist Mono', monospace; letter-spacing: .14em; text-transform: uppercase; }
+    h1 { margin: 8px 0; font: 400 28px 'Instrument Serif', serif; letter-spacing: .01em; }
+    p { margin: 0 0 16px; color: #4f5d75; font-size: 16px; }
+    svg { display: block; width: 100%; height: auto; }
   </style>
 </head>
 <body>
-  <div class="frame">
-    <p class="eyebrow">Architecture · Diagram Design</p>
-    <h1>Live-v3 as an interchangeable backend</h1>
+<main>
+  <div class="eyebrow">System architecture · provider overview</div>
+  <h1>Go API, interchangeable standings engines</h1>
+  <p>Go owns the public API. Its application port selects native Go standings or a client for the private live-v3 engine.</p>
+  <svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="live-v3-architecture-title live-v3-architecture-desc">
+    <title id="live-v3-architecture-title">Go compatibility layer with interchangeable engines</title>
+    <desc id="live-v3-architecture-desc">The Go HTTP and SSE API consumes an application-owned standings port implemented by the native manager or a client for the private Kotlin engine. Each engine owns its history.</desc>
+    <defs>
+      <marker id="overview-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#4f5d75"/></marker>
+      <marker id="overview-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0 0 L8 3 L0 6 Z" fill="#2e5aa8"/></marker>
+    </defs>
+    <rect width="1280" height="720" fill="#f5f5f5"/>
+    <!-- provider zones -->
+    <rect x="240" y="128" width="440" height="216" rx="8" fill="#ececec" stroke="#bfc0c0"/>
+    <rect x="240" y="376" width="440" height="216" rx="8" fill="#ececec" stroke="#bfc0c0"/>
+    <text x="260" y="156" fill="#2e5aa8" font-family="'Geist Mono',monospace" font-size="12" letter-spacing="1.5">NATIVE GO ENGINE</text>
+    <text x="260" y="404" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12" letter-spacing="1.5">KOTLIN / LIVE-V3 ENGINE (PRIVATE)</text>
 
-    <!-- Replace live-v3-architecture with a unique slug for this diagram before export. -->
-<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="live-v3-architecture-title live-v3-architecture-desc">
-<title id="live-v3-architecture-title">Live-v3 as an interchangeable contest backend</title>
-<desc id="live-v3-architecture-desc">Codeforces feeds a pinned live-v3 engine that reconciles durable raw history before scoring; a Kotlin compatibility service filters friends and sends snapshots and patches to the existing frontend, while the Go backend remains an independent alternative.</desc>
-<defs>
-<marker id="arrow" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#4f5d75"/></marker>
-<marker id="arrow-link" markerWidth="8" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8" fill="#2e5aa8"/></marker>
-</defs>
-<rect width="1280" height="720" fill="#f5f5f5"/>
-<text x="56" y="40" font-family="Geist Mono,monospace" font-size="8" letter-spacing="2" fill="#4f5d75">ARCHITECTURE / CODEFORCES LIVE STANDINGS</text>
-<text x="56" y="88" font-family="Instrument Serif,serif" font-size="32" fill="#2d3142">Live-v3 as an interchangeable backend</text>
-<text x="56" y="120" font-family="Geist,sans-serif" font-size="16" fill="#4f5d75">One contest engine. Personal friend views. The same live API.</text>
-<rect x="264" y="176" width="576" height="368" rx="8" fill="#f1f1f2" stroke="#c7c9cf" stroke-width="1"/>
-<rect x="288" y="168" width="312" height="24" fill="#f5f5f5"/>
-<text x="304" y="184" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">KOTLIN ALTERNATIVE / JVM 17</text>
-<!-- Connectors precede all endpoint nodes. -->
-<path d="M216 280 H280" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)"/>
-<path d="M520 280 H584" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M824 280 H888" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M360 336 V456 Q360 464 368 464 H520" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M600 420 V392 Q600 384 592 384 H408 Q400 384 400 376 V336" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M728 336 V420" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)"/>
-<path d="M1008 432 V320" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
-<path d="M136 320 V560 Q136 568 144 568 H960 Q968 568 968 560 V512" fill="none" stroke="#7a8399" stroke-width="1" stroke-dasharray="4,4" marker-end="url(#arrow)"/>
+    <!-- connectors, behind nodes -->
+    <path d="M184 336 H208 Q216 336 216 328 V232 Q216 224 224 224 H264" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M184 368 H208 Q216 368 216 376 V472 Q216 480 224 480 H264" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M408 224 H456" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M552 264 V288" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M408 480 H456" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M552 520 V544" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M648 224 H708 Q716 224 716 232 V320 Q716 328 724 328 H760" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#overview-blue)"/>
+    <path d="M648 480 H708 Q716 480 716 472 V416 Q716 408 724 408 H760" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#overview-arrow)"/>
+    <path d="M952 368 H1000" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#overview-blue)"/>
 
-<rect x="224" y="256" width="48" height="16" rx="4" fill="#f5f5f5"/><text x="248" y="268" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">API</text>
-<rect x="528" y="256" width="48" height="16" rx="4" fill="#f5f5f5"/><text x="552" y="268" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">EVENTS</text>
-<rect x="832" y="256" width="48" height="16" rx="4" fill="#f5f5f5"/><text x="856" y="268" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">SSE</text>
-<rect x="368" y="408" width="104" height="16" rx="4" fill="#f5f5f5"/><text x="420" y="420" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">RAW UPSERTS</text>
-<rect x="448" y="360" width="104" height="16" rx="4" fill="#f5f5f5"/><text x="500" y="372" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">RESTORE</text>
-<rect x="736" y="384" width="96" height="16" rx="4" fill="#f5f5f5"/><text x="784" y="396" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">CHECKPOINT</text>
-<rect x="1016" y="368" width="80" height="16" rx="4" fill="#f5f5f5"/><text x="1056" y="380" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" letter-spacing="1" fill="#4f5d75">ALT URL</text>
-<rect x="56" y="240" width="160" height="80" rx="8" fill="#eeeeef" stroke="#4f5d75" stroke-width="1"/>
-<text x="136" y="272" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">Codeforces API</text>
-<text x="136" y="296" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#4f5d75">status · standings · hacks</text>
-<rect x="280" y="224" width="240" height="112" rx="8" fill="#fce9e0" stroke="#eb6c36" stroke-width="1"/>
-<text x="400" y="264" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">live-v3 contest engine</text>
-<text x="400" y="288" text-anchor="middle" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">reconcile → score → rank</text>
-<text x="400" y="304" text-anchor="middle" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">pinned fork / per contest</text>
-<rect x="584" y="224" width="240" height="112" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-<text x="704" y="264" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">Compatibility service</text>
-<text x="704" y="288" text-anchor="middle" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">friend projections</text>
-<text x="704" y="304" text-anchor="middle" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">activation · revisions</text>
-<rect x="888" y="240" width="160" height="80" rx="8" fill="#ffffff" stroke="#4f5d75" stroke-width="1"/>
-<text x="968" y="272" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">Existing frontend</text>
-<text x="968" y="296" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#4f5d75">snapshot · patch · state</text>
-<rect x="520" y="420" width="240" height="80" rx="8" fill="#e9eaed" stroke="#4f5d75" stroke-width="1"/>
-<text x="640" y="452" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">SQLite</text>
-<text x="640" y="476" text-anchor="middle" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">raw history + checkpoints</text>
-<rect x="888" y="432" width="160" height="80" rx="8" fill="#f1f1f2" stroke="#4f5d75" stroke-width="1" stroke-dasharray="4,4"/>
-<text x="968" y="464" text-anchor="middle" font-family="Geist,sans-serif" font-size="16" font-weight="600" fill="#2d3142">Go backend</text>
-<text x="968" y="488" text-anchor="middle" font-family="Geist Mono,monospace" font-size="8" fill="#4f5d75">independent provider</text>
-<text x="288" y="524" font-family="Geist,sans-serif" font-size="12" fill="#4f5d75">Raw history is committed before derived events are published.</text>
-<text x="56" y="600" font-family="Geist Mono,monospace" font-size="12" fill="#4f5d75">Select either provider with NEXT_PUBLIC_LIVE_API_BASE_URL. No automatic failover.</text>
-<line x1="56" y1="632" x2="1224" y2="632" stroke="#c7c9cf" stroke-width="1"/>
-<rect x="56" y="652" width="16" height="16" rx="4" fill="#fce9e0" stroke="#eb6c36"/>
-<text x="88" y="664" font-family="Geist,sans-serif" font-size="12" fill="#4f5d75">live-v3 engine</text>
-<rect x="312" y="652" width="16" height="16" rx="4" fill="#e9eaed" stroke="#4f5d75"/>
-<text x="344" y="664" font-family="Geist,sans-serif" font-size="12" fill="#4f5d75">durable state</text>
-<path d="M568 660 H616" stroke="#7a8399" stroke-width="1" stroke-dasharray="4,4"/>
-<text x="632" y="664" font-family="Geist,sans-serif" font-size="12" fill="#4f5d75">existing alternative</text>
-</svg>
-  </div>
+    <!-- nodes -->
+    <g font-family="'Geist',sans-serif" text-anchor="middle">
+      <rect x="40" y="320" width="144" height="64" rx="6" fill="#ffffff" stroke="#7a8399"/>
+      <text x="112" y="348" fill="#2d3142" font-size="16" font-weight="600">Codeforces API</text>
+      <text x="112" y="368" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">Codeforces data</text>
+
+      <rect x="264" y="184" width="144" height="80" rx="6" fill="#ffffff" stroke="#bfc0c0"/>
+      <text x="336" y="216" fill="#2d3142" font-size="16" font-weight="600">Go backend</text>
+      <text x="336" y="240" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">fetch + parse</text>
+      <rect x="456" y="184" width="192" height="80" rx="6" fill="#ffffff" stroke="#bfc0c0"/>
+      <text x="552" y="212" fill="#2d3142" font-size="16" font-weight="600">Sessions + scoring</text>
+      <text x="552" y="236" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">merge retained submissions</text>
+      <text x="552" y="252" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">friend projections</text>
+      <rect x="456" y="288" width="192" height="56" rx="6" fill="#fce9e0" stroke="#eb6c36" stroke-width="1.2"/>
+      <text x="552" y="312" fill="#2d3142" font-size="16" font-weight="600">Go SQLite</text>
+      <text x="552" y="332" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">submissions · contests</text>
+
+      <rect x="264" y="440" width="144" height="80" rx="6" fill="#ffffff" stroke="#bfc0c0"/>
+      <text x="336" y="472" fill="#2d3142" font-size="16" font-weight="600">live-v3</text>
+      <text x="336" y="496" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">source + engine</text>
+      <rect x="456" y="440" width="192" height="80" rx="6" fill="#ffffff" stroke="#bfc0c0"/>
+      <text x="552" y="472" fill="#2d3142" font-size="16" font-weight="600">Internal view API</text>
+      <text x="552" y="496" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">JSON views · long polling</text>
+      <rect x="456" y="544" width="192" height="48" rx="6" fill="#ececec" stroke="#7a8399"/>
+      <text x="552" y="568" fill="#2d3142" font-size="16" font-weight="600">live-v3 SQLite</text>
+      <text x="552" y="584" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">raw history + snapshots</text>
+
+      <rect x="760" y="288" width="192" height="160" rx="6" fill="#ececec" stroke="#2e5aa8" stroke-width="1.2"/>
+      <text x="856" y="328" fill="#2d3142" font-size="20" font-weight="600">Go HTTP / SSE API</text>
+      <text x="856" y="360" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">LiveStandingsProvider</text>
+      <text x="856" y="384" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">snapshot · patch · state</text>
+      <text x="856" y="416" fill="#4f5d75" font-size="16">telemetry + CORS</text>
+
+      <rect x="1000" y="320" width="240" height="96" rx="6" fill="#ffffff" stroke="#bfc0c0"/>
+      <text x="1120" y="356" fill="#2d3142" font-size="20" font-weight="600">Frontend</text>
+      <text x="1120" y="384" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">calls the Go public API</text>
+    </g>
+
+    <text x="40" y="640" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">Go selects its engine with LIVE_V3_ENGINE_URL. The JVM engine has no public port.</text>
+    <text x="40" y="672" fill="#4f5d75" font-family="'Geist Mono',monospace" font-size="12">Each engine keeps its own history. Go owns the public contract and telemetry database.</text>
+  </svg>
+</main>
 </body>
 </html>

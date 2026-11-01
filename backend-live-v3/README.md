@@ -5,7 +5,10 @@ raw-history reconciliation, verdict processing, hacks, scoring and ranking. This
 service adds SQLite durability, contest activation, friend projections and the
 existing HTTP/SSE interface. It does not import or call the Go backend.
 
-![Architecture](../docs/architecture/live-v3-architecture.png)
+![Provider overview](../docs/architecture/live-v3-architecture.png)
+
+The [Go provider flow](../docs/architecture/go-backend-architecture.png) details
+the public API, provider interface, native Go persistence, and private live-v3 engine.
 
 ## Build and run
 

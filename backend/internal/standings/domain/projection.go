@@ -34,24 +34,41 @@ func Project(contest Contest, source *Standings, all map[int]Submission, handles
 				standings.Rows = append(standings.Rows, row)
 			}
 		}
-		addMissingRows(&standings, all, handles)
+		if !source.Authoritative {
+			addMissingRows(&standings, all, handles)
+		}
+	}
+	positions := friendPositions(standings)
+	for i := range standings.Rows {
+		standings.Rows[i].Party.Rank = positions[PartyName(standings.Rows[i].Party)]
 	}
 	return standings, decorateSubmissions(all, handles, standings)
 }
 
-func decorateSubmissions(all map[int]Submission, handles HandleSet, standings Standings) []Submission {
+func friendPositions(standings Standings) map[string]int {
 	positions := make(map[string]int)
 	previousPoints, previousPosition := -1.0, 0
 	previousPenalty := -1
+	previousRank := -1
 	for index, row := range standings.Rows {
 		position := index + 1
-		if row.Points == previousPoints && row.Penalty == previousPenalty {
+		tied := row.Rank > 0 && previousRank > 0 && row.Rank == previousRank
+		if !standings.Authoritative && (row.Rank == 0 || previousRank == 0) {
+			tied = row.Points == previousPoints && row.Penalty == previousPenalty
+		}
+		if tied {
 			position = previousPosition
 		}
 		positions[PartyName(row.Party)] = position
 		previousPoints, previousPenalty, previousPosition = row.Points, row.Penalty, position
+		previousRank = row.Rank
 	}
 
+	return positions
+}
+
+func decorateSubmissions(all map[int]Submission, handles HandleSet, standings Standings) []Submission {
+	positions := friendPositions(standings)
 	result := make([]Submission, 0)
 	for _, submission := range all {
 		if handles.Selects(submission.Author) {
@@ -165,6 +182,9 @@ func addMissingRows(standings *Standings, all map[int]Submission, handles Handle
 		} else if !solved[name][submission.Problem.Index] && penalized(submission.Verdict) {
 			result.RejectedAttemptCount++
 		}
+	}
+	if len(missing) == 0 {
+		return
 	}
 	for _, row := range missing {
 		standings.Rows = append(standings.Rows, *row)

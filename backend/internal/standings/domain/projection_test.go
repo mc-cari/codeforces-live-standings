@@ -24,3 +24,20 @@ func TestProjectionReconstructsMissingParticipantRow(t *testing.T) {
 		t.Fatalf("unexpected reconstructed rows: %#v", projected.Rows)
 	}
 }
+
+func TestAuthoritativeProjectionPreservesEngineTiesAndDoesNotInventRows(t *testing.T) {
+	party := func(handle string) Party { return Party{Members: []Member{{Handle: handle}}} }
+	source := Standings{Authoritative: true, Rows: []RanklistRow{{Party: party("a"), Rank: 2, Points: 500}, {Party: party("b"), Rank: 3, Points: 500}, {Party: party("c"), Rank: 3, Points: 500}}}
+	all := map[int]Submission{1: {ID: 1, Author: party("a")}, 2: {ID: 2, Author: party("b")}, 3: {ID: 3, Author: party("c")}, 4: {ID: 4, Author: party("missing"), Verdict: "OK"}}
+	view, submissions := Project(Contest{}, &source, all, NewHandleSet([]string{"a", "b", "c", "missing"}))
+	if len(view.Rows) != 3 {
+		t.Fatal("invented authoritative row")
+	}
+	ranks := map[string]int{}
+	for _, submission := range submissions {
+		ranks[submission.Author.Members[0].Handle] = submission.Author.Rank
+	}
+	if ranks["a"] != 1 || ranks["b"] != 2 || ranks["c"] != 2 {
+		t.Fatal(ranks)
+	}
+}

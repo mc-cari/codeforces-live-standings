@@ -62,12 +62,14 @@ export const useLiveStandingsFeed = ({
     officialStandings: Standings,
     remoteSubmissions: Submission[],
     updateContestInfo = false,
+    authoritative = false,
   ) => {
     const projection = projectLiveUpdate(
       officialStandings,
       remoteSubmissions,
       submissionsRef.current,
       userHandles,
+      authoritative,
     );
     submissionsRef.current = projection.submissions;
     setNewSubmissionsCount(projection.newSubmissionCount);
@@ -177,7 +179,7 @@ export const useLiveStandingsFeed = ({
     const applySnapshot = (snapshot: LiveSnapshot) => {
       const snapshotSubmissions = snapshot.submissions;
       streamedSubmissionsRef.current = snapshotSubmissions;
-      applyProjection(snapshot.standings, snapshotSubmissions, true);
+      applyProjection(snapshot.standings, snapshotSubmissions, true, true);
       setIsUpdateStale(snapshot.health?.state === 'stale');
       if (snapshot.health?.state === 'finished') setIsContestFinished(true);
       completeInitialLoad();
@@ -186,7 +188,7 @@ export const useLiveStandingsFeed = ({
       const current = new Map(streamedSubmissionsRef.current.map((submission) => [submission.id, submission]));
       patch.submissionUpserts.forEach((submission) => current.set(submission.id, submission));
       streamedSubmissionsRef.current = [...current.values()];
-      applyProjection(patch.standings, streamedSubmissionsRef.current, true);
+      applyProjection(patch.standings, streamedSubmissionsRef.current, true, true);
       completeInitialLoad();
     };
     const handleState = (state: string, contest?: LiveSnapshot['contest']) => {

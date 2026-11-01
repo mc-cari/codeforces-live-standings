@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 )
 
@@ -140,4 +141,24 @@ func transportOutcome(err error) string {
 		return "timeout"
 	}
 	return "transport_error"
+}
+
+// InitialUpdate initializes the application view before browsers subscribe.
+func (client *Client) InitialUpdate(ctx context.Context, id int) (application.ContestUpdate, error) {
+	standings, err := client.FetchStandings(ctx, id)
+	if err != nil {
+		return application.ContestUpdate{}, err
+	}
+	if standings.Contest.Phase == "BEFORE" {
+		return application.ContestUpdate{Standings: standings, Submissions: make(map[int]domain.Submission)}, nil
+	}
+	submissions, err := client.FetchSubmissions(ctx, id)
+	if err != nil {
+		return application.ContestUpdate{}, err
+	}
+	all := make(map[int]domain.Submission, len(submissions))
+	for _, submission := range submissions {
+		all[submission.ID] = submission
+	}
+	return application.ContestUpdate{Standings: standings, Submissions: all}, nil
 }

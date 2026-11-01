@@ -1,204 +1,395 @@
+// Package livev3 adapts the standard CDS converter CLICS API to application views.
 package livev3
 
 import (
+	"bufio"
 	"context"
-	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
-	"net/url"
-	"reflect"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strconv"
-	"strings"
+	"sync"
 	"time"
 
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 )
 
+type Config struct {
+	Binary       string
+	APIBaseURL   string
+	APIKey       string
+	APISecret    string
+	ManagerMode  bool
+	MaxWorkers   int
+	ReadyTimeout time.Duration
+	Store        application.ViewRepository
+}
+type result struct {
+	view application.ContestUpdate
+	err  error
+}
+type worker struct {
+	cancel  context.CancelFunc
+	done    chan struct{}
+	ready   chan struct{}
+	updates chan result
+	initial result
+}
 type Client struct {
-	base string
-	http *http.Client
+	config  Config
+	mu      sync.Mutex
+	workers map[int]*worker
 }
 
-var _ application.LiveStandingsProvider = (*Client)(nil)
+var _ application.ContestGateway = (*Client)(nil)
+var _ application.StreamingGateway = (*Client)(nil)
 
-func NewClient(base string) (*Client, error) {
-	u, err := url.Parse(base)
-	if err != nil || u.Host == "" || (u.Scheme != "http" && u.Scheme != "https") || u.RawQuery != "" || u.Fragment != "" || u.User != nil {
-		return nil, fmt.Errorf("invalid LIVE_V3_ENGINE_URL")
+func New(config Config) (*Client, error) {
+	if config.Binary == "" {
+		return nil, errors.New("LIVE_V3_CONVERTER is required")
 	}
-	return &Client{base: strings.TrimRight(base, "/"), http: &http.Client{Timeout: 130 * time.Second}}, nil
-}
-
-func (client *Client) request(ctx context.Context, method, path string, result any) (bool, error) {
-	request, err := http.NewRequestWithContext(ctx, method, client.base+path, nil)
+	binary, err := exec.LookPath(config.Binary)
 	if err != nil {
-		return false, err
+		return nil, fmt.Errorf("converter binary: %w", err)
 	}
-	response, err := client.http.Do(request)
+	binary, err = filepath.Abs(binary)
 	if err != nil {
-		return false, fmt.Errorf("live-v3 engine unavailable: %w", err)
-	}
-	defer response.Body.Close()
-	if response.StatusCode == http.StatusNoContent {
-		return false, nil
-	}
-	if response.StatusCode != http.StatusOK {
-		if response.StatusCode == http.StatusNotFound {
-			return false, application.ErrContestInactive
-		}
-		if response.StatusCode == http.StatusTooManyRequests {
-			return false, fmt.Errorf("live-v3 capacity reached")
-		}
-		if response.StatusCode == http.StatusConflict {
-			return false, fmt.Errorf("contest is unsupported by live-v3")
-		}
-		return false, fmt.Errorf("live-v3 engine returned HTTP %d", response.StatusCode)
-	}
-	if err := json.NewDecoder(io.LimitReader(response.Body, 64<<20)).Decode(result); err != nil {
-		return false, fmt.Errorf("decode live-v3 response: %w", err)
-	}
-	return true, nil
-}
-
-func (client *Client) ActivateContest(ctx context.Context, id int) (application.Activation, error) {
-	var value application.Activation
-	changed, err := client.request(ctx, http.MethodPost, fmt.Sprintf("/internal/v1/contests/%d/activate", id), &value)
-	if err == nil && (!changed || value.Contest.ID != id || value.State == "") {
-		err = fmt.Errorf("invalid live-v3 activation response")
-	}
-	return value, err
-}
-
-func (client *Client) view(ctx context.Context, id int, handles []string, previous *application.Snapshot) (*application.Snapshot, error) {
-	query := url.Values{"h": {base64.RawURLEncoding.EncodeToString([]byte(strings.Join(handles, ";")))}}
-	if previous != nil {
-		query.Set("after", strconv.FormatInt(previous.Revision, 10))
-		query.Set("health", previous.Health.State)
-	}
-	var value application.Snapshot
-	changed, err := client.request(ctx, http.MethodGet, fmt.Sprintf("/internal/v1/contests/%d/view?%s", id, query.Encode()), &value)
-	if err != nil || !changed {
 		return nil, err
 	}
-	if value.Contest.ID != id || value.Revision < 0 || value.Standings.Contest.ID != id {
-		return nil, fmt.Errorf("invalid live-v3 view")
+	config.Binary = binary
+	if config.MaxWorkers <= 0 {
+		config.MaxWorkers = 3
 	}
-	return &value, nil
+	if config.ReadyTimeout <= 0 {
+		config.ReadyTimeout = 60 * time.Second
+	}
+	if config.APIBaseURL == "" {
+		config.APIBaseURL = "https://codeforces.com/api/"
+	}
+	return &Client{config: config, workers: make(map[int]*worker)}, nil
 }
-
-func (client *Client) SubscribeContest(parent context.Context, id int, handles []string) (*application.Feed, error) {
-	ctx, cancel := context.WithCancel(parent)
-	initial, err := client.view(ctx, id, handles, nil)
-	if err != nil || initial == nil {
-		cancel()
-		if err == nil {
-			err = fmt.Errorf("live-v3 engine returned no initial view")
+func (c *Client) get(id int) (*worker, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if w := c.workers[id]; w != nil {
+		return w, nil
+	}
+	if len(c.workers) >= c.config.MaxWorkers {
+		return nil, errors.New("converter capacity reached")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	w := &worker{cancel: cancel, done: make(chan struct{}), ready: make(chan struct{}), updates: make(chan result, 1)}
+	c.workers[id] = w
+	go func() { defer close(w.done); c.run(ctx, id, w) }()
+	return w, nil
+}
+func (c *Client) StopContest(id int) {
+	c.mu.Lock()
+	w := c.workers[id]
+	if w != nil {
+		w.cancel()
+	}
+	c.mu.Unlock()
+	if w != nil {
+		<-w.done
+		c.mu.Lock()
+		if c.workers[id] == w {
+			delete(c.workers, id)
 		}
-		return nil, err
+		c.mu.Unlock()
 	}
-	events := make(chan application.Event, 2)
-	done := make(chan struct{})
-	events <- snapshotEvent(initial)
-	go func() {
-		defer close(done)
-		defer cancel()
-		previous := initial
-		resync := false
-		for {
-			pollPrevious := previous
-			if resync {
-				pollPrevious = nil
-			}
-			next, err := client.view(ctx, id, handles, pollPrevious)
-			if ctx.Err() != nil {
-				return
-			}
-			if err != nil {
-				stale := *previous
-				stale.Health.State = "stale"
-				if !publish(ctx, events, snapshotEvent(&stale), &stale) {
-					return
-				}
-				select {
-				case <-ctx.Done():
-					return
-				case <-time.After(time.Second):
-				}
-				resync = true
-				continue
-			}
-			if next == nil {
-				continue
-			}
-			event := update(previous, next)
-			if resync {
-				event = snapshotEvent(next)
-				resync = false
-			}
-			if !publish(ctx, events, event, next) {
-				return
-			}
-			if next.Health.State != previous.Health.State && (next.Health.State == "stale" || next.Health.State == "finished") {
-				if !publish(ctx, events, application.Event{Kind: "state", Revision: next.Revision, Payload: application.State{State: next.Health.State, Contest: next.Contest}}, next) {
-					return
-				}
-			}
-			previous = next
-		}
-	}()
-	return &application.Feed{Events: events, Done: done, Close: cancel}, nil
 }
-
-func snapshotEvent(value *application.Snapshot) application.Event {
-	return application.Event{Kind: "snapshot", Revision: value.Revision, Payload: *value}
-}
-
-func update(previous, next *application.Snapshot) application.Event {
-	if previous == nil || next.Revision != previous.Revision+1 {
-		return snapshotEvent(next)
+func (c *Client) FetchStandings(ctx context.Context, id int) (domain.Standings, error) {
+	w, err := c.get(id)
+	if err != nil {
+		return domain.Standings{}, err
 	}
-	old := make(map[int]domain.Submission, len(previous.Submissions))
-	for _, submission := range previous.Submissions {
-		old[submission.ID] = submission
-	}
-	upserts := make([]domain.Submission, 0)
-	for _, submission := range next.Submissions {
-		if saved, exists := old[submission.ID]; !exists || !reflect.DeepEqual(saved, submission) {
-			upserts = append(upserts, submission)
-		}
-		delete(old, submission.ID)
-	}
-	if len(old) != 0 {
-		return snapshotEvent(next)
-	}
-	return application.Event{Kind: "patch", Revision: next.Revision, Payload: application.Patch{Revision: next.Revision, Contest: next.Contest, Standings: next.Standings, SubmissionUpserts: upserts, Health: next.Health}}
-}
-
-func publish(ctx context.Context, events chan application.Event, event application.Event, current *application.Snapshot) bool {
+	timer := time.NewTimer(c.config.ReadyTimeout)
+	defer timer.Stop()
 	select {
 	case <-ctx.Done():
-		return false
-	default:
+		c.StopContest(id)
+		return domain.Standings{}, ctx.Err()
+	case <-timer.C:
+		c.StopContest(id)
+		return domain.Standings{}, errors.New("converter readiness timeout")
+	case <-w.ready:
+		if w.initial.err != nil {
+			c.StopContest(id)
+		}
+		return w.initial.view.Standings, w.initial.err
 	}
-	select {
-	case events <- event:
-	default:
-		for {
-			select {
-			case <-events:
-				continue
-			default:
+}
+func (c *Client) InitialUpdate(ctx context.Context, id int) (application.ContestUpdate, error) {
+	if _, err := c.FetchStandings(ctx, id); err != nil {
+		return application.ContestUpdate{}, err
+	}
+	c.mu.Lock()
+	w := c.workers[id]
+	c.mu.Unlock()
+	if w == nil {
+		return application.ContestUpdate{}, errors.New("converter stopped during activation")
+	}
+	return w.initial.view, w.initial.err
+}
+func (c *Client) FetchSubmissions(context.Context, int) ([]domain.Submission, error) {
+	return nil, errors.New("stream source does not poll submissions")
+}
+func (c *Client) Stream(ctx context.Context, id int, publish func(application.ContestUpdate) error) error {
+	w, err := c.get(id)
+	if err != nil {
+		return err
+	}
+	defer c.StopContest(id)
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case value, ok := <-w.updates:
+			if !ok {
+				return errors.New("converter stopped")
 			}
-			break
+			if value.err != nil {
+				return value.err
+			}
+			if err := publish(value.view); err != nil {
+				return err
+			}
+			if value.view.Finished {
+				return nil
+			}
+		}
+	}
+}
+func (c *Client) run(ctx context.Context, id int, w *worker) {
+	first := true
+	send := func(value result) {
+		if first {
+			w.initial = value
+			close(w.ready)
+			first = false
 		}
 		select {
-		case events <- snapshotEvent(current):
+		case <-w.updates:
+		default:
+		}
+		select {
+		case w.updates <- value:
 		case <-ctx.Done():
-			return false
 		}
 	}
-	return true
+	defer close(w.updates)
+	err := c.convert(ctx, id, func(view application.ContestUpdate) { send(result{view: view}) })
+	if err != nil {
+		send(result{err: err})
+	}
+	if first {
+		send(result{err: errors.New("converter exited before readiness")})
+	}
+}
+func (c *Client) convert(ctx context.Context, id int, publish func(application.ContestUpdate)) error {
+	dir, err := os.MkdirTemp("", "standings-converter-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(dir)
+	settings := map[string]any{"type": "cf", "contestId": id, "asManager": c.config.ManagerMode, "includeUnofficial": true, "baseUrl": c.config.APIBaseURL}
+	if c.config.ManagerMode {
+		settings["apiKey"] = c.config.APIKey
+		settings["apiSecret"] = c.config.APISecret
+	}
+	data, err := json.Marshal(settings)
+	if err != nil {
+		return err
+	}
+	if err = os.WriteFile(filepath.Join(dir, "settings.json"), data, 0600); err != nil {
+		return err
+	}
+	// The converter accepts Ktor's host setting; only Go can reach this worker.
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return err
+	}
+	port := listener.Addr().(*net.TCPAddr).Port
+	listener.Close()
+	command := exec.CommandContext(ctx, c.config.Binary, "server", "--config-directory", dir, "--port", strconv.Itoa(port), "--ktor-arg=-host=127.0.0.1", "--no-auto-finalize")
+	command.Dir = dir
+	command.Stdout = os.Stderr
+	command.Stderr = os.Stderr
+	if err = command.Start(); err != nil {
+		return err
+	}
+	exited := make(chan error, 1)
+	go func() { exited <- command.Wait() }()
+	defer func() {
+		if command.Process != nil {
+			_ = command.Process.Kill()
+		}
+		<-exited
+	}()
+	base := fmt.Sprintf("http://127.0.0.1:%d/clics/api/contests/contest", port)
+	client := &http.Client{Timeout: 10 * time.Second}
+	readyCtx, cancel := context.WithTimeout(ctx, c.config.ReadyTimeout)
+	defer cancel()
+	for {
+		req, _ := http.NewRequestWithContext(readyCtx, "GET", base+"/scoreboard?x_live=true&include_unofficial=true", nil)
+		resp, e := client.Do(req)
+		if e == nil {
+			resp.Body.Close()
+			if resp.StatusCode == 200 {
+				break
+			}
+		}
+		select {
+		case <-readyCtx.Done():
+			return readyCtx.Err()
+		case err := <-exited:
+			exited <- err
+			return fmt.Errorf("converter exited: %v", err)
+		case <-time.After(100 * time.Millisecond):
+		}
+	}
+	return c.consume(ctx, id, base, publish)
+}
+
+func (c *Client) consume(ctx context.Context, id int, base string, publish func(application.ContestUpdate)) error {
+	client := &http.Client{Timeout: 10 * time.Second}
+	streamCtx, stop := context.WithCancel(ctx)
+	defer stop()
+	req, _ := http.NewRequestWithContext(streamCtx, "GET", base+"/event-feed?x_live=true", nil)
+	req.Header.Set("Accept-Encoding", "identity")
+	response, err := (&http.Client{}).Do(req)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		return fmt.Errorf("CLICS feed HTTP %d", response.StatusCode)
+	}
+	events := make(chan feedEvent, 256)
+	fail := make(chan error, 1)
+	go func() {
+		defer close(events)
+		scanner := bufio.NewScanner(response.Body)
+		scanner.Buffer(make([]byte, 65536), 16<<20)
+		for scanner.Scan() {
+			if len(scanner.Bytes()) == 0 {
+				continue
+			}
+			var event feedEvent
+			if err := json.Unmarshal(scanner.Bytes(), &event); err != nil {
+				fail <- err
+				return
+			}
+			select {
+			case events <- event:
+			case <-streamCtx.Done():
+				return
+			}
+		}
+		err := scanner.Err()
+		if err == nil {
+			err = io.EOF
+		}
+		fail <- err
+	}()
+	entities := make(map[string]map[string][]byte)
+	if c.config.Store != nil {
+		saved, e := c.config.Store.LoadView(id)
+		if e != nil {
+			return e
+		}
+		if saved != nil && saved.Entities != nil {
+			entities = saved.Entities
+		}
+	}
+	currentToken := ""
+	lastBoard := time.Time{}
+	instance := ""
+	ticker := time.NewTicker(150 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		case <-ticker.C:
+		}
+		if len(events) == 0 {
+			select {
+			case err := <-fail:
+				return err
+			default:
+			}
+			if currentToken != "" && time.Since(lastBoard) < 5*time.Second {
+				continue
+			}
+		}
+		lastBoard = time.Now()
+		var board scoreboard
+		if err := getJSON(ctx, client, base+"/scoreboard?x_live=true&include_unofficial=true", &board); err != nil {
+			return err
+		}
+		if board.Live.Instance == "" || board.Live.Watermark == "" {
+			return errors.New("converter lacks x_live synchronization metadata")
+		}
+		if instance != "" && instance != board.Live.Instance {
+			return errors.New("converter feed instance changed")
+		}
+		instance = board.Live.Instance
+		if currentToken == board.Live.Watermark {
+			continue
+		}
+		// Do not consume beyond this scoreboard's watermark. Later events stay staged
+		// in the bounded reader channel until a matching calculated scoreboard arrives.
+		for currentToken != board.Live.Watermark {
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case event, ok := <-events:
+				if !ok {
+					select {
+					case e := <-fail:
+						return e
+					default:
+						return io.EOF
+					}
+				}
+				if event.Live.Instance != instance {
+					return errors.New("feed and scoreboard instances differ")
+				}
+				applyEvent(entities, event)
+				currentToken = event.Token
+			}
+		}
+		view, err := normalize(id, entities, board)
+		if err != nil {
+			return err
+		}
+		publish(view)
+		if view.Finished {
+			return nil
+		}
+	}
+}
+func getJSON(ctx context.Context, client *http.Client, url string, value any) error {
+	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
+	if err != nil {
+		return err
+	}
+	response, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != 200 {
+		return fmt.Errorf("CLICS HTTP %d", response.StatusCode)
+	}
+	return json.NewDecoder(io.LimitReader(response.Body, 64<<20)).Decode(value)
 }

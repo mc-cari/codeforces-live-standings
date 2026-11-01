@@ -3,147 +3,150 @@ package livev3
 import (
 	"context"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"sync/atomic"
-	"testing"
-	"time"
-
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
 )
 
-func view(revision int64, ids ...int) *application.Snapshot {
-	value := &application.Snapshot{Revision: revision, Contest: domain.Contest{ID: 1}, Health: application.Health{State: "live"}}
-	value.Standings.Contest = value.Contest
-	for _, id := range ids {
-		value.Submissions = append(value.Submissions, domain.Submission{ID: id, Verdict: "TESTING"})
+func TestEntityUpsertReplayAndExplicitDeletion(t *testing.T) {
+	entities := make(map[string]map[string][]byte)
+	apply := func(data string) {
+		var event feedEvent
+		if err := json.Unmarshal([]byte(data), &event); err != nil {
+			t.Fatal(err)
+		}
+		applyEvent(entities, event)
 	}
-	return value
+	apply(`{"type":"submissions","id":"1","data":{"id":"1"},"x_live":{"custom_fields":{"codeforces.submission":"old"}}}`)
+	before := string(entities["submissions"]["1"])
+	apply(`{"type":"submissions","id":"1","data":{"id":"1"},"x_live":{"custom_fields":{"codeforces.submission":"old"}}}`)
+	if string(entities["submissions"]["1"]) != before {
+		t.Fatal("duplicate replay changed entity")
+	}
+	apply(`{"type":"submissions","id":"2","data":{"id":"2"}}`)
+	if len(entities["submissions"]) != 2 {
+		t.Fatal("omission removed entity")
+	}
+	apply(`{"type":"submissions","id":"1","data":{"id":"1"},"x_live":{"custom_fields":{"codeforces.submission":"new"}}}`)
+	if string(entities["submissions"]["1"]) == before {
+		t.Fatal("changed ID ignored")
+	}
+	apply(`{"type":"submissions","id":"1","data":null}`)
+	if len(entities["submissions"]) != 1 {
+		t.Fatal("explicit deletion ignored")
+	}
 }
-
-func TestUpdatesRecoverMissingRevisionsAndRetiredSubmissions(t *testing.T) {
-	previous := view(1, 1, 2)
-	next := view(2, 1, 2)
-	next.Submissions[1].Verdict = "OK"
-	event := update(previous, next)
-	if event.Kind != "patch" {
-		t.Fatal(event.Kind)
-	}
-	patch := event.Payload.(application.Patch)
-	if len(patch.SubmissionUpserts) != 1 || patch.SubmissionUpserts[0].Verdict != "OK" {
-		t.Fatal(patch)
-	}
-	for _, next := range []*application.Snapshot{view(4, 1, 2), view(3, 2), view(0, 1)} {
-		if event := update(view(2, 1, 2), next); event.Kind != "snapshot" {
-			t.Fatal(event)
+func TestNormalizePreservesProgressAndEngineRows(t *testing.T) {
+	entities := make(map[string]map[string][]byte)
+	native := `{"contest":{"id":1,"phase":"CODING","type":"CF"},"problems":[{"index":"A"}]}`
+	board := scoreboard{Live: extension{Fields: map[string]string{"codeforces.standings": native}}}
+	var row boardRow
+	row.Team = "alice"
+	row.Rank = 4
+	points := 430.0
+	row.Score.Points = &points
+	board.Rows = []boardRow{row}
+	applyEvent(entities, feedEvent{Type: "teams", ID: "alice", Data: json.RawMessage(`{"id":"alice"}`), Live: extension{Fields: map[string]string{"codeforces.party": `{"members":[{"handle":"alice"}],"participantType":"OUT_OF_COMPETITION"}`}}})
+	for _, count := range []int{22, 23} {
+		submission := domain.Submission{ID: 1, Verdict: "TESTING", Testset: "TESTS", PassedTestCount: count, MemoryConsumedBytes: 1234, TimeConsumedMillis: 45, Author: domain.Party{Members: []domain.Member{{Handle: "alice"}}}}
+		raw, _ := json.Marshal(submission)
+		applyEvent(entities, feedEvent{Type: "submissions", ID: "1", Data: json.RawMessage(`{"id":"1"}`), Live: extension{Fields: map[string]string{"codeforces.submission": string(raw)}}})
+		view, err := normalize(1, entities, board)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if view.Submissions[1].PassedTestCount != count || view.Submissions[1].MemoryConsumedBytes != 1234 || view.Standings.Rows[0].Points != 430 || view.Standings.Rows[0].Rank != 4 {
+			t.Fatal(view)
 		}
 	}
 }
 
-func TestSlowConsumerGetsReplacementSnapshot(t *testing.T) {
-	events := make(chan application.Event, 2)
-	events <- snapshotEvent(view(1, 1))
-	events <- update(view(1, 1), view(2, 1, 2))
-	current := view(3, 1, 2, 3)
-	if !publish(context.Background(), events, update(view(2, 1, 2), current), current) {
-		t.Fatal("publish failed")
-	}
-	event := <-events
-	if event.Kind != "snapshot" || event.Revision != 3 || len(events) != 0 {
-		t.Fatal(event)
-	}
-}
-
-func TestDisconnectCancelsInternalRequest(t *testing.T) {
-	var calls atomic.Int32
-	canceled := make(chan struct{})
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if calls.Add(1) == 1 {
-			_ = json.NewEncoder(w).Encode(view(1, 1))
-			return
-		}
-		<-r.Context().Done()
-		close(canceled)
-	}))
-	defer server.Close()
-	client, _ := NewClient(server.URL)
-	feed, err := client.SubscribeContest(context.Background(), 1, []string{"alice"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	<-feed.Events
-	deadline := time.After(time.Second)
-	for calls.Load() < 2 {
-		select {
-		case <-deadline:
-			t.Fatal("poll never started")
-		default:
-			time.Sleep(time.Millisecond)
-		}
-	}
-	feed.Close()
-	select {
-	case <-canceled:
-	case <-time.After(time.Second):
-		t.Fatal("request was not canceled")
-	}
-	select {
-	case <-feed.Done:
-	case <-time.After(time.Second):
-		t.Fatal("feed did not stop")
-	}
-}
-
-func TestUnavailableAndInvalidEngineResponses(t *testing.T) {
-	for _, status := range []int{404, 409, 429, 502} {
-		t.Run(http.StatusText(status), func(t *testing.T) {
-			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(status) }))
+func TestReplayPublishesOnlyMatchingScoreboardAndRejectsFeedReset(t *testing.T) {
+	for _, mismatch := range []bool{false, true} {
+		t.Run(map[bool]string{false: "matching", true: "feed reset"}[mismatch], func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/scoreboard" {
+					board := scoreboard{Live: extension{Instance: "new-worker", Watermark: "live-cds-2", Fields: map[string]string{"codeforces.standings": `{"contest":{"id":1,"phase":"CODING"},"problems":[]}`}}}
+					_ = json.NewEncoder(w).Encode(board)
+					return
+				}
+				w.Header().Set("Content-Type", "application/x-ndjson")
+				w.WriteHeader(200)
+				instance := "new-worker"
+				if mismatch {
+					instance = "old-worker"
+				}
+				for index, count := range []int{22, 23} {
+					raw, _ := json.Marshal(domain.Submission{ID: 101, Verdict: "TESTING", PassedTestCount: count})
+					_ = json.NewEncoder(w).Encode(feedEvent{Type: "submissions", ID: "101", Token: []string{"live-cds-1", "live-cds-2"}[index], Data: json.RawMessage(`{"id":"101"}`), Live: extension{Instance: instance, Fields: map[string]string{"codeforces.submission": string(raw)}}})
+					w.(http.Flusher).Flush()
+				}
+				<-r.Context().Done()
+			}))
 			defer server.Close()
-			client, _ := NewClient(server.URL)
-			if _, err := client.ActivateContest(context.Background(), 1); err == nil {
-				t.Fatal("expected error")
+			client := &Client{}
+			ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+			defer cancel()
+			calls := 0
+			err := client.consume(ctx, 1, server.URL, func(update application.ContestUpdate) {
+				calls++
+				if update.Submissions[101].PassedTestCount != 23 {
+					t.Error("replay regression published")
+				}
+				cancel()
+			})
+			if err == nil {
+				t.Fatal("expected cancellation or mismatch")
+			}
+			if mismatch && calls != 0 {
+				t.Fatal("published mismatched instance")
+			}
+			if !mismatch && calls != 1 {
+				t.Fatalf("published %d snapshots", calls)
 			}
 		})
 	}
-	if _, err := NewClient("file:///tmp/engine"); err == nil {
-		t.Fatal("expected invalid URL")
-	}
 }
-
-func TestRecoveryReplacesStaleViewWithoutNewRevision(t *testing.T) {
-	var calls atomic.Int32
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch calls.Add(1) {
-		case 1:
-			_ = json.NewEncoder(w).Encode(view(1, 1))
-		case 2:
-			w.WriteHeader(http.StatusServiceUnavailable)
-		case 3:
-			if r.URL.Query().Get("after") != "" {
-				t.Error("recovery must request a fresh view")
-			}
-			_ = json.NewEncoder(w).Encode(view(1, 1))
-		default:
-			<-r.Context().Done()
-		}
-	}))
-	defer server.Close()
-	client, _ := NewClient(server.URL)
-	feed, err := client.SubscribeContest(context.Background(), 1, []string{"alice"})
+func TestWorkerCapacityAndReadinessFailureReleaseResources(t *testing.T) {
+	client, err := New(Config{Binary: "/bin/false", MaxWorkers: 1, ReadyTimeout: time.Second})
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer feed.Close()
-	for _, expected := range []string{"live", "stale", "live"} {
-		select {
-		case event := <-feed.Events:
-			value, ok := event.Payload.(application.Snapshot)
-			if !ok || value.Health.State != expected || value.Revision != 1 {
-				t.Fatalf("expected %s, got %#v", expected, event)
-			}
-		case <-time.After(3 * time.Second):
-			t.Fatalf("missing %s view", expected)
+	if _, err := client.get(1); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := client.get(2); err == nil {
+		t.Fatal("worker capacity not enforced")
+	}
+	client.StopContest(1)
+	if _, err := client.FetchStandings(context.Background(), 2); err == nil {
+		t.Fatal("failed worker became ready")
+	}
+	client.mu.Lock()
+	defer client.mu.Unlock()
+	if len(client.workers) != 0 {
+		t.Fatal("failed activation leaked worker")
+	}
+}
+
+func TestContestStateRemainsAuthoritativeDuringFinalization(t *testing.T) {
+	for _, test := range []struct {
+		state    contestState
+		phase    string
+		finished bool
+	}{
+		{contestState{}, "BEFORE", false},
+		{contestState{Started: "start"}, "SYSTEM_TEST", false},
+		{contestState{Started: "start", Ended: "end"}, "FINISHED", true},
+		{contestState{Started: "start", Finalized: "final"}, "FINISHED", true},
+	} {
+		board := scoreboard{State: &test.state, Live: extension{Fields: map[string]string{"codeforces.standings": `{"contest":{"id":1,"phase":"FINISHED"},"problems":[]}`}}}
+		view, err := normalize(1, map[string]map[string][]byte{}, board)
+		if err != nil || view.Standings.Contest.Phase != test.phase || view.Finished != test.finished {
+			t.Fatal(view, err)
 		}
 	}
 }

@@ -34,19 +34,19 @@ jobs:
         with:
           go-version-file: backend/go.mod
           cache-dependency-path: backend/go.sum
-      - name: Build and test Kotlin service
-        working-directory: vendor/live-v3/services/codeforces-engine
-        run: ./gradlew --no-daemon test installDist
+      - name: Build standard CDS converter
+        working-directory: vendor/live-v3
+        run: ./gradlew --no-daemon :cds-converter:test :cds-converter:installDist -Plive.dev.embedFrontend=false
       - name: Test pinned engine and exported APIs
         working-directory: vendor/live-v3
         run: ./gradlew --no-daemon :cds:plugins:codeforces:test :cds:core:test :cds:plugins:codeforces:apiCheck :cds:core:apiCheck
       - name: Test existing Go backend
         working-directory: backend
-        run: go test ./... && go build -o /tmp/live-go .
+        run: go test -race ./... && go build -o /tmp/live-go .
       - name: Go API with real live-v3 engine
         working-directory: backend
         env:
-          LIVE_V3_TEST_BINARY: ${{ github.workspace }}/vendor/live-v3/services/codeforces-engine/build/install/live-v3-backend/bin/live-v3-backend
+          LIVE_V3_TEST_BINARY: ${{ github.workspace }}/vendor/live-v3/src/cds-converter/build/install/cds-converter/bin/cds-converter
         run: go test -race ./internal/adapters/livev3 -count=1
       - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
         with:
@@ -59,10 +59,25 @@ jobs:
       - name: Browser dependencies
         working-directory: frontend
         run: pnpm install --frozen-lockfile
+      - name: Frontend unit tests and type checks
+        working-directory: frontend
+        run: pnpm test:unit && pnpm exec tsc --noEmit --ignoreDeprecations 6.0
       - name: Frontend SSE behavior
         working-directory: frontend
         run: |
           pnpm exec playwright install --with-deps chromium
           pnpm exec playwright test --config playwright.sse.config.ts
-      - name: JVM 17 container build
-        run: docker build -f vendor/live-v3/services/codeforces-engine/Dockerfile -t live-v3-backend:test vendor/live-v3
+      - name: Validate Compose configuration
+        run: docker compose -f docker-compose.live-v3.yml config --quiet
+      - name: Build combined deployment image
+        run: docker build -f backend/Dockerfile.live-v3 -t live-v3-backend:test .
+      - name: Smoke test combined deployment
+        run: |
+          docker run -d --name live-v3-smoke -p 127.0.0.1:18080:8080 live-v3-backend:test
+          trap 'docker logs live-v3-smoke; docker rm -f live-v3-smoke' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:18080/healthz
+          docker stop --time 10 live-v3-smoke

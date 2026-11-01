@@ -49,27 +49,37 @@ func main() {
 		2100*time.Millisecond,
 		codeforces.WithRequestObserver(metrics),
 	)
-	manager := application.NewManager(repository, upstream, application.Config{
-		PollInterval:              4200 * time.Millisecond,
-		RetentionPeriod:           retentionPeriod,
-		MaxActiveContests:         3,
-		SubmissionHistoryObserver: metrics,
+	sourceName := env("STANDINGS_SOURCE", "codeforces")
+	scoped, err := repository.Scope(sourceName)
+	if err != nil {
+		slog.Error("configure contest storage failed", "error", err)
+		os.Exit(1)
+	}
+	var gateway application.ContestGateway = upstream
+	if sourceName == "livev3" {
+		source, err := livev3.New(livev3.Config{
+			Binary:     env("LIVE_V3_CONVERTER", "/opt/live-v3/bin/cds-converter"),
+			APIBaseURL: env("CF_API_BASE_URL", defaultCodeforces),
+			APIKey:     os.Getenv("CF_API_KEY"), APISecret: os.Getenv("CF_API_SECRET"),
+			ManagerMode: env("CF_MANAGER_MODE", "false") == "true",
+			MaxWorkers:  3, Store: scoped,
+		})
+		if err != nil {
+			slog.Error("configure contest source failed", "error", err)
+			os.Exit(1)
+		}
+		gateway = source
+	}
+	manager := application.NewManager(scoped, gateway, application.Config{
+		PollInterval: 4200 * time.Millisecond, RetentionPeriod: retentionPeriod,
+		MaxActiveContests: 3, SubmissionHistoryObserver: metrics,
 	})
 	var provider application.LiveStandingsProvider = manager
-	if engineURL := os.Getenv("LIVE_V3_ENGINE_URL"); engineURL != "" {
-		remote, err := livev3.NewClient(engineURL)
-		if err != nil {
-			slog.Error("configure live-v3 engine failed", "error", err)
-			os.Exit(1)
-		}
-		provider = remote
-	} else {
-		if err := manager.Restore(ctx); err != nil {
-			slog.Error("restore active contests failed", "error", err)
-			os.Exit(1)
-		}
-		go manager.RunCleanup(ctx, time.Hour)
+	if err := manager.Restore(ctx); err != nil {
+		slog.Error("restore active contests failed", "error", err)
+		os.Exit(1)
 	}
+	go manager.RunCleanup(ctx, time.Hour)
 
 	metricsMux := http.NewServeMux()
 	metricsMux.Handle("/metrics", metrics.Handler())
@@ -112,9 +122,9 @@ func main() {
 		<-ctx.Done()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
+		manager.Stop()
 		_ = server.Shutdown(shutdownCtx)
 		_ = metricsServer.Shutdown(shutdownCtx)
-		manager.Stop()
 	}()
 
 	slog.Info("live backend listening", "addr", server.Addr)

@@ -57,9 +57,10 @@ type RanklistRow struct {
 }
 
 type Standings struct {
-	Contest  Contest       `json:"contest"`
-	Problems []Problem     `json:"problems"`
-	Rows     []RanklistRow `json:"rows"`
+	Authoritative bool          `json:"-"`
+	Contest       Contest       `json:"contest"`
+	Problems      []Problem     `json:"problems"`
+	Rows          []RanklistRow `json:"rows"`
 }
 
 type Submission struct {

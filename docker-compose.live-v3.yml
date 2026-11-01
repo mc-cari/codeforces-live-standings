@@ -1,6 +1,8 @@
 services:
   live-backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.live-v3
     restart: unless-stopped
     ports:
       - "${LIVE_V3_PORT:-8091}:8080"
@@ -10,30 +12,17 @@ services:
       LISTEN_ADDR: :8080
       METRICS_LISTEN_ADDR: :9090
       MAX_SSE_CONNECTIONS: ${MAX_SSE_CONNECTIONS:-128}
-      LIVE_V3_ENGINE_URL: http://live-v3-engine:8080
-      TELEMETRY_TOKEN: ${TELEMETRY_TOKEN:-}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://codeforces-live-standings.mccari.us,https://codeforces-live-standings-*-mccaris-projects.vercel.app}
-    volumes:
-      - live-v3-api-data:/data
-    depends_on:
-      - live-v3-engine
-  live-v3-engine:
-    build:
-      context: ./vendor/live-v3
-      dockerfile: services/codeforces-engine/Dockerfile
-    restart: unless-stopped
-    environment:
-      DATA_DIR: /data
-      LISTEN_ADDR: :8080
-      METRICS_LISTEN_ADDR: :9090
+      STANDINGS_SOURCE: livev3
+      LIVE_V3_CONVERTER: /opt/live-v3/bin/cds-converter
       CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
       CF_MANAGER_MODE: ${CF_MANAGER_MODE:-false}
       CF_API_KEY: ${CF_API_KEY:-}
       CF_API_SECRET: ${CF_API_SECRET:-}
-      JAVA_OPTS: ${LIVE_V3_JAVA_OPTS:--Xmx1536m}
+      JAVA_OPTS: ${LIVE_V3_JAVA_OPTS:--Xmx512m}
+      TELEMETRY_TOKEN: ${TELEMETRY_TOKEN:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://codeforces-live-standings.mccari.us,https://codeforces-live-standings-*-mccaris-projects.vercel.app}
     volumes:
-      - live-v3-data:/data
+      - live-v3-api-data:/data
 
 volumes:
-  live-v3-data:
   live-v3-api-data:

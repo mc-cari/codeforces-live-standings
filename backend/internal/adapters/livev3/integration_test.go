@@ -3,19 +3,17 @@ package livev3
 import (
 	"bufio"
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/transport/httpapi"
@@ -26,12 +24,7 @@ func TestGoAPIWithLiveV3Engine(t *testing.T) {
 	if binary == "" {
 		t.Skip("LIVE_V3_TEST_BINARY is not configured")
 	}
-	binary, err := filepath.Abs(binary)
-	if err != nil {
-		t.Fatal(err)
-	}
 	var stage atomic.Int32
-	var failing atomic.Bool
 	contest := domain.Contest{ID: 1, Name: "Integration", Type: "CF", Phase: "CODING", StartTimeSeconds: 1700000000, DurationSeconds: 7200}
 	problem := domain.Problem{ContestID: 1, Index: "A", Name: "A", Type: "PROGRAMMING", Points: 500}
 	submission := func(id, seconds int, verdict, handle string) domain.Submission {
@@ -41,14 +34,29 @@ func TestGoAPIWithLiveV3Engine(t *testing.T) {
 		var result any
 		switch r.URL.Path {
 		case "/contest.standings":
-			result = domain.Standings{Contest: contest, Problems: []domain.Problem{problem}, Rows: []domain.RanklistRow{}}
+			result = domain.Standings{Contest: contest, Problems: []domain.Problem{problem, {ContestID: 1, Index: "B", Name: "B", Type: "PROGRAMMING", Points: 500}}, Rows: []domain.RanklistRow{}}
 		case "/contest.hacks":
 			result = []any{}
 		case "/contest.status":
 			if stage.Load() == 0 {
-				result = []domain.Submission{submission(101, 300, "WRONG_ANSWER", "alice"), submission(102, 600, "OK", "alice"), submission(201, 300, "OK", "bob")}
+				unofficial := submission(301, 300, "OK", "charlie")
+				unofficial.Author.ParticipantType = "OUT_OF_COMPETITION"
+				result = []domain.Submission{submission(101, 300, "WRONG_ANSWER", "alice"), submission(102, 600, "OK", "alice"), submission(201, 300, "OK", "bob"), unofficial}
 			} else {
-				result = []domain.Submission{submission(103, 700, "OK", "alice")}
+				value := submission(103, 700, "OK", "alice")
+				value.Problem.Index = "B"
+				value.Problem.Name = "B"
+				switch stage.Load() {
+				case 2:
+					value.Verdict = "TESTING"
+					value.PassedTestCount = 22
+				case 3:
+					value.Verdict = "TESTING"
+					value.PassedTestCount = 23
+				case 5:
+					value.Verdict = "WRONG_ANSWER"
+				}
+				result = []domain.Submission{value}
 			}
 		default:
 			http.NotFound(w, r)
@@ -63,63 +71,28 @@ func TestGoAPIWithLiveV3Engine(t *testing.T) {
 			}
 			result = submissions
 		}
-		if failing.Load() {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			_, _ = w.Write([]byte("upstream unavailable"))
-			return
-		}
 		_ = json.NewEncoder(w).Encode(map[string]any{"status": "OK", "result": result})
 	}))
 	defer upstream.Close()
-	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	repository, err := sqlite.Open(t.TempDir() + "/live.sqlite")
 	if err != nil {
 		t.Fatal(err)
 	}
-	address := listener.Addr().String()
-	listener.Close()
-	data := t.TempDir()
-	start := func() *exec.Cmd {
-		log, err := os.CreateTemp(t.TempDir(), "engine-*.log")
-		if err != nil {
-			t.Fatal(err)
-		}
-		command := exec.Command(binary)
-		command.Env = append(os.Environ(), "DATA_DIR="+data, "LISTEN_ADDR="+address, "METRICS_LISTEN_ADDR=127.0.0.1:0", "CF_API_BASE_URL="+upstream.URL+"/", "POLL_INTERVAL_MS=100", "CF_REQUEST_INTERVAL_MS=20")
-		command.Stdout, command.Stderr = log, log
-		if err := command.Start(); err != nil {
-			t.Fatal(err)
-		}
-		t.Cleanup(func() {
-			if t.Failed() {
-				contents, _ := os.ReadFile(log.Name())
-				t.Logf("engine log: %s", contents)
-			}
-			if command.ProcessState == nil {
-				_ = command.Process.Kill()
-				_ = command.Wait()
-			}
-			log.Close()
-		})
-		deadline := time.Now().Add(30 * time.Second)
-		for time.Now().Before(deadline) {
-			response, err := http.Get("http://" + address + "/healthz")
-			if err == nil {
-				response.Body.Close()
-				if response.StatusCode == 200 {
-					return command
-				}
-			}
-			time.Sleep(50 * time.Millisecond)
-		}
-		contents, _ := os.ReadFile(log.Name())
-		t.Fatalf("engine did not start: %s", contents)
-		return nil
+	defer repository.Close()
+	store, err := repository.Scope("livev3")
+	if err != nil {
+		t.Fatal(err)
 	}
-	engine := start()
-	provider, _ := NewClient("http://" + address)
+	source, err := New(Config{Binary: binary, APIBaseURL: upstream.URL + "/", Store: store})
+	if err != nil {
+		t.Fatal(err)
+	}
+	manager := application.NewManager(store, source, application.Config{MaxActiveContests: 3, RetentionPeriod: time.Hour})
+	defer manager.Stop()
+	var provider application.LiveStandingsProvider = manager
 	api := httptest.NewServer(httpapi.NewServer(provider, httpapi.Config{MaxStreams: 2}))
 	t.Cleanup(api.Close)
-	client := &http.Client{Timeout: 20 * time.Second}
+	client := &http.Client{Timeout: 90 * time.Second}
 	response, err := client.Post(api.URL+"/v1/contests/1/activate", "application/json", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -168,58 +141,120 @@ func TestGoAPIWithLiveV3Engine(t *testing.T) {
 	if err := json.Unmarshal(payload, &initial); err != nil {
 		t.Fatal(err)
 	}
-	if kind != "snapshot" || len(initial.Submissions) != 2 || initial.Standings.Rows[0].Points != 430 {
-		t.Fatalf("initial %s: %s", kind, payload)
-	}
-	failing.Store(true)
-	staleDeadline := time.After(10 * time.Second)
-	staleSeen := false
-	for !staleSeen {
-		select {
-		case <-staleDeadline:
-			t.Fatal("stale state not published")
-		default:
-			kind, payload = read(reader)
-			if kind == "snapshot" {
-				var current application.Snapshot
-				if err := json.Unmarshal(payload, &current); err != nil {
-					t.Fatal(err)
-				}
-				staleSeen = current.Health.State == "stale" && len(current.Submissions) == 2
-			}
+	for len(initial.Submissions) != 2 {
+		kind, payload = read(reader)
+		if kind != "snapshot" {
+			continue
+		}
+		if err := json.Unmarshal(payload, &initial); err != nil {
+			t.Fatal(err)
 		}
 	}
-	failing.Store(false)
+	if initial.Standings.Rows[0].Points != 430 {
+		t.Fatalf("initial %s: %s", kind, payload)
+	}
 	stage.Store(1)
 	for {
 		kind, payload = read(reader)
-		if kind != "patch" {
+		if kind != "snapshot" {
 			continue
 		}
-		var patch application.Patch
+		var patch application.Snapshot
 		if err := json.Unmarshal(payload, &patch); err != nil {
 			t.Fatal(err)
 		}
-		if len(patch.SubmissionUpserts) > 0 && patch.SubmissionUpserts[0].ID == 103 {
+		if len(patch.Submissions) > 0 && patch.Submissions[0].ID == 103 {
 			break
 		}
 	}
-	stream.Body.Close()
-	bob, bobReader := connect("Qk9C")
+	defer stream.Body.Close()
+	bob, bobReader := connect(base64.RawURLEncoding.EncodeToString([]byte("BOB;charlie")))
 	_, payload = read(bobReader)
 	if !bytes.Contains(payload, []byte(`"id":201`)) || bytes.Contains(payload, []byte(`"id":101`)) {
 		t.Fatal(string(payload))
 	}
+	var tied application.Snapshot
+	if err := json.Unmarshal(payload, &tied); err != nil {
+		t.Fatal(err)
+	}
+	if len(tied.Standings.Rows) != 2 || tied.Standings.Rows[0].Rank != tied.Standings.Rows[1].Rank || len(tied.Submissions) != 2 || tied.Submissions[0].Author.Rank != 1 || tied.Submissions[1].Author.Rank != 1 {
+		t.Fatalf("unofficial ties lost: %s", payload)
+	}
 	bob.Body.Close()
-	_ = engine.Process.Signal(os.Interrupt)
-	if err := engine.Wait(); err != nil && !strings.Contains(err.Error(), "exit status 130") {
-		t.Log(fmt.Sprint(err))
+	source.mu.Lock()
+	workers := len(source.workers)
+	source.mu.Unlock()
+	if workers != 1 {
+		t.Fatalf("two browsers started %d workers", workers)
 	}
-	start()
-	reconnected, reconnectedReader := connect("YWxpY2U")
-	defer reconnected.Body.Close()
-	kind, payload = read(reconnectedReader)
-	if kind != "snapshot" || !bytes.Contains(payload, []byte(`"id":101`)) || !bytes.Contains(payload, []byte(`"id":103`)) {
-		t.Fatalf("restored %s: %s", kind, payload)
+	scores := make(map[int32]float64)
+	for _, next := range []struct {
+		stage   int32
+		verdict string
+		tests   int
+	}{{2, "TESTING", 22}, {3, "TESTING", 23}, {4, "OK", 1}, {5, "WRONG_ANSWER", 1}, {6, "OK", 1}} {
+		stage.Store(next.stage)
+		for {
+			kind, payload = read(reader)
+			if kind != "snapshot" {
+				continue
+			}
+			var current application.Snapshot
+			if err := json.Unmarshal(payload, &current); err != nil {
+				t.Fatal(err)
+			}
+			found := false
+			for _, submission := range current.Submissions {
+				if submission.ID == 103 && submission.Verdict == next.verdict && submission.PassedTestCount == next.tests {
+					found = true
+				}
+			}
+			if found {
+				scores[next.stage] = current.Standings.Rows[0].Points
+				break
+			}
+		}
 	}
+	if scores[2] != scores[3] || scores[4] <= scores[3] || scores[5] >= scores[4] || scores[6] != scores[4] {
+		t.Fatalf("score/rejudge transitions: %v", scores)
+	}
+	source.StopContest(1)
+	// Session owns restart, keeps the previous published state stale, and merges
+	// the fresh worker replay with retained entities from SQLite.
+	staleSeen := false
+	deadline := time.Now().Add(20 * time.Second)
+	for time.Now().Before(deadline) {
+		kind, payload = read(reader)
+		if kind == "state" && bytes.Contains(payload, []byte(`"state":"stale"`)) {
+			staleSeen = true
+		}
+		if kind == "snapshot" && bytes.Contains(payload, []byte(`"id":101`)) && bytes.Contains(payload, []byte(`"id":103`)) && bytes.Contains(payload, []byte(`"state":"live"`)) {
+			if !staleSeen {
+				t.Fatal("worker restart did not mark retained view stale")
+			}
+			stream.Body.Close()
+			manager.Stop()
+			restoredSource, err := New(Config{Binary: binary, APIBaseURL: upstream.URL + "/", Store: store})
+			if err != nil {
+				t.Fatal(err)
+			}
+			restored := application.NewManager(store, restoredSource, application.Config{MaxActiveContests: 3, RetentionPeriod: time.Hour})
+			defer restored.Stop()
+			if err := restored.Restore(t.Context()); err != nil {
+				t.Fatal(err)
+			}
+			feed, err := restored.SubscribeContest(t.Context(), 1, []string{"alice"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer feed.Close()
+			first := <-feed.Events
+			saved := first.Payload.(application.Snapshot)
+			if saved.Health.State != "stale" || len(saved.Submissions) != 3 {
+				t.Fatalf("application restart lost retained view: %#v", saved)
+			}
+			return
+		}
+	}
+	t.Fatal("worker did not reconcile retained history")
 }

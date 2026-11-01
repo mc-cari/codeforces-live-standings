@@ -18,14 +18,18 @@ type Event struct {
 }
 
 type Snapshot struct {
-	Revision    int64               `json:"revision"`
-	Contest     domain.Contest      `json:"contest"`
-	Standings   domain.Standings    `json:"standings"`
-	Submissions []domain.Submission `json:"submissions"`
-	Health      Health              `json:"health"`
+	Hacks           []domain.Hack       `json:"hacks"`
+	HacksIncomplete bool                `json:"hacksIncomplete"`
+	Revision        int64               `json:"revision"`
+	Contest         domain.Contest      `json:"contest"`
+	Standings       domain.Standings    `json:"standings"`
+	Submissions     []domain.Submission `json:"submissions"`
+	Health          Health              `json:"health"`
 }
 
 type Patch struct {
+	HackUpserts       []domain.Hack       `json:"hackUpserts"`
+	HacksIncomplete   bool                `json:"hacksIncomplete"`
 	Revision          int64               `json:"revision"`
 	Contest           domain.Contest      `json:"contest"`
 	Standings         domain.Standings    `json:"standings"`
@@ -48,6 +52,10 @@ type Subscription struct {
 }
 
 type Session struct {
+	hacks             map[int]domain.Hack
+	hacksLoaded       bool
+	lastHackFetch     time.Time
+	finishObserved    time.Time
 	historyObserver   SubmissionHistoryObserver
 	historyIncomplete bool
 	repository        Repository
@@ -70,7 +78,7 @@ type Session struct {
 }
 
 func newSession(repository Repository, gateway ContestGateway, pollInterval time.Duration, contest domain.Contest, standings *domain.Standings, revision int64, stored map[int]domain.Submission, observer SubmissionHistoryObserver) *Session {
-	return &Session{historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
+	return &Session{hacks: make(map[int]domain.Hack), historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
 }
 
 func (session *Session) Contest() domain.Contest {
@@ -113,7 +121,7 @@ func (session *Session) Unsubscribe(subscription *Subscription) {
 
 func (session *Session) snapshotLocked(subscription *Subscription) Event {
 	standings, submissions := domain.Project(session.contest, session.standings, session.submissions, subscription.Handles)
-	return Event{Kind: "snapshot", Revision: session.revision, Payload: Snapshot{Revision: session.revision, Contest: session.contest, Standings: standings, Submissions: submissions, Health: Health{State: session.healthStateLocked()}}}
+	return Event{Kind: "snapshot", Revision: session.revision, Payload: Snapshot{Hacks: session.selectedHacksLocked(subscription), HacksIncomplete: session.hacksIncompleteLocked(subscription.Handles), Revision: session.revision, Contest: session.contest, Standings: standings, Submissions: submissions, Health: Health{State: session.healthStateLocked()}}}
 }
 
 func (session *Session) healthStateLocked() string {
@@ -134,7 +142,7 @@ func (session *Session) patchLocked(subscription *Subscription, upserts []domain
 			selected = append(selected, submission)
 		}
 	}
-	return Event{Kind: "patch", Revision: session.revision, Payload: Patch{Revision: session.revision, Contest: session.contest, Standings: standings, SubmissionUpserts: selected, Health: Health{State: "live"}}}
+	return Event{Kind: "patch", Revision: session.revision, Payload: Patch{HackUpserts: session.selectedHacksLocked(subscription), HacksIncomplete: session.hacksIncompleteLocked(subscription.Handles), Revision: session.revision, Contest: session.contest, Standings: standings, SubmissionUpserts: selected, Health: Health{State: "live"}}}
 }
 
 func (session *Session) Run(ctx context.Context) {
@@ -161,6 +169,9 @@ func (session *Session) Run(ctx context.Context) {
 		case <-ticker.C:
 			if !session.poll(ctx) {
 				return
+			}
+			if session.finishedPolls >= 2 && !session.finishObserved.IsZero() {
+				ticker.Reset(30 * time.Second)
 			}
 		case <-ctx.Done():
 			return
@@ -209,6 +220,7 @@ func (session *Session) poll(ctx context.Context) bool {
 			standingsErr = err
 		}
 	}
+	hackChanged := session.collectHacks(ctx, contestID)
 	if statusErr != nil || standingsErr != nil {
 		slog.Warn("contest poll incomplete", "contest", contestID, "status_error", statusErr, "standings_error", standingsErr)
 		session.mu.Lock()
@@ -236,10 +248,16 @@ func (session *Session) poll(ctx context.Context) bool {
 	session.mu.Unlock()
 	standingsChanged := previousStandings == nil || !reflect.DeepEqual(*previousStandings, standings)
 	contestChanged := !reflect.DeepEqual(previousContest, standings.Contest)
-	if len(changed) > 0 || standingsChanged || contestChanged || wasStale {
+	if hackChanged || len(changed) > 0 || standingsChanged || contestChanged || wasStale {
 		session.broadcast(changed)
 	}
-	if finished && session.finishedPolls >= 2 {
+	if finished && session.finishObserved.IsZero() {
+		session.finishObserved = now
+	}
+	session.mu.RLock()
+	incompleteHacks := session.hacksIncompleteLocked(nil)
+	session.mu.RUnlock()
+	if finished && session.finishedPolls >= 2 && (!incompleteHacks || now.Sub(session.finishObserved) >= 10*time.Minute) {
 		session.mu.Lock()
 		session.finished = true
 		session.finishedAt = now
@@ -312,4 +330,61 @@ func (session *Session) offer(subscriber *Subscription, event Event, replace boo
 	case subscriber.Events <- event:
 	default:
 	}
+}
+
+func (session *Session) collectHacks(ctx context.Context, contestID int) bool {
+	gateway := session.gateway
+	if time.Since(session.lastHackFetch) < 30*time.Second {
+		return false
+	}
+	session.lastHackFetch = time.Now()
+	hacks, err := gateway.FetchHacks(ctx, contestID)
+	session.lastHackFetch = time.Now()
+	session.mu.Lock()
+	defer session.mu.Unlock()
+	session.hacksLoaded = err == nil
+	if err == nil {
+		for _, hack := range hacks {
+			session.hacks[hack.ID] = hack
+		}
+	}
+	// Availability changes and verdict updates are included even without submissions.
+	return true
+}
+
+func (session *Session) selectedHacksLocked(subscription *Subscription) []domain.Hack {
+	result := make([]domain.Hack, 0)
+	for _, hack := range session.hacks {
+		if subscription.Handles.Selects(hack.Hacker) || subscription.Handles.Selects(hack.Defender) {
+			result = append(result, hack)
+		}
+	}
+	return result
+}
+
+func (session *Session) hacksIncompleteLocked(handles domain.HandleSet) bool {
+	if !session.hacksLoaded || session.contest.Phase != "FINISHED" || session.standings == nil {
+		return true
+	}
+	for _, row := range session.standings.Rows {
+		if handles != nil && !handles.Selects(row.Party) {
+			continue
+		}
+		successful, unsuccessful := 0, 0
+		for _, hack := range session.hacks {
+			if !domain.SameParty(hack.Hacker, row.Party) {
+				continue
+			}
+			if hack.Verdict == "HACK_SUCCESSFUL" {
+				successful++
+			}
+			if hack.Verdict == "HACK_UNSUCCESSFUL" {
+				unsuccessful++
+			}
+		}
+		if successful != row.SuccessfulHackCount || unsuccessful != row.UnsuccessfulHackCount {
+			return true
+		}
+	}
+	return false
 }

@@ -141,3 +141,9 @@ func transportOutcome(err error) string {
 	}
 	return "transport_error"
 }
+
+func (client *Client) FetchHacks(ctx context.Context, contestID int) ([]domain.Hack, error) {
+	var result []domain.Hack
+	err := client.fetch(ctx, "contest.hacks", contestID, &result)
+	return result, err
+}

@@ -1,3 +1,4 @@
+import type { Hack } from '@/src/shared/domain/hacks';
 import { useEffect, useState } from 'react';
 import { useFreeze } from '@/src/shared/freeze/useFreeze';
 import FreezeControls from '@/src/shared/freeze/FreezeControls';
@@ -13,6 +14,8 @@ type LiveStandingsWorkspaceProps = {
   contest: Contest | undefined;
   contestId: string;
   contestType: string;
+  hacks?: Hack[];
+  hacksIncomplete?: boolean;
   submissions: Submission[];
   newSubmissionsCount: number;
   localStandings: Map<string, number> | undefined;
@@ -30,6 +33,8 @@ export default function LiveStandingsWorkspace({
   contestId,
   contestType,
   submissions,
+  hacks = [],
+  hacksIncomplete = true,
   newSubmissionsCount,
   localStandings,
   globalStandings,
@@ -47,11 +52,12 @@ export default function LiveStandingsWorkspace({
   const source = globalStandings;
   const elapsed = source ? (isContestFinished ? source.contest.durationSeconds
     : Math.max(source.contest.relativeTimeSeconds, now - source.contest.startTimeSeconds)) : 0;
-  const freeze = useFreeze(source, submissions, elapsed, isContestFinished);
+  const freeze = useFreeze(source, submissions, elapsed, isContestFinished, 'live', '', false, hacks, hacksIncomplete);
   if (freeze.cutoff !== undefined && freeze.projection) {
     globalStandings = freeze.projection.standings as Standings;
     localStandings = freeze.projection.localStandings;
     submissions = freeze.projection.submissions as Submission[];
+    hacks = freeze.projection.hacks;
     if (freeze.state === 'frozen' || freeze.state === 'revealing') newSubmissionsCount = 0;
   }
   submissions = submissions.slice(0, MAX_SUBMISSIONS_IN_MEMORY);
@@ -98,6 +104,9 @@ export default function LiveStandingsWorkspace({
               globalStandings={globalStandings}
               newSubmissionsCount={newSubmissionsCount}
               submissions={submissions}
+              hacks={hacks}
+              focused={freeze.focused}
+              hacksIncomplete={hacksIncomplete}
               userRank={userRank}
             />
           </div>

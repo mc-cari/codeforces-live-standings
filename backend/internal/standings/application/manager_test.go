@@ -80,3 +80,7 @@ func TestFinishedContestRunsShortPollingLifecycle(t *testing.T) {
 		}
 	}
 }
+
+func (gateway *countingGateway) FetchHacks(context.Context, int) ([]domain.Hack, error) {
+	return nil, nil
+}

@@ -1,3 +1,4 @@
+import { sanitizeHack, type Hack } from '@/src/shared/domain/hacks';
 import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
 import type {
   CodeforcesApiResponse,
@@ -23,6 +24,10 @@ const readResponse = async <Result>(response: Response, message: string): Promis
 };
 
 export const codeforcesLiveContestGateway: LiveContestGateway = {
+  async getHacks(contestId, signal) {
+    const response = await codeforcesFetch('contest.hacks', { contestId }, { signal });
+    return (await readResponse<Hack[]>(response, 'Unable to load hack details')).map(sanitizeHack);
+  },
   async getContest(contestId, signal) {
     const response = await codeforcesFetch('contest.info', { contestId }, { signal });
     return mapContestDto(await readResponse<CodeforcesContestDto>(response, 'Unable to load contest information'));

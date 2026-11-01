@@ -12,7 +12,8 @@ export type LiveProjection = {
 };
 
 const hasSelectedMember = (party: Party, selected: Set<string>) => (
-  party.members.some((member) => selected.has(participantIdentity(member.handle)))
+  selected.has(participantIdentity(party.teamName || ''))
+  || party.members.some((member) => selected.has(participantIdentity(member.handle)))
 );
 
 const calculateLocalStandings = (

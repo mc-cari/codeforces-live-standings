@@ -35,3 +35,18 @@ func TestProjectionReconstructsMissingParticipantRow(t *testing.T) {
 		t.Fatalf("unexpected reconstructed rows: %#v", projected.Rows)
 	}
 }
+
+func TestSamePartyHandlesTeamsAndCase(t *testing.T) {
+	first := Party{ParticipantType: "CONTESTANT", TeamName: "Team One", Members: []Member{{Handle: "Member"}}}
+	for _, other := range []Party{
+		{ParticipantType: "CONTESTANT", TeamName: "team one"},
+		{ParticipantType: "CONTESTANT", Members: []Member{{Handle: "member"}}},
+	} {
+		if !SameParty(first, other) {
+			t.Fatal("matching party not recognized")
+		}
+	}
+	if SameParty(first, Party{ParticipantType: "PRACTICE", Members: first.Members}) {
+		t.Fatal("practice party matched contestant")
+	}
+}

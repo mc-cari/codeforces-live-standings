@@ -1,3 +1,4 @@
+import type { Hack } from '@/src/shared/domain/hacks';
 import type {
   ReplayStandings,
   ReplaySubmission,
@@ -5,6 +6,7 @@ import type {
 } from '../domain/models';
 
 export interface ReplayGateway {
+  getHacks(contestId: string, signal?: AbortSignal): Promise<Hack[]>;
   getStandings(contestId: string, signal?: AbortSignal): Promise<ReplayStandings>;
   getSubmissions(
     contestId: string,

@@ -1,3 +1,4 @@
+import { sanitizeHack, type Hack } from '@/src/shared/domain/hacks';
 import { createHash, randomBytes } from 'crypto';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { Agent, fetch as undiciFetch } from 'undici';
@@ -37,12 +38,13 @@ const allowedParameters: Record<string, Set<string>> = {
   'contest.list': new Set(['gym']),
   'contest.info': new Set(['contestId']),
   'contest.standings': new Set(['contestId']),
+  'contest.hacks': new Set(['contestId']),
   'contest.status': new Set(['contestId', 'handles', 'participantTypes']),
   'participant.import': new Set(['contestId', 'count', 'selection']),
   'user.info': new Set(['handles']),
 };
 
-const anonymousMethods = new Set(['contest.list', 'contest.standings']);
+const anonymousMethods = new Set(['contest.list', 'contest.standings', 'contest.hacks']);
 const freshConnectionMethods = new Set(['contest.standings', 'contest.status']);
 
 type CachedResponse = { body: string; status: number };
@@ -54,6 +56,7 @@ const responseCache = new ExpiringCache<CachedResponse>(Date.now, {
 const requestCoordinator = new RequestCoordinator();
 
 const cacheDuration = (method: string): number => {
+  if (method === 'contest.hacks') return 30 * 1000;
   if (method === 'user.info') return 60 * 60 * 1000;
   if (method === 'contest.standings') return 10 * 1000;
   if (method === 'contest.list') return 5 * 60 * 1000;
@@ -106,7 +109,7 @@ const filterSubmissions = (
 ): string => {
   if (!handles && !participantTypes) return body;
 
-  const selectedHandles = handles ? new Set(handles.split(';')) : null;
+  const selectedHandles = handles ? new Set(handles.split(';').map((handle) => handle.toLowerCase())) : null;
   const selectedParticipantTypes = participantTypes ? new Set(participantTypes.split(',')) : null;
   const response = parseCodeforcesResponse<CodeforcesSubmissionDto[]>(body);
   if (!Array.isArray(response.result)) return body;
@@ -115,7 +118,8 @@ const filterSubmissions = (
     ...response,
     result: response.result.filter((submission) => (
       (!selectedHandles
-        || submission.author.members.some((member) => selectedHandles.has(member.handle)))
+        || selectedHandles.has(submission.author.teamName?.toLowerCase() || '')
+        || submission.author.members.some((member) => selectedHandles.has(member.handle.toLowerCase())))
       && (!selectedParticipantTypes
         || selectedParticipantTypes.has(submission.author.participantType))
     )),
@@ -152,6 +156,10 @@ const getCodeforcesResponse = async (method: string, parameters: URLSearchParams
 
   return requestCoordinator.run(cacheKey, async () => {
     const response = await fetchCodeforces(method, new URLSearchParams(parameters));
+    if (method === 'contest.hacks' && isSuccessfulCodeforcesResponse(response)) {
+      const payload = parseCodeforcesResponse<Hack[]>(response.body);
+      response.body = JSON.stringify({ ...payload, result: payload.result?.map(sanitizeHack) });
+    }
     const duration = getResponseCacheDuration(cacheDuration(method), response);
     if (duration !== undefined) responseCache.set(cacheKey, response, duration);
     return response;

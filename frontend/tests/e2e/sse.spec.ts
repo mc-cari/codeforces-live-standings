@@ -56,3 +56,45 @@ test('SSE loads standings when the initial contest-info request fails', async ({
   await expect(page.getByTestId('contest-ribbon')).toContainText('Recovered SSE contest');
   await expect.poll(() => events.filter((event) => event.kind === 'view_displayed').length).toBe(1);
 });
+
+test('SSE hack upserts replace verdicts, survive reconnects and reveal once for two selected participants', async ({ page }) => {
+  const start = Math.floor(Date.now() / 1000) - 7200;
+  const contest = { id: 566, name: 'Hack SSE contest', type: 'CF', phase: 'FINISHED', durationSeconds: 7200,
+    startTimeSeconds: start, relativeTimeSeconds: 7200 };
+  const party = (handle: string) => ({ members: [{ handle }], participantType: 'CONTESTANT' });
+  const standings = { contest, problems: [{ index: 'A', name: 'Problem A' }], rows: ['alpha', 'beta'].map((name, index) => ({
+    party: party(name), rank: index + 1, points: index ? 0 : 100, penalty: 0,
+    successfulHackCount: index ? 0 : 1, unsuccessfulHackCount: 0,
+    problemResults: [{ points: 0, penalty: 0, rejectedAttemptCount: 0, bestSubmissionTimeSeconds: 0 }],
+  })) };
+  const hack = { id: 1, creationTimeSeconds: start + 4000, hacker: party('alpha'), defender: party('beta'),
+    problem: { index: 'A' }, verdict: 'HACK_UNSUCCESSFUL' };
+  const submission = { id: 1, contestId: 566, creationTimeSeconds: start + 100, relativeTimeSeconds: 100,
+    author: party('alpha'), problem: { index: 'A' }, verdict: 'CHALLENGED' };
+  const snapshot = { revision: 1, contest, standings, submissions: [submission], hacks: [hack], hacksIncomplete: true };
+  const patch = { revision: 2, contest, standings, submissionUpserts: [],
+    hackUpserts: [{ ...hack, verdict: 'HACK_SUCCESSFUL' }], hacksIncomplete: false };
+  await page.route('**/api/codeforces?**', (route) => route.fulfill({ json: { status: 'OK', result:
+    new URL(route.request().url()).searchParams.get('method') === 'contest.info' ? contest : [] } }));
+  await page.route('**/v1/contests/566/activate', (route) => route.fulfill({ json: { state: 'live', contest } }));
+  await page.route('**/v1/contests/566/events?**', (route) => route.fulfill({ contentType: 'text/event-stream',
+    body: `retry: 100
+ event: snapshot
+data: ${JSON.stringify(snapshot)}
+
+event: patch
+data: ${JSON.stringify(patch)}
+
+`.replace(' event:', 'event:') }));
+  await page.goto('/contests/566/standings?contestType=normal&handles=alpha&handles=beta&freezeMinutes=60');
+  await expect(page.getByText(/Standings frozen/)).toBeVisible();
+  await expect(page.locator('[data-hack-id]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Start reveal' }).click();
+  await page.getByRole('button', { name: 'Next', exact: true }).click();
+  await expect(page.getByText('Reveal complete', { exact: true })).toBeVisible();
+  await expect(page.locator('[data-hack-id="1"]')).toHaveCount(1);
+  await expect(page.locator('[data-hack-id="1"]')).toContainText('+100');
+  await expect(page.locator('[data-feed-key="submission:1"]')).toHaveCount(1);
+  await expect(page.locator('[data-feed-key="hack:1"]')).toHaveCount(1);
+  await expect(page.locator('[data-hack-id="1"]')).not.toContainText('-50');
+});

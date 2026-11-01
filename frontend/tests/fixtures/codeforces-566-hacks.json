@@ -1,0 +1,1665 @@
+{
+  "source": {
+    "contestId": 566,
+    "handles": [
+      "Misha100896",
+      "fruwajacybyk"
+    ],
+    "fetchedAt": "2026-11-01",
+    "methods": [
+      "contest.standings",
+      "contest.hacks",
+      "contest.status"
+    ],
+    "note": "Public API data; tests and judge protocols excluded. Latest submission verdicts only."
+  },
+  "standings": {
+    "contest": {
+      "id": 566,
+      "name": "VK Cup 2015 - Finals, online mirror",
+      "type": "CF",
+      "phase": "FINISHED",
+      "frozen": false,
+      "durationSeconds": 10800,
+      "startTimeSeconds": 1438273200,
+      "relativeTimeSeconds": 355299861
+    },
+    "problems": [
+      {
+        "contestId": 566,
+        "index": "A",
+        "name": "Matching Names",
+        "type": "PROGRAMMING",
+        "points": 1750.0,
+        "rating": 2300,
+        "tags": [
+          "dfs and similar",
+          "strings",
+          "trees"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "B",
+        "name": "Replicating Processes",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2600,
+        "tags": [
+          "constructive algorithms",
+          "greedy"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "C",
+        "name": "Logistical Questions",
+        "type": "PROGRAMMING",
+        "points": 3000.0,
+        "rating": 3000,
+        "tags": [
+          "dfs and similar",
+          "divide and conquer",
+          "trees"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "E",
+        "name": "Restoring Map",
+        "type": "PROGRAMMING",
+        "points": 3000.0,
+        "rating": 3200,
+        "tags": [
+          "bitmasks",
+          "constructive algorithms",
+          "trees"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      }
+    ],
+    "rows": [
+      {
+        "party": {
+          "contestId": 566,
+          "participantId": 5250116,
+          "members": [
+            {
+              "handle": "Misha100896"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 5,
+          "startTimeSeconds": 1438273200
+        },
+        "rank": 204,
+        "points": 690.0,
+        "penalty": 0,
+        "successfulHackCount": 3,
+        "unsuccessfulHackCount": 8,
+        "problemResults": [
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 380.0,
+            "rejectedAttemptCount": 2,
+            "type": "FINAL",
+            "bestSubmissionTimeSeconds": 7802
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 410.0,
+            "rejectedAttemptCount": 1,
+            "type": "FINAL",
+            "bestSubmissionTimeSeconds": 1206
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 1,
+            "type": "FINAL"
+          }
+        ]
+      },
+      {
+        "party": {
+          "contestId": 566,
+          "participantId": 5250118,
+          "members": [
+            {
+              "handle": "fruwajacybyk"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 5,
+          "startTimeSeconds": 1438273200
+        },
+        "rank": 402,
+        "points": 150.0,
+        "penalty": 0,
+        "successfulHackCount": 0,
+        "unsuccessfulHackCount": 0,
+        "problemResults": [
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 2,
+            "type": "FINAL"
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 0,
+            "type": "FINAL"
+          },
+          {
+            "points": 150.0,
+            "rejectedAttemptCount": 4,
+            "type": "FINAL",
+            "bestSubmissionTimeSeconds": 8691
+          },
+          {
+            "points": 0.0,
+            "rejectedAttemptCount": 2,
+            "type": "FINAL"
+          }
+        ]
+      }
+    ]
+  },
+  "hacks": [
+    {
+      "id": 160427,
+      "creationTimeSeconds": 1438274878,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160428,
+      "creationTimeSeconds": 1438274957,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160429,
+      "creationTimeSeconds": 1438275141,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_SUCCESSFUL"
+    },
+    {
+      "id": 160430,
+      "creationTimeSeconds": 1438275257,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5249937,
+        "members": [
+          {
+            "handle": "Kmcode"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160432,
+      "creationTimeSeconds": 1438275564,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5249937,
+        "members": [
+          {
+            "handle": "Kmcode"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160438,
+      "creationTimeSeconds": 1438275856,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250311,
+        "members": [
+          {
+            "handle": "amitsaharana"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "INVALID_INPUT"
+    },
+    {
+      "id": 160447,
+      "creationTimeSeconds": 1438276310,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5249737,
+        "members": [
+          {
+            "handle": "vishfrnds"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "INVALID_INPUT"
+    },
+    {
+      "id": 160491,
+      "creationTimeSeconds": 1438278895,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250311,
+        "members": [
+          {
+            "handle": "amitsaharana"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160499,
+      "creationTimeSeconds": 1438279628,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_SUCCESSFUL"
+    },
+    {
+      "id": 160548,
+      "creationTimeSeconds": 1438281234,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250358,
+        "members": [
+          {
+            "handle": "ghazouani92"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "verdict": "INVALID_INPUT"
+    },
+    {
+      "id": 160551,
+      "creationTimeSeconds": 1438281294,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250358,
+        "members": [
+          {
+            "handle": "ghazouani92"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "verdict": "HACK_SUCCESSFUL"
+    },
+    {
+      "id": 160560,
+      "creationTimeSeconds": 1438281471,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5249512,
+        "members": [
+          {
+            "handle": "ZenekMartyniuk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160631,
+      "creationTimeSeconds": 1438282514,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "verdict": "INVALID_INPUT"
+    },
+    {
+      "id": 160640,
+      "creationTimeSeconds": 1438282606,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160643,
+      "creationTimeSeconds": 1438282647,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5249831,
+        "members": [
+          {
+            "handle": "guille"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160644,
+      "creationTimeSeconds": 1438282665,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5245063,
+        "members": [
+          {
+            "handle": "SpOleM"
+          },
+          {
+            "handle": "anzu"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "teamId": 12654,
+        "teamName": "GandL",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    },
+    {
+      "id": 160654,
+      "creationTimeSeconds": 1438282810,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5247943,
+        "members": [
+          {
+            "handle": "ilyakor"
+          },
+          {
+            "handle": "Petr"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "teamId": 12750,
+        "teamName": "Petr team",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "verdict": "HACK_SUCCESSFUL"
+    },
+    {
+      "id": 160733,
+      "creationTimeSeconds": 1438283792,
+      "hacker": {
+        "contestId": 566,
+        "participantId": 5245063,
+        "members": [
+          {
+            "handle": "SpOleM"
+          },
+          {
+            "handle": "anzu"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "teamId": 12654,
+        "teamName": "GandL",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "defender": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "verdict": "HACK_UNSUCCESSFUL"
+    }
+  ],
+  "submissions": [
+    {
+      "id": 12339034,
+      "contestId": 566,
+      "creationTimeSeconds": 1438695328,
+      "relativeTimeSeconds": 2147483647,
+      "problem": {
+        "contestId": 566,
+        "index": "A",
+        "name": "Matching Names",
+        "type": "PROGRAMMING",
+        "points": 1750.0,
+        "rating": 2300,
+        "tags": [
+          "dfs and similar",
+          "strings",
+          "trees"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5251667,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "PRACTICE",
+        "ghost": false,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "OK",
+      "testset": "TESTS",
+      "passedTestCount": 38,
+      "timeConsumedMillis": 342,
+      "memoryConsumedBytes": 95436800
+    },
+    {
+      "id": 12281391,
+      "contestId": 566,
+      "creationTimeSeconds": 1438282287,
+      "relativeTimeSeconds": 9087,
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "CHALLENGED",
+      "testset": "CHALLENGES",
+      "passedTestCount": 6,
+      "timeConsumedMillis": 234,
+      "memoryConsumedBytes": 0
+    },
+    {
+      "id": 12280918,
+      "contestId": 566,
+      "creationTimeSeconds": 1438281002,
+      "relativeTimeSeconds": 7802,
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "OK",
+      "testset": "TESTS",
+      "passedTestCount": 48,
+      "timeConsumedMillis": 889,
+      "memoryConsumedBytes": 15974400
+    },
+    {
+      "id": 12280821,
+      "contestId": 566,
+      "creationTimeSeconds": 1438280757,
+      "relativeTimeSeconds": 7557,
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "MEMORY_LIMIT_EXCEEDED",
+      "testset": "PRETESTS",
+      "passedTestCount": 1,
+      "timeConsumedMillis": 483,
+      "memoryConsumedBytes": 268390400
+    },
+    {
+      "id": 12280720,
+      "contestId": 566,
+      "creationTimeSeconds": 1438280509,
+      "relativeTimeSeconds": 7309,
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "MEMORY_LIMIT_EXCEEDED",
+      "testset": "PRETESTS",
+      "passedTestCount": 1,
+      "timeConsumedMillis": 140,
+      "memoryConsumedBytes": 268390400
+    },
+    {
+      "id": 12277698,
+      "contestId": 566,
+      "creationTimeSeconds": 1438274406,
+      "relativeTimeSeconds": 1206,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "OK",
+      "testset": "TESTS",
+      "passedTestCount": 38,
+      "timeConsumedMillis": 608,
+      "memoryConsumedBytes": 11980800
+    },
+    {
+      "id": 12277553,
+      "contestId": 566,
+      "creationTimeSeconds": 1438274137,
+      "relativeTimeSeconds": 937,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250116,
+        "members": [
+          {
+            "handle": "Misha100896"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++11",
+      "verdict": "TIME_LIMIT_EXCEEDED",
+      "testset": "PRETESTS",
+      "passedTestCount": 5,
+      "timeConsumedMillis": 1000,
+      "memoryConsumedBytes": 11980800
+    },
+    {
+      "id": 12282634,
+      "contestId": 566,
+      "creationTimeSeconds": 1438286171,
+      "relativeTimeSeconds": 2147483647,
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5251278,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "PRACTICE",
+        "ghost": false,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "OK",
+      "testset": "TESTS",
+      "passedTestCount": 53,
+      "timeConsumedMillis": 93,
+      "memoryConsumedBytes": 3174400
+    },
+    {
+      "id": 12282094,
+      "contestId": 566,
+      "creationTimeSeconds": 1438283898,
+      "relativeTimeSeconds": 10698,
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "TIME_LIMIT_EXCEEDED",
+      "testset": "TESTS",
+      "passedTestCount": 36,
+      "timeConsumedMillis": 2000,
+      "memoryConsumedBytes": 4096000
+    },
+    {
+      "id": 12282071,
+      "contestId": 566,
+      "creationTimeSeconds": 1438283853,
+      "relativeTimeSeconds": 10653,
+      "problem": {
+        "contestId": 566,
+        "index": "D",
+        "name": "Restructuring Company",
+        "type": "PROGRAMMING",
+        "points": 1000.0,
+        "rating": 1900,
+        "tags": [
+          "data structures",
+          "dsu"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "TIME_LIMIT_EXCEEDED",
+      "testset": "PRETESTS",
+      "passedTestCount": 1,
+      "timeConsumedMillis": 2000,
+      "memoryConsumedBytes": 1638400
+    },
+    {
+      "id": 12281253,
+      "contestId": 566,
+      "creationTimeSeconds": 1438281891,
+      "relativeTimeSeconds": 8691,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "OK",
+      "testset": "TESTS",
+      "passedTestCount": 38,
+      "timeConsumedMillis": 607,
+      "memoryConsumedBytes": 15360000
+    },
+    {
+      "id": 12281222,
+      "contestId": 566,
+      "creationTimeSeconds": 1438281805,
+      "relativeTimeSeconds": 8605,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "WRONG_ANSWER",
+      "testset": "PRETESTS",
+      "passedTestCount": 1,
+      "timeConsumedMillis": 421,
+      "memoryConsumedBytes": 9113600
+    },
+    {
+      "id": 12280210,
+      "contestId": 566,
+      "creationTimeSeconds": 1438279303,
+      "relativeTimeSeconds": 6103,
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "WRONG_ANSWER",
+      "testset": "TESTS",
+      "passedTestCount": 20,
+      "timeConsumedMillis": 78,
+      "memoryConsumedBytes": 3174400
+    },
+    {
+      "id": 12278676,
+      "contestId": 566,
+      "creationTimeSeconds": 1438276139,
+      "relativeTimeSeconds": 2939,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "CHALLENGED",
+      "testset": "CHALLENGES",
+      "passedTestCount": 6,
+      "timeConsumedMillis": 561,
+      "memoryConsumedBytes": 15360000
+    },
+    {
+      "id": 12278450,
+      "contestId": 566,
+      "creationTimeSeconds": 1438275738,
+      "relativeTimeSeconds": 2538,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "WRONG_ANSWER",
+      "testset": "CHALLENGES",
+      "passedTestCount": 0,
+      "timeConsumedMillis": 561,
+      "memoryConsumedBytes": 15360000
+    },
+    {
+      "id": 12277964,
+      "contestId": 566,
+      "creationTimeSeconds": 1438274942,
+      "relativeTimeSeconds": 1742,
+      "problem": {
+        "contestId": 566,
+        "index": "G",
+        "name": "Max and Min",
+        "type": "PROGRAMMING",
+        "points": 2500.0,
+        "rating": 2500,
+        "tags": [
+          "geometry"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "SKIPPED",
+      "testset": "PRETESTS",
+      "passedTestCount": 6,
+      "timeConsumedMillis": 78,
+      "memoryConsumedBytes": 0
+    },
+    {
+      "id": 12277531,
+      "contestId": 566,
+      "creationTimeSeconds": 1438274093,
+      "relativeTimeSeconds": 893,
+      "problem": {
+        "contestId": 566,
+        "index": "F",
+        "name": "Clique in the Divisibility Graph",
+        "type": "PROGRAMMING",
+        "points": 500.0,
+        "rating": 1500,
+        "tags": [
+          "dp",
+          "math",
+          "number theory"
+        ]
+      },
+      "author": {
+        "contestId": 566,
+        "participantId": 5250118,
+        "members": [
+          {
+            "handle": "fruwajacybyk"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "room": 5,
+        "startTimeSeconds": 1438273200
+      },
+      "programmingLanguage": "GNU C++",
+      "verdict": "CHALLENGED",
+      "testset": "CHALLENGES",
+      "passedTestCount": 6,
+      "timeConsumedMillis": 530,
+      "memoryConsumedBytes": 15360000
+    }
+  ]
+}

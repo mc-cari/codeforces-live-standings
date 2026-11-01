@@ -1,3 +1,4 @@
+import { mergeHacks, selectsHack, selectsParty, hackCoverageIncomplete, type Hack } from '@/src/shared/domain/hacks';
 import { useFreeze } from '@/src/shared/freeze/useFreeze';
 import FreezeControls from '@/src/shared/freeze/FreezeControls';
 import ShareSetupButton from '@/src/shared/presentation/ShareSetupButton';
@@ -60,6 +61,17 @@ export default function ReplayPage() {
   const userHandles = useMemo<string[]>(() => JSON.parse(selectedHandlesKey), [selectedHandlesKey]);
   const requestedSpeed = getPlaybackSpeed(getQueryValue(playbackSpeed));
   const [finalStandings, setFinalStandings] = useState<ReplayStandings>();
+  const hackSourceKey = JSON.stringify([contestId, userHandles]);
+  const [hackSource, setHackSource] = useState(hackSourceKey);
+  const [hacks, setHacks] = useState<Hack[]>([]);
+  const [hacksLoaded, setHacksLoaded] = useState(false);
+  if (hackSource !== hackSourceKey) {
+    setHackSource(hackSourceKey);
+    setHacks([]);
+    setHacksLoaded(false);
+  }
+  const [hackRetry, setHackRetry] = useState(0);
+  const [hacksLoading, setHacksLoading] = useState(false);
   const [events, setEvents] = useState<ReplaySubmission[]>([]);
   const [userRank, setUserRank] = useState<Map<string, string>>(new Map<string, string>());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -85,6 +97,22 @@ export default function ReplayPage() {
     testingSubmissionsRef.current = next;
     setTestingSubmissions(next);
   }, []);
+
+  useEffect(() => {
+    if (!router.isReady || typeof contestId !== 'string' || !contestType || userHandles.length === 0) return;
+    const controller = new AbortController();
+    if (contestId === '1735' && getQueryValue(demo) === 'true') {
+      return;
+    }
+    codeforcesReplayGateway.getHacks(contestId, controller.signal).then((incoming) => {
+      if (controller.signal.aborted) return;
+      setHacks((previous) => mergeHacks(previous, incoming.filter((hack) => selectsHack(hack, userHandles))));
+      setHacksLoaded(true);
+    }).catch(() => { if (!controller.signal.aborted) setHacksLoaded(false); })
+      .finally(() => { if (!controller.signal.aborted) setHacksLoading(false); });
+    return () => controller.abort();
+  }, [contestId, contestType, demo, userHandles, router.isReady, hackRetry]);
+  const hacksIncomplete = !finalStandings || hackCoverageIncomplete(finalStandings, hacks, hacksLoaded || (contestId === '1735' && getQueryValue(demo) === 'true'));
 
   useEffect(() => {
     if (!router.isReady) return undefined;
@@ -169,17 +197,15 @@ export default function ReplayPage() {
           standingsRequest, statusRequest, usersRequest,
         ]);
         if (!isActive) return;
-        const isSelectedParticipant = (party: ReplayParty) => party.members
-          .some((member) => userHandles.some((handle) => (
-            handle.toLowerCase() === member.handle.toLowerCase()
-          )));
+        const isSelectedParticipant = (party: ReplayParty) => selectsParty(party, userHandles);
         const officialStandings: ReplayStandings = {
           ...standingsData,
           rows: standingsData.rows.filter((row) => isSelectedParticipant(row.party)),
         };
         const replayEvents = allSelectedEvents
           .filter((submission) => (
-            submission.relativeTimeSeconds >= 0
+            isSelectedParticipant(submission.author)
+            && submission.relativeTimeSeconds >= 0
             && submission.relativeTimeSeconds <= officialStandings.contest.durationSeconds
           ))
           .sort((first, second) => (
@@ -248,10 +274,10 @@ export default function ReplayPage() {
       previousTick.current = now;
       const next = Math.min(finalStandings.contest.durationSeconds, elapsedSeconds + elapsed);
       setElapsedSeconds(() => next);
-      if (next === finalStandings.contest.durationSeconds) setIsPlaying(false);
+      if (next === finalStandings.contest.durationSeconds) { setIsPlaying(false); clearJudging(); }
     }, REPLAY_PLAYBACK_TICK_MILLISECONDS);
     return () => window.clearInterval(timer);
-  }, [elapsedSeconds, finalStandings, isPlaying, speed]);
+  }, [elapsedSeconds, finalStandings, isPlaying, speed, clearJudging]);
 
   useBrowserLayoutEffect(() => {
     const previousTime = previousReplayTime.current;
@@ -280,7 +306,8 @@ export default function ReplayPage() {
       Math.max(windowStart, windowEnd - REPLAY_RELEASE_BATCH_SIZE), windowEnd,
     );
     releasedEvents.forEach((submission) => {
-      if (judgingJobs.current.has(submission.id)) return;
+      // Keep the latest challenged verdict visible throughout playback.
+      if (submission.verdict === 'CHALLENGED' || judgingJobs.current.has(submission.id)) return;
       const totalTests = submission.verdict === 'OK'
         ? Math.max(1, submission.passedTestCount)
         : Math.max(1, submission.passedTestCount + 1);
@@ -335,11 +362,11 @@ export default function ReplayPage() {
     events.filter((event) => !testingSubmissions.has(event.id))
   ), [events, testingSubmissions]);
   const replaySnapshot = useMemo(() => (
-    finalStandings ? buildReplaySnapshot(finalStandings, settledEvents, elapsedSeconds) : undefined
-  ), [elapsedSeconds, finalStandings, settledEvents]);
+    finalStandings ? buildReplaySnapshot(finalStandings, settledEvents, elapsedSeconds, hacks) : undefined
+  ), [elapsedSeconds, finalStandings, settledEvents, hacks]);
   const freeze = useFreeze(finalStandings, settledEvents, elapsedSeconds,
     Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds),
-    'replay', String(seekVersion), testingSubmissions.size > 0);
+    'replay', String(seekVersion), testingSubmissions.size > 0, hacks, hacksIncomplete);
   const snapshot = freeze.cutoff !== undefined ? freeze.projection : replaySnapshot;
   const cinematicSubmissions = useMemo(() => {
     if (freeze.cutoff !== undefined) return snapshot?.submissions || [];
@@ -456,6 +483,11 @@ export default function ReplayPage() {
         <section className={`${mobilePanel === 'submissions' ? 'block' : 'hidden'} h-full min-h-0 w-full p-2 lg:block lg:w-2/5 lg:p-3`} aria-label="Replay submissions">
           <div className="h-full overflow-hidden rounded-sm broadcast-panel">
             <LiveSubmissionsList
+              hacks={snapshot.hacks}
+              hacksIncomplete={hacksIncomplete}
+              retryHacks={() => { setHacksLoading(true); setHackRetry((version) => version + 1); }}
+              hacksLoading={hacksLoading}
+              focused={freeze.focused}
               submissions={cinematicSubmissions as unknown as Submission[]}
               newSubmissionsCount={testingSubmissions.size}
               globalStandings={snapshot.standings as unknown as Standings}

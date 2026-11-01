@@ -1,3 +1,4 @@
+import { mergeHacks, sameParty, hackPoints, type Hack } from '../domain/hacks.ts';
 import type { ReplayStandings, ReplaySubmission } from '../../contexts/replay/domain/models.ts';
 import getName from '../domain/party.ts';
 import { addMissingParticipantRows } from '../domain/standings.ts';
@@ -15,10 +16,21 @@ export function parseFreeze(minutes: string | string[] | undefined, view: string
 }
 
 export function projectVisible(standings: ReplayStandings, events: ReplaySubmission[], elapsed: number,
-  cutoff?: number, revealed = new Set<string>(), authoritative = false, runningSolvedCount = false) {
+  cutoff?: number, revealed = new Set<string>(), authoritative = false, runningSolvedCount = false,
+  hacks: Hack[] = [], baseline?: ReplayStandings) {
   const available = events.filter((event) => event.relativeTimeSeconds >= 0
     && event.relativeTimeSeconds <= Math.min(elapsed, standings.contest.durationSeconds));
   const pending = new Map<string, number>();
+  const pendingHacks: Hack[] = [];
+  const visibleHacks = mergeHacks([], hacks).filter((hack) => {
+    const time = hack.creationTimeSeconds - standings.contest.startTimeSeconds;
+    if (time < 0 || Math.min(time, standings.contest.durationSeconds) > elapsed) return false;
+    if (!standings.rows.some((row) => sameParty(row.party, hack.hacker) || sameParty(row.party, hack.defender))) return false;
+    if (cutoff === undefined || time < cutoff || revealed.has(hackKey(hack.id))) return true;
+    pendingHacks.push(hack);
+    return false;
+  });
+  pendingHacks.sort((a, b) => a.creationTimeSeconds - b.creationTimeSeconds || a.id - b.id);
   const visible = available.filter((event) => {
     const key = cellKey(getName(event.author), event.problem.index);
     if (cutoff === undefined || event.relativeTimeSeconds < cutoff || revealed.has(key)) return true;
@@ -27,12 +39,38 @@ export function projectVisible(standings: ReplayStandings, events: ReplaySubmiss
   });
   const reconstructed = addMissingParticipantRows<ReplayStandings, ReplaySubmission>({ ...standings, rows: [] }, visible, getName);
   const byName = new Map(reconstructed.rows.map((row) => [getName(row.party), row]));
-  const rows = standings.rows.map((row) => authoritative ? { ...row } : byName.get(getName(row.party)) || {
+  let rows = standings.rows.map((row) => authoritative ? { ...row } : byName.get(getName(row.party)) || {
     ...row, points: 0, penalty: 0, rank: 0, successfulHackCount: 0, unsuccessfulHackCount: 0,
     lastSubmissionTimeSeconds: 0,
     problemResults: standings.problems.map(() => ({ points: 0, penalty: 0, rejectedAttemptCount: 0,
       bestSubmissionTimeSeconds: 0, type: 'FINAL' })),
   });
+  if (!authoritative) {
+    if (baseline && cutoff !== undefined) {
+      rows = rows.map((row) => {
+        const frozen = baseline.rows.find((source) => sameParty(source.party, row.party));
+        if (!frozen) return row;
+        const result = { ...frozen, problemResults: frozen.problemResults.map((cell) => ({ ...cell })) };
+        standings.problems.forEach((problem, index) => {
+          if (!revealed.has(cellKey(getName(row.party), problem.index))) return;
+          const cell = row.problemResults[index];
+          result.points += cell.points - result.problemResults[index].points;
+          result.penalty += cell.penalty - result.problemResults[index].penalty;
+          result.problemResults[index] = cell;
+        });
+        return result;
+      });
+    }
+    for (const hack of visibleHacks) {
+      // An observed official baseline already includes all pre-cutoff hack points.
+      if (baseline && cutoff !== undefined && hack.creationTimeSeconds - standings.contest.startTimeSeconds < cutoff) continue;
+      const row = rows.find((candidate) => sameParty(candidate.party, hack.hacker));
+      if (!row) continue;
+      row.points += hackPoints(standings.contest.type, hack.verdict);
+      if (hack.verdict === 'HACK_SUCCESSFUL') row.successfulHackCount = (row.successfulHackCount || 0) + 1;
+      if (hack.verdict === 'HACK_UNSUCCESSFUL') row.unsuccessfulHackCount = (row.unsuccessfulHackCount || 0) + 1;
+    }
+  }
   rows.sort((a, b) => b.points - a.points || a.penalty - b.penalty
     || getName(a.party).localeCompare(getName(b.party)));
   const localStandings = new Map<string, number>();
@@ -59,15 +97,19 @@ export function projectVisible(standings: ReplayStandings, events: ReplaySubmiss
       ? solvedByEvent.get(event.id) || 0
       : solved.get(getName(event.author)) || 0,
   }));
-  return { standings: { ...standings, rows }, localStandings, submissions, pending };
+  return { standings: { ...standings, rows }, localStandings, submissions, pending, hacks: visibleHacks, pendingHacks };
 }
+
+export const hackKey = (id: number) => `hack:${id}`;
 
 export function nextPending(snapshot: ReturnType<typeof projectVisible>) {
   for (const row of [...snapshot.standings.rows].reverse()) {
     for (const problem of snapshot.standings.problems) {
       const key = cellKey(getName(row.party), problem.index);
-      if (snapshot.pending.has(key)) return { key, name: getName(row.party), problem: problem.index };
+      if (snapshot.pending.has(key)) return { key, name: getName(row.party), problem: problem.index, hack: false };
     }
+    const hack = snapshot.pendingHacks.find((event) => sameParty(row.party, event.hacker) || sameParty(row.party, event.defender));
+    if (hack) return { key: hackKey(hack.id), name: getName(row.party), problem: hack.problem.index, hack: true };
   }
   return undefined;
 }

@@ -57,6 +57,8 @@ export default function LiveStandingsPage() {
       isUpdateStale={feed.isUpdateStale}
       localStandings={feed.localStandings}
       newSubmissionsCount={feed.newSubmissionsCount}
+      hacks={feed.hacks}
+      hacksIncomplete={feed.hacksIncomplete}
       submissions={feed.submissions}
       userRank={contest.userRank}
     />

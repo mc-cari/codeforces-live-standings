@@ -192,3 +192,7 @@ func readEvent(t *testing.T, reader *bufio.Reader) map[string]string {
 }
 
 var _ application.ContestGateway = (*stagedGateway)(nil)
+
+func (gateway *stagedGateway) FetchHacks(context.Context, int) ([]domain.Hack, error) {
+	return nil, nil
+}

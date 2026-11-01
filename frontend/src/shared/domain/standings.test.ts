@@ -60,7 +60,7 @@ test('reconstructs CF points when accepted submissions omit points', () => {
   assert.equal(result.rows[0].points, 440);
 });
 
-test('uses Codeforces scoring without scaling penalties by contest duration', () => {
+test('reconstructs published contest 1735 scores in its 135-minute duration', () => {
   const contestStandings = standings('CF');
   contestStandings.contest.durationSeconds = 8_100;
   contestStandings.problems = [500, 750, 1_250, 1_750, 2_250]
@@ -135,3 +135,24 @@ test('does not duplicate a participant already present in official standings', (
   assert.equal(result.rows.length, 1);
   assert.equal(result.rows[0], officialStandings.rows[0]);
 });
+
+// Score, solve time, and rejected attempts observed in contest.standings.
+for (const [name, duration, seconds, maximum, wrong, expected] of [
+  ['1137/sunset/A', 9000, 470, 500, 0, 489],
+  ['1137/sunset/E', 9000, 4072, 2500, 1, 1914],
+  ['2262/Kevin114514/C', 10800, 2479, 1750, 1, 1509],
+  ['1735/9u46/B', 8100, 763, 750, 1, 664],
+  ['1916/Benq/F', 7200, 5500, 2750, 3, 1599],
+] as const) {
+  test(`reconstructs published Codeforces score for ${name}`, () => {
+    const source = standings('CF');
+    source.contest.durationSeconds = duration;
+    source.problems[0].points = maximum;
+    const attempts = Array.from({ length: wrong }, (_, i) => (
+      submission(i + 1, 'user', 'CONTESTANT', 'WRONG_ANSWER', i + 1)
+    ));
+    attempts.push(submission(wrong + 1, 'user', 'CONTESTANT', 'OK', seconds));
+    const result = addMissingParticipantRows(source, attempts, getHandle);
+    assert.equal(result.rows[0].points, expected);
+  });
+}

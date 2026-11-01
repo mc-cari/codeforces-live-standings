@@ -1,0 +1,1562 @@
+{
+  "capturedAt": "2026-11-01T23:26:48.787260+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1739",
+    "https://codeforces.com/api/contest.status?contestId=1739"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1739,
+        "name": "Educational Codeforces Round 136 (Rated for Div. 2)",
+        "type": "ICPC",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 7200,
+        "startTimeSeconds": 1664462100,
+        "relativeTimeSeconds": 129113470
+      },
+      "problems": [
+        {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "F",
+          "name": "Keyboard Design",
+          "type": "PROGRAMMING",
+          "rating": 2600,
+          "tags": [
+            "bitmasks",
+            "data structures",
+            "dp",
+            "string suffix structures",
+            "strings"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1739,
+            "participantId": 141035025,
+            "members": [
+              {
+                "handle": "ScarletS"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1664462100
+          },
+          "rank": 791,
+          "points": 3.0,
+          "penalty": 23,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 110
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 289
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1084
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1739,
+            "participantId": 141097181,
+            "members": [
+              {
+                "handle": "minpago"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1664462100
+          },
+          "rank": 792,
+          "points": 3.0,
+          "penalty": 24,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 132
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 350
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1028
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 5,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1739,
+            "participantId": 141008144,
+            "members": [
+              {
+                "handle": "Kawaii"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1664462100
+          },
+          "rank": 794,
+          "points": 3.0,
+          "penalty": 25,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 181
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 348
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1069
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 5,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1739,
+            "participantId": 141016856,
+            "members": [
+              {
+                "handle": "Jonas01234500"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1664462100
+          },
+          "rank": 795,
+          "points": 3.0,
+          "penalty": 27,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 99
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 354
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1289
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 173993098,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664468662,
+        "relativeTimeSeconds": 6562,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 49152000
+      },
+      {
+        "id": 173991645,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664468379,
+        "relativeTimeSeconds": 6279,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 49152000
+      },
+      {
+        "id": 173989959,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664468034,
+        "relativeTimeSeconds": 5934,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 16,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 6451200
+      },
+      {
+        "id": 173989517,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467949,
+        "relativeTimeSeconds": 5849,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 16,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 6451200
+      },
+      {
+        "id": 173989020,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467849,
+        "relativeTimeSeconds": 5749,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "TESTS",
+        "passedTestCount": 8,
+        "timeConsumedMillis": 3000,
+        "memoryConsumedBytes": 54579200
+      },
+      {
+        "id": 173988352,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467711,
+        "relativeTimeSeconds": 5611,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173987601,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467579,
+        "relativeTimeSeconds": 5479,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "TESTS",
+        "passedTestCount": 8,
+        "timeConsumedMillis": 3000,
+        "memoryConsumedBytes": 55910400
+      },
+      {
+        "id": 173985512,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467197,
+        "relativeTimeSeconds": 5097,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 40140800
+      },
+      {
+        "id": 173984996,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467103,
+        "relativeTimeSeconds": 5003,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 40038400
+      },
+      {
+        "id": 173984131,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466942,
+        "relativeTimeSeconds": 4842,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173981803,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466515,
+        "relativeTimeSeconds": 4415,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173980424,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466281,
+        "relativeTimeSeconds": 4181,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 40140800
+      },
+      {
+        "id": 173978852,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466028,
+        "relativeTimeSeconds": 3928,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141016856,
+          "members": [
+            {
+              "handle": "Jonas01234500"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173977028,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664465750,
+        "relativeTimeSeconds": 3650,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 5632000
+      },
+      {
+        "id": 173976986,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664465743,
+        "relativeTimeSeconds": 3643,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 40140800
+      },
+      {
+        "id": 173973611,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664465253,
+        "relativeTimeSeconds": 3153,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 22425600
+      },
+      {
+        "id": 173972855,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664465153,
+        "relativeTimeSeconds": 3053,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141016856,
+          "members": [
+            {
+              "handle": "Jonas01234500"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173968558,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664464621,
+        "relativeTimeSeconds": 2521,
+        "problem": {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 22425600
+      },
+      {
+        "id": 173955769,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664463389,
+        "relativeTimeSeconds": 1289,
+        "problem": {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141016856,
+          "members": [
+            {
+              "handle": "Jonas01234500"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 5,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173952687,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664463184,
+        "relativeTimeSeconds": 1084,
+        "problem": {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 5,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173952455,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664463169,
+        "relativeTimeSeconds": 1069,
+        "problem": {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 5,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173951794,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664463128,
+        "relativeTimeSeconds": 1028,
+        "problem": {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 5,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 307200
+      },
+      {
+        "id": 173938477,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462454,
+        "relativeTimeSeconds": 354,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141016856,
+          "members": [
+            {
+              "handle": "Jonas01234500"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 171,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173938393,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462450,
+        "relativeTimeSeconds": 350,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 171,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173938357,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462448,
+        "relativeTimeSeconds": 348,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 171,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173937893,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462425,
+        "relativeTimeSeconds": 325,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173937255,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462389,
+        "relativeTimeSeconds": 289,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 171,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173935380,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462281,
+        "relativeTimeSeconds": 181,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173935141,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462264,
+        "relativeTimeSeconds": 164,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173934742,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462232,
+        "relativeTimeSeconds": 132,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173934734,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462231,
+        "relativeTimeSeconds": 131,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141008144,
+          "members": [
+            {
+              "handle": "Kawaii"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173934543,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462210,
+        "relativeTimeSeconds": 110,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173934441,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462199,
+        "relativeTimeSeconds": 99,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141016856,
+          "members": [
+            {
+              "handle": "Jonas01234500"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173934211,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462158,
+        "relativeTimeSeconds": 58,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141035025,
+          "members": [
+            {
+              "handle": "ScarletS"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      }
+    ]
+  }
+}

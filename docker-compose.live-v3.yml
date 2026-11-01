@@ -14,6 +14,7 @@ services:
       MAX_SSE_CONNECTIONS: ${MAX_SSE_CONNECTIONS:-128}
       STANDINGS_SOURCE: livev3
       LIVE_V3_CONVERTER: /opt/live-v3/bin/cds-converter
+      CF_ICPC_PENALTY_OVERRIDES: ${CF_ICPC_PENALTY_OVERRIDES:-}
       CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
       CF_MANAGER_MODE: ${CF_MANAGER_MODE:-false}
       CF_API_KEY: ${CF_API_KEY:-}

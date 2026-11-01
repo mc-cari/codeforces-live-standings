@@ -164,18 +164,22 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 		return nil, false, err
 	}
 	revision := int64(0)
+	var previousStandings *domain.Standings
 	if store, ok := manager.repository.(ViewRepository); ok {
 		saved, loadErr := store.LoadView(id)
 		if loadErr != nil {
 			return nil, false, loadErr
 		}
 		if saved != nil {
+			previousStandings = &saved.Standings
 			for key, value := range saved.Submissions {
 				stored[key] = value
 			}
 		}
 	}
+	standings.ResolveICPCPenalty(previousStandings)
 	if initial != nil {
+		initial.Standings = standings
 		for key, value := range initial.Submissions {
 			stored[key] = value
 		}

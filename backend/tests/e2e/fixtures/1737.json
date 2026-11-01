@@ -1,0 +1,1425 @@
+{
+  "capturedAt": "2026-11-01T23:56:14.578416+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1737",
+    "https://codeforces.com/api/contest.status?contestId=1737&handle=Kniaz",
+    "https://codeforces.com/api/contest.status?contestId=1737&handle=opportunityfan",
+    "https://codeforces.com/api/contest.status?contestId=1737&handle=duck702702",
+    "https://codeforces.com/api/contest.status?contestId=1737&handle=SkqLiiiao"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1737,
+        "name": "Dytechlab Cup 2022",
+        "type": "CF",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 9000,
+        "startTimeSeconds": 1665153300,
+        "relativeTimeSeconds": 128424061
+      },
+      "problems": [
+        {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "E",
+          "name": "Ela Goes Hiking",
+          "type": "PROGRAMMING",
+          "points": 2750.0,
+          "rating": 2500,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "F",
+          "name": "Ela and Prime GCD",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3300,
+          "tags": [
+            "constructive algorithms",
+            "math",
+            "number theory"
+          ]
+        },
+        {
+          "contestId": 1737,
+          "index": "G",
+          "name": "Ela Takes Dancing Class",
+          "type": "PROGRAMMING",
+          "points": 3750.0,
+          "rating": 3500,
+          "tags": [
+            "binary search",
+            "data structures"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1737,
+            "participantId": 141491878,
+            "members": [
+              {
+                "handle": "Kniaz"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 378,
+            "startTimeSeconds": 1665153300
+          },
+          "rank": 497,
+          "points": 3476.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 491.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 394
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 1356.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1802
+            },
+            {
+              "points": 1629.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3508
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1737,
+            "participantId": 141609769,
+            "members": [
+              {
+                "handle": "opportunityfan"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 255,
+            "startTimeSeconds": 1665153300
+          },
+          "rank": 501,
+          "points": 3466.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 882.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2222
+            },
+            {
+              "points": 1217.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3563
+            },
+            {
+              "points": 1367.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5974
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1737,
+            "participantId": 141608254,
+            "members": [
+              {
+                "handle": "duck702702"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 150,
+            "startTimeSeconds": 1665153300
+          },
+          "rank": 503,
+          "points": 3462.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 850.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2857
+            },
+            {
+              "points": 1164.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 4207
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 1448.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 8906
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1737,
+            "participantId": 141594696,
+            "members": [
+              {
+                "handle": "SkqLiiiao"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 87,
+            "startTimeSeconds": 1665153300
+          },
+          "rank": 522,
+          "points": 3228.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 473.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1039
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 1034.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3989
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 5,
+              "type": "FINAL"
+            },
+            {
+              "points": 1721.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 7055
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 175029597,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665162296,
+        "relativeTimeSeconds": 8996,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 1123,
+        "memoryConsumedBytes": 8294400
+      },
+      {
+        "id": 175029389,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665162275,
+        "relativeTimeSeconds": 8975,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 1138,
+        "memoryConsumedBytes": 8294400
+      },
+      {
+        "id": 175029277,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665162261,
+        "relativeTimeSeconds": 8961,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 389,
+        "memoryConsumedBytes": 8294400
+      },
+      {
+        "id": 175028924,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665162208,
+        "relativeTimeSeconds": 8908,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 4000,
+        "memoryConsumedBytes": 8294400
+      },
+      {
+        "id": 175028912,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665162206,
+        "relativeTimeSeconds": 8906,
+        "problem": {
+          "contestId": 1737,
+          "index": "E",
+          "name": "Ela Goes Hiking",
+          "type": "PROGRAMMING",
+          "points": 2750.0,
+          "rating": 2500,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141608254,
+          "members": [
+            {
+              "handle": "duck702702"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 150,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 92,
+        "timeConsumedMillis": 904,
+        "memoryConsumedBytes": 122675200
+      },
+      {
+        "id": 175027382,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665161909,
+        "relativeTimeSeconds": 8609,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 4000,
+        "memoryConsumedBytes": 8806400
+      },
+      {
+        "id": 175020542,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665160355,
+        "relativeTimeSeconds": 7055,
+        "problem": {
+          "contestId": 1737,
+          "index": "E",
+          "name": "Ela Goes Hiking",
+          "type": "PROGRAMMING",
+          "points": 2750.0,
+          "rating": 2500,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 92,
+        "timeConsumedMillis": 265,
+        "memoryConsumedBytes": 11980800
+      },
+      {
+        "id": 175015632,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665159274,
+        "relativeTimeSeconds": 5974,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141609769,
+          "members": [
+            {
+              "handle": "opportunityfan"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 255,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 38,
+        "timeConsumedMillis": 654,
+        "memoryConsumedBytes": 3993600
+      },
+      {
+        "id": 175010033,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665158092,
+        "relativeTimeSeconds": 4792,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141608254,
+          "members": [
+            {
+              "handle": "duck702702"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 150,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 61,
+        "memoryConsumedBytes": 2457600
+      },
+      {
+        "id": 175007220,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665157507,
+        "relativeTimeSeconds": 4207,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141608254,
+          "members": [
+            {
+              "handle": "duck702702"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 150,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 22,
+        "timeConsumedMillis": 264,
+        "memoryConsumedBytes": 10956800
+      },
+      {
+        "id": 175006016,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665157289,
+        "relativeTimeSeconds": 3989,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 22,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175003738,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156863,
+        "relativeTimeSeconds": 3563,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141609769,
+          "members": [
+            {
+              "handle": "opportunityfan"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 255,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 22,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175003432,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156808,
+        "relativeTimeSeconds": 3508,
+        "problem": {
+          "contestId": 1737,
+          "index": "D",
+          "name": "Ela and the Wiring Wizard",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2200,
+          "tags": [
+            "brute force",
+            "dp",
+            "graphs",
+            "greedy",
+            "implementation",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141491878,
+          "members": [
+            {
+              "handle": "Kniaz"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 378,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 38,
+        "timeConsumedMillis": 2012,
+        "memoryConsumedBytes": 8089600
+      },
+      {
+        "id": 175003294,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156783,
+        "relativeTimeSeconds": 3483,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175001428,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156458,
+        "relativeTimeSeconds": 3158,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175000661,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156318,
+        "relativeTimeSeconds": 3018,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174999710,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665156157,
+        "relativeTimeSeconds": 2857,
+        "problem": {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141608254,
+          "members": [
+            {
+              "handle": "duck702702"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 150,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 17,
+        "timeConsumedMillis": 140,
+        "memoryConsumedBytes": 9318400
+      },
+      {
+        "id": 174995867,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665155522,
+        "relativeTimeSeconds": 2222,
+        "problem": {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141609769,
+          "members": [
+            {
+              "handle": "opportunityfan"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 255,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 17,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174994051,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665155241,
+        "relativeTimeSeconds": 1941,
+        "problem": {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174993193,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665155102,
+        "relativeTimeSeconds": 1802,
+        "problem": {
+          "contestId": 1737,
+          "index": "C",
+          "name": "Ela and Crickets",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "games",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141491878,
+          "members": [
+            {
+              "handle": "Kniaz"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 378,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 22,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174992791,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665155041,
+        "relativeTimeSeconds": 1741,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141609769,
+          "members": [
+            {
+              "handle": "opportunityfan"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 255,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174992373,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665154975,
+        "relativeTimeSeconds": 1675,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141608254,
+          "members": [
+            {
+              "handle": "duck702702"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 150,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 62,
+        "memoryConsumedBytes": 2252800
+      },
+      {
+        "id": 174991384,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665154823,
+        "relativeTimeSeconds": 1523,
+        "problem": {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174989225,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665154497,
+        "relativeTimeSeconds": 1197,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141609769,
+          "members": [
+            {
+              "handle": "opportunityfan"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 255,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174988184,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665154339,
+        "relativeTimeSeconds": 1039,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141594696,
+          "members": [
+            {
+              "handle": "SkqLiiiao"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 87,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 13,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 102400
+      },
+      {
+        "id": 174985642,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665153963,
+        "relativeTimeSeconds": 663,
+        "problem": {
+          "contestId": 1737,
+          "index": "B",
+          "name": "Ela's Fitness and the Luxury Number",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1300,
+          "tags": [
+            "binary search",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141491878,
+          "members": [
+            {
+              "handle": "Kniaz"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 378,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174983903,
+        "contestId": 1737,
+        "creationTimeSeconds": 1665153694,
+        "relativeTimeSeconds": 394,
+        "problem": {
+          "contestId": 1737,
+          "index": "A",
+          "name": "Ela Sorting Books",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1737,
+          "participantId": 141491878,
+          "members": [
+            {
+              "handle": "Kniaz"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 378,
+          "startTimeSeconds": 1665153300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 13,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      }
+    ]
+  }
+}

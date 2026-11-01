@@ -161,3 +161,15 @@ SQLite scopes complete views and retained entities by source and contest. Restar
 The direct provider alone supplies the existing missing-row scoring fallback. Live-v3 rows, scores, order, and tie information are authoritative. Browser friend lists are projected from one complete view without recalculating scores.
 
 See [the provider diagram](docs/architecture/live-v3-architecture.html) and [the shared Go application diagram](docs/architecture/go-backend-architecture.html). Run Go tests with `go test -race ./...` from `backend`; set `LIVE_V3_TEST_BINARY` to the converter executable to include the real-converter fixture test. CI also checks the pinned engine APIs, frontend SSE behavior, Compose configuration, and the combined deployment image.
+
+Optional real-contest scoring E2E tests for both Go providers live in
+[`backend/tests/e2e`](backend/tests/e2e/README.md). They replay saved Codeforces API
+snapshots for standard and educational rounds and require the built live-v3 converter.
+
+For ICPC missing-row reconstruction, both Go sources learn a wrong-attempt penalty
+from consistent official standings evidence and retain it when later evidence is
+missing or conflicting. Set `CF_ICPC_PENALTY_OVERRIDES='{"100001":7}'` to override
+specific contests (minutes; zero is allowed). The live-v3 worker receives the same
+setting through its CF `penaltyPerWrongAttemptMinutes` configuration. Go persists
+its learned rule; live-v3 retains it for the worker lifetime. Defaults without
+usable evidence remain 10 minutes for public IDs and 20 for Gym IDs.

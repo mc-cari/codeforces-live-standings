@@ -41,3 +41,36 @@ func TestAuthoritativeProjectionPreservesEngineTiesAndDoesNotInventRows(t *testi
 		t.Fatal(ranks)
 	}
 }
+
+// Expected scores come from contest.standings, including its rejectedAttemptCount.
+func TestMissingRowsMatchCodeforcesDurationScoring(t *testing.T) {
+	cases := []struct {
+		name              string
+		duration, seconds int64
+		maximum, expected float64
+		wrong             int
+	}{
+		{"1137/sunset/A", 9000, 470, 500, 489, 0},
+		{"1137/sunset/E", 9000, 4072, 2500, 1914, 1},
+		{"2262/Kevin114514/C", 10800, 2479, 1750, 1509, 1},
+		{"1735/9u46/B", 8100, 763, 750, 664, 1},
+		{"1916/Benq/F", 7200, 5500, 2750, 1599, 3},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			contest := Contest{Type: "CF", DurationSeconds: c.duration}
+			problem := Problem{Index: "A", Points: c.maximum}
+			party := Party{Members: []Member{{Handle: "user"}}, ParticipantType: "CONTESTANT"}
+			submissions := map[int]Submission{}
+			for i := 1; i <= c.wrong; i++ {
+				submissions[i] = Submission{ID: i, RelativeTimeSeconds: int64(i), Verdict: "WRONG_ANSWER", Problem: problem, Author: party}
+			}
+			id := c.wrong + 1
+			submissions[id] = Submission{ID: id, RelativeTimeSeconds: c.seconds, Verdict: "OK", Problem: problem, Author: party}
+			view, _ := Project(contest, &Standings{Contest: contest, Problems: []Problem{problem}}, submissions, NewHandleSet([]string{"user"}))
+			if len(view.Rows) != 1 || view.Rows[0].Points != c.expected {
+				t.Fatalf("expected %v points, got %#v", c.expected, view.Rows)
+			}
+		})
+	}
+}

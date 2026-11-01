@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"os"
@@ -42,12 +43,26 @@ func main() {
 	}
 	defer repository.Close()
 
+	penaltyOverrides := map[int]int{}
+	if raw := os.Getenv("CF_ICPC_PENALTY_OVERRIDES"); raw != "" {
+		if err := json.Unmarshal([]byte(raw), &penaltyOverrides); err != nil {
+			slog.Error("invalid CF_ICPC_PENALTY_OVERRIDES", "error", err)
+			os.Exit(1)
+		}
+		for id, minutes := range penaltyOverrides {
+			if id <= 0 || minutes < 0 {
+				slog.Error("invalid ICPC penalty override", "contest", id, "minutes", minutes)
+				os.Exit(1)
+			}
+		}
+	}
 	metrics := telemetry.New(repository)
 	upstream := codeforces.NewClient(
 		strings.TrimRight(env("CF_API_BASE_URL", defaultCodeforces), "/")+"/",
 		codeforces.NewFreshConnectionHTTPClient(30*time.Second),
 		2100*time.Millisecond,
 		codeforces.WithRequestObserver(metrics),
+		codeforces.WithPenaltyOverrides(penaltyOverrides),
 	)
 	sourceName := env("STANDINGS_SOURCE", "codeforces")
 	scoped, err := repository.Scope(sourceName)
@@ -58,9 +73,10 @@ func main() {
 	var gateway application.ContestGateway = upstream
 	if sourceName == "livev3" {
 		source, err := livev3.New(livev3.Config{
-			Binary:     env("LIVE_V3_CONVERTER", "/opt/live-v3/bin/cds-converter"),
-			APIBaseURL: env("CF_API_BASE_URL", defaultCodeforces),
-			APIKey:     os.Getenv("CF_API_KEY"), APISecret: os.Getenv("CF_API_SECRET"),
+			ICPCPenaltyOverrides: penaltyOverrides,
+			Binary:               env("LIVE_V3_CONVERTER", "/opt/live-v3/bin/cds-converter"),
+			APIBaseURL:           env("CF_API_BASE_URL", defaultCodeforces),
+			APIKey:               os.Getenv("CF_API_KEY"), APISecret: os.Getenv("CF_API_SECRET"),
 			ManagerMode: env("CF_MANAGER_MODE", "false") == "true",
 			MaxWorkers:  3, Store: scoped,
 		})

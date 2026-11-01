@@ -13,7 +13,7 @@ type ContestRibbonProps = {
   mode: 'LIVE' | 'REPLAY';
   clock?: string;
   status?: string;
-  statusTone?: 'live' | 'paused' | 'finished';
+  statusTone?: 'live' | 'paused' | 'judging' | 'finished';
   controls?: ReactNode;
 };
 
@@ -49,6 +49,7 @@ export default function ContestRibbon({
   const tone = {
     live: 'bg-[#21c16b]',
     paused: 'bg-[#f3b83f]',
+    judging: 'bg-[#65adff]',
     finished: 'bg-[#91a3ba]',
   }[statusTone];
 
@@ -64,7 +65,7 @@ export default function ContestRibbon({
             {contest?.name || `Codeforces ${contestId}`}
           </h1>
         </div>
-        <div className="flex items-center gap-2 rounded-sm border border-[#25364d] bg-[#0d1b2a] px-3 py-2">
+        <div className="flex items-center gap-2 rounded-sm border border-[#25364d] bg-[#0d1b2a] px-3 py-2" role="status" aria-atomic="true">
           <span className={`h-2 w-2 rounded-full ${tone} ${statusTone === 'live' ? 'motion-safe:animate-pulse' : ''}`} />
           <div className={status ? undefined : 'flex items-center'}>
             <p className="leading-none broadcast-label">{mode}</p>

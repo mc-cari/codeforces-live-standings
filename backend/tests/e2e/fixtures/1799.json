@@ -1,0 +1,1426 @@
+{
+  "capturedAt": "2026-11-01T23:56:29.109776+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1799",
+    "https://codeforces.com/api/contest.status?contestId=1799&handle=rainboy",
+    "https://codeforces.com/api/contest.status?contestId=1799&handle=kaiboy",
+    "https://codeforces.com/api/contest.status?contestId=1799&handle=Ahmed_Salah7",
+    "https://codeforces.com/api/contest.status?contestId=1799&handle=mbdtf"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1799,
+        "name": "Codeforces Round 854 by cybercats (Div. 1 + Div. 2)",
+        "type": "CF",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 10800,
+        "startTimeSeconds": 1677508500,
+        "relativeTimeSeconds": 116068874
+      },
+      "problems": [
+        {
+          "contestId": 1799,
+          "index": "A",
+          "name": "Recent Actions",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "data structures",
+            "greedy",
+            "implementation",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "B",
+          "name": "Equalize by Divide",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1200,
+          "tags": [
+            "brute force",
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "C",
+          "name": "Double Lexicographically Minimum",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1700,
+          "tags": [
+            "greedy",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "D1",
+          "name": "Hot Start Up (easy version)",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1900,
+          "tags": [
+            "dp"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "D2",
+          "name": "Hot Start Up (hard version)",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 2100,
+          "tags": [
+            "data structures",
+            "dp"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "E",
+          "name": "City Union",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2300,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "dsu",
+            "geometry",
+            "greedy",
+            "implementation",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "G",
+          "name": "Count Voting",
+          "type": "PROGRAMMING",
+          "points": 3000.0,
+          "rating": 2600,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1799,
+          "index": "H",
+          "name": "Tree Cutting",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3200,
+          "tags": [
+            "bitmasks",
+            "dfs and similar",
+            "dp"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1799,
+            "participantId": 150596676,
+            "members": [
+              {
+                "handle": "rainboy"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 435,
+            "startTimeSeconds": 1677508500
+          },
+          "rank": 206,
+          "points": 6150.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 1177.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 10587
+            },
+            {
+              "points": 2254.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5224
+            },
+            {
+              "points": 2719.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 4404
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1799,
+            "participantId": 150596678,
+            "members": [
+              {
+                "handle": "kaiboy"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 399,
+            "startTimeSeconds": 1677508500
+          },
+          "rank": 851,
+          "points": 3520.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 1336.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2502
+            },
+            {
+              "points": 618.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2491
+            },
+            {
+              "points": 1566.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 6875
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1799,
+            "participantId": 150629521,
+            "members": [
+              {
+                "handle": "Ahmed_Salah7"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 409,
+            "startTimeSeconds": 1677508500
+          },
+          "rank": 940,
+          "points": 3357.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 963.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 866
+            },
+            {
+              "points": 1230.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3330
+            },
+            {
+              "points": 1164.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5083
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1799,
+            "participantId": 150642324,
+            "members": [
+              {
+                "handle": "mbdtf"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 76,
+            "startTimeSeconds": 1677508500
+          },
+          "rank": 949,
+          "points": 3332.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 944.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1317
+            },
+            {
+              "points": 1236.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 4000
+            },
+            {
+              "points": 1152.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5230
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 195188868,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677519087,
+        "relativeTimeSeconds": 10587,
+        "problem": {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 27,
+        "timeConsumedMillis": 202,
+        "memoryConsumedBytes": 200499200
+      },
+      {
+        "id": 195188539,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677519015,
+        "relativeTimeSeconds": 10515,
+        "problem": {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 200499200
+      },
+      {
+        "id": 195188327,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677518961,
+        "relativeTimeSeconds": 10461,
+        "problem": {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 200499200
+      },
+      {
+        "id": 195188098,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677518900,
+        "relativeTimeSeconds": 10400,
+        "problem": {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 200499200
+      },
+      {
+        "id": 195187617,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677518775,
+        "relativeTimeSeconds": 10275,
+        "problem": {
+          "contestId": 1799,
+          "index": "F",
+          "name": "Halve or Subtract",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "binary search",
+            "brute force",
+            "dp",
+            "greedy",
+            "sortings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "MEMORY_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 268390400
+      },
+      {
+        "id": 195174981,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677515375,
+        "relativeTimeSeconds": 6875,
+        "problem": {
+          "contestId": 1799,
+          "index": "E",
+          "name": "City Union",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2300,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "dsu",
+            "geometry",
+            "greedy",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596678,
+          "members": [
+            {
+              "handle": "kaiboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 399,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 67,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 195167863,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677513730,
+        "relativeTimeSeconds": 5230,
+        "problem": {
+          "contestId": 1799,
+          "index": "D1",
+          "name": "Hot Start Up (easy version)",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1900,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150642324,
+          "members": [
+            {
+              "handle": "mbdtf"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 76,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 28,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 195167821,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677513724,
+        "relativeTimeSeconds": 5224,
+        "problem": {
+          "contestId": 1799,
+          "index": "G",
+          "name": "Count Voting",
+          "type": "PROGRAMMING",
+          "points": 3000.0,
+          "rating": 2600,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 57,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 195167492,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677513655,
+        "relativeTimeSeconds": 5155,
+        "problem": {
+          "contestId": 1799,
+          "index": "D1",
+          "name": "Hot Start Up (easy version)",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1900,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150642324,
+          "members": [
+            {
+              "handle": "mbdtf"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 76,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 195167209,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677513596,
+        "relativeTimeSeconds": 5096,
+        "problem": {
+          "contestId": 1799,
+          "index": "G",
+          "name": "Count Voting",
+          "type": "PROGRAMMING",
+          "points": 3000.0,
+          "rating": 2600,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 20,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 195167140,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677513583,
+        "relativeTimeSeconds": 5083,
+        "problem": {
+          "contestId": 1799,
+          "index": "D1",
+          "name": "Hot Start Up (easy version)",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1900,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 28,
+        "timeConsumedMillis": 997,
+        "memoryConsumedBytes": 402022400
+      },
+      {
+        "id": 195163845,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677512904,
+        "relativeTimeSeconds": 4404,
+        "problem": {
+          "contestId": 1799,
+          "index": "H",
+          "name": "Tree Cutting",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3200,
+          "tags": [
+            "bitmasks",
+            "dfs and similar",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 43,
+        "timeConsumedMillis": 592,
+        "memoryConsumedBytes": 39424000
+      },
+      {
+        "id": 195161760,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677512500,
+        "relativeTimeSeconds": 4000,
+        "problem": {
+          "contestId": 1799,
+          "index": "C",
+          "name": "Double Lexicographically Minimum",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1700,
+          "tags": [
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150642324,
+          "members": [
+            {
+              "handle": "mbdtf"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 76,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 30,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 195158310,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677511830,
+        "relativeTimeSeconds": 3330,
+        "problem": {
+          "contestId": 1799,
+          "index": "C",
+          "name": "Double Lexicographically Minimum",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1700,
+          "tags": [
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 30,
+        "timeConsumedMillis": 124,
+        "memoryConsumedBytes": 716800
+      },
+      {
+        "id": 195157927,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677511760,
+        "relativeTimeSeconds": 3260,
+        "problem": {
+          "contestId": 1799,
+          "index": "C",
+          "name": "Double Lexicographically Minimum",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1700,
+          "tags": [
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 102400
+      },
+      {
+        "id": 195157176,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677511625,
+        "relativeTimeSeconds": 3125,
+        "problem": {
+          "contestId": 1799,
+          "index": "H",
+          "name": "Tree Cutting",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3200,
+          "tags": [
+            "bitmasks",
+            "dfs and similar",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 12,
+        "timeConsumedMillis": 2000,
+        "memoryConsumedBytes": 3379200
+      },
+      {
+        "id": 195156450,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677511499,
+        "relativeTimeSeconds": 2999,
+        "problem": {
+          "contestId": 1799,
+          "index": "H",
+          "name": "Tree Cutting",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3200,
+          "tags": [
+            "bitmasks",
+            "dfs and similar",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596676,
+          "members": [
+            {
+              "handle": "rainboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 435,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "GNU C11",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 12,
+        "timeConsumedMillis": 2000,
+        "memoryConsumedBytes": 3276800
+      },
+      {
+        "id": 195153581,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677511002,
+        "relativeTimeSeconds": 2502,
+        "problem": {
+          "contestId": 1799,
+          "index": "D1",
+          "name": "Hot Start Up (easy version)",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1900,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596678,
+          "members": [
+            {
+              "handle": "kaiboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 399,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 28,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 6041600
+      },
+      {
+        "id": 195153527,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677510991,
+        "relativeTimeSeconds": 2491,
+        "problem": {
+          "contestId": 1799,
+          "index": "D2",
+          "name": "Hot Start Up (hard version)",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 2100,
+          "tags": [
+            "data structures",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596678,
+          "members": [
+            {
+              "handle": "kaiboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 399,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 28,
+        "timeConsumedMillis": 140,
+        "memoryConsumedBytes": 6041600
+      },
+      {
+        "id": 195153394,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677510968,
+        "relativeTimeSeconds": 2468,
+        "problem": {
+          "contestId": 1799,
+          "index": "D2",
+          "name": "Hot Start Up (hard version)",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 2100,
+          "tags": [
+            "data structures",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596678,
+          "members": [
+            {
+              "handle": "kaiboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 399,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 1000,
+        "memoryConsumedBytes": 6041600
+      },
+      {
+        "id": 195153382,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677510964,
+        "relativeTimeSeconds": 2464,
+        "problem": {
+          "contestId": 1799,
+          "index": "C",
+          "name": "Double Lexicographically Minimum",
+          "type": "PROGRAMMING",
+          "points": 1500.0,
+          "rating": 1700,
+          "tags": [
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 3,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 716800
+      },
+      {
+        "id": 195152498,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677510812,
+        "relativeTimeSeconds": 2312,
+        "problem": {
+          "contestId": 1799,
+          "index": "D2",
+          "name": "Hot Start Up (hard version)",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 2100,
+          "tags": [
+            "data structures",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150596678,
+          "members": [
+            {
+              "handle": "kaiboy"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 399,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 5939200
+      },
+      {
+        "id": 195146427,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677509817,
+        "relativeTimeSeconds": 1317,
+        "problem": {
+          "contestId": 1799,
+          "index": "B",
+          "name": "Equalize by Divide",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1200,
+          "tags": [
+            "brute force",
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150642324,
+          "members": [
+            {
+              "handle": "mbdtf"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 76,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 195143503,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677509366,
+        "relativeTimeSeconds": 866,
+        "problem": {
+          "contestId": 1799,
+          "index": "B",
+          "name": "Equalize by Divide",
+          "type": "PROGRAMMING",
+          "points": 1000.0,
+          "rating": 1200,
+          "tags": [
+            "brute force",
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 195141829,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677509123,
+        "relativeTimeSeconds": 623,
+        "problem": {
+          "contestId": 1799,
+          "index": "A",
+          "name": "Recent Actions",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "data structures",
+            "greedy",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150642324,
+          "members": [
+            {
+              "handle": "mbdtf"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 76,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "RUNTIME_ERROR",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 2048000
+      },
+      {
+        "id": 195140099,
+        "contestId": 1799,
+        "creationTimeSeconds": 1677508850,
+        "relativeTimeSeconds": 350,
+        "problem": {
+          "contestId": 1799,
+          "index": "A",
+          "name": "Recent Actions",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "data structures",
+            "greedy",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1799,
+          "participantId": 150629521,
+          "members": [
+            {
+              "handle": "Ahmed_Salah7"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 409,
+          "startTimeSeconds": 1677508500
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "RUNTIME_ERROR",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 2048000
+      }
+    ]
+  }
+}

@@ -1,0 +1,226 @@
+{
+  "checked_on": "2026-11-01",
+  "method": "Compare every positive scored problem result for CONTESTANT parties using contest.standings problem maximum, bestSubmissionTimeSeconds and rejectedAttemptCount. Both candidates subtract 50 per rejected attempt and enforce a 30% floor; the duration candidate and fixed engine candidate ceil the score. go_match uses the previous Go expression without ceil. Comparisons use rational arithmetic. These are API-derived summaries, not complete saved API responses. Contest 1739 is ICPC and has no CF results to compare.",
+  "contests": [
+    {
+      "contest": 1137,
+      "name": "Codeforces Round 545 (Div. 1)",
+      "duration_minutes": 150,
+      "url": "https://codeforces.com/api/contest.standings?contestId=1137",
+      "results": 1087,
+      "old_match": 1087,
+      "fixed_match": 11,
+      "go_match": 11,
+      "examples_with_wrong_attempts": [
+        {
+          "handle": "sunset",
+          "problem": "E",
+          "maximum": 2500.0,
+          "seconds": 4072,
+          "wrong": 1,
+          "official": 1914.0,
+          "duration_formula": 1914.0,
+          "fixed_formula_rounded": 1780.0,
+          "go_formula": 1780.0
+        },
+        {
+          "handle": "Radewoosh",
+          "problem": "C",
+          "maximum": 1500.0,
+          "seconds": 2950,
+          "wrong": 1,
+          "official": 1215.0,
+          "duration_formula": 1215.0,
+          "fixed_formula_rounded": 1156.0,
+          "go_formula": 1156.0
+        }
+      ],
+      "decay_disagreements": [
+        {
+          "handle": "sunset",
+          "problem": "A",
+          "maximum": 500.0,
+          "seconds": 470,
+          "wrong": 0,
+          "official": 489.0,
+          "duration_formula": 489.0,
+          "fixed_formula_rounded": 486.0,
+          "go_formula": 486.0
+        },
+        {
+          "handle": "sunset",
+          "problem": "B",
+          "maximum": 750.0,
+          "seconds": 802,
+          "wrong": 0,
+          "official": 719.0,
+          "duration_formula": 719.0,
+          "fixed_formula_rounded": 711.0,
+          "go_formula": 711.0
+        },
+        {
+          "handle": "sunset",
+          "problem": "D",
+          "maximum": 2250.0,
+          "seconds": 7321,
+          "wrong": 0,
+          "official": 1372.0,
+          "duration_formula": 1372.0,
+          "fixed_formula_rounded": 1152.0,
+          "go_formula": 1152.0
+        }
+      ]
+    },
+    {
+      "contest": 1735,
+      "name": "Codeforces Round 824 (Div. 2)",
+      "duration_minutes": 135,
+      "url": "https://codeforces.com/api/contest.standings?contestId=1735",
+      "results": 22578,
+      "old_match": 22578,
+      "fixed_match": 22578,
+      "go_match": 22578,
+      "examples_with_wrong_attempts": [
+        {
+          "handle": "9u46",
+          "problem": "B",
+          "maximum": 750.0,
+          "seconds": 763,
+          "wrong": 1,
+          "official": 664.0,
+          "duration_formula": 664.0,
+          "fixed_formula_rounded": 664.0,
+          "go_formula": 664.0
+        },
+        {
+          "handle": "9u46",
+          "problem": "E",
+          "maximum": 2250.0,
+          "seconds": 3344,
+          "wrong": 1,
+          "official": 1705.0,
+          "duration_formula": 1705.0,
+          "fixed_formula_rounded": 1705.0,
+          "go_formula": 1705.0
+        }
+      ],
+      "decay_disagreements": []
+    },
+    {
+      "contest": 1739,
+      "name": "Educational Codeforces Round 136 (Rated for Div. 2)",
+      "duration_minutes": 120,
+      "url": "https://codeforces.com/api/contest.standings?contestId=1739",
+      "results": 0,
+      "old_match": 0,
+      "fixed_match": 0,
+      "go_match": 0,
+      "examples_with_wrong_attempts": [],
+      "decay_disagreements": []
+    },
+    {
+      "contest": 1916,
+      "name": "Good Bye 2023",
+      "duration_minutes": 120,
+      "url": "https://codeforces.com/api/contest.standings?contestId=1916",
+      "results": 36922,
+      "old_match": 36922,
+      "fixed_match": 36922,
+      "go_match": 36922,
+      "examples_with_wrong_attempts": [
+        {
+          "handle": "Benq",
+          "problem": "F",
+          "maximum": 2750.0,
+          "seconds": 5500,
+          "wrong": 3,
+          "official": 1599.0,
+          "duration_formula": 1599.0,
+          "fixed_formula_rounded": 1599.0,
+          "go_formula": 1599.0
+        },
+        {
+          "handle": "gamegame",
+          "problem": "F",
+          "maximum": 2750.0,
+          "seconds": 4668,
+          "wrong": 2,
+          "official": 1803.0,
+          "duration_formula": 1803.0,
+          "fixed_formula_rounded": 1803.0,
+          "go_formula": 1803.0
+        }
+      ],
+      "decay_disagreements": []
+    },
+    {
+      "contest": 1110,
+      "name": "Codeforces Global Round 1",
+      "type": "CF",
+      "duration_minutes": 120,
+      "url": "https://codeforces.com/api/contest.standings?contestId=1110",
+      "results": 13461,
+      "old_match": 13461,
+      "fixed_match": 13461,
+      "go_match": 13461,
+      "decay_disagreements": []
+    },
+    {
+      "contest": 2262,
+      "name": "Codeforces Round 1120 (Div. 1)",
+      "type": "CF",
+      "duration_minutes": 180,
+      "url": "https://codeforces.com/api/contest.standings?contestId=2262",
+      "results": 2011,
+      "old_match": 2011,
+      "fixed_match": 1,
+      "go_match": 1,
+      "decay_disagreements": [
+        {
+          "handle": "Kevin114514",
+          "problem": "A1",
+          "maximum": 500.0,
+          "seconds": 181,
+          "wrong": 0,
+          "official": 496.0,
+          "duration_formula": 496.0,
+          "fixed_formula": 494.0,
+          "go_formula": 494.0
+        },
+        {
+          "handle": "Kevin114514",
+          "problem": "A2",
+          "maximum": 1000.0,
+          "seconds": 570,
+          "wrong": 0,
+          "official": 976.0,
+          "duration_formula": 976.0,
+          "fixed_formula": 964.0,
+          "go_formula": 964.0
+        },
+        {
+          "handle": "Kevin114514",
+          "problem": "B",
+          "maximum": 1750.0,
+          "seconds": 1181,
+          "wrong": 0,
+          "official": 1662.0,
+          "duration_formula": 1662.0,
+          "fixed_formula": 1617.0,
+          "go_formula": 1617.0
+        },
+        {
+          "handle": "Kevin114514",
+          "problem": "C",
+          "maximum": 1750.0,
+          "seconds": 2479,
+          "wrong": 1,
+          "official": 1509.0,
+          "duration_formula": 1509.0,
+          "fixed_formula": 1413.0,
+          "go_formula": 1413.0
+        }
+      ]
+    }
+  ]
+}

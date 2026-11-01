@@ -228,6 +228,7 @@ func (session *Session) poll(ctx context.Context) bool {
 	}
 	standings, standingsErr := session.gateway.FetchStandings(ctx, contestID)
 	if standingsErr == nil {
+		standings.ResolveICPCPenalty(previousStandings)
 		session.mu.Lock()
 		session.standings = &standings
 		session.contest = standings.Contest

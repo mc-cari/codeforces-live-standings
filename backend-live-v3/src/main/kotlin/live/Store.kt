@@ -26,9 +26,7 @@ open class Store(path: Path) : AutoCloseable {
         db.createStatement().use { s ->
             listOf("PRAGMA journal_mode=WAL", "PRAGMA synchronous=FULL", "PRAGMA foreign_keys=ON", "PRAGMA busy_timeout=5000",
                 "CREATE TABLE IF NOT EXISTS contests(id INTEGER PRIMARY KEY, revision INTEGER NOT NULL DEFAULT 0, snapshot TEXT, finished_at INTEGER, active INTEGER NOT NULL DEFAULT 1, deactivated_at INTEGER)",
-                "CREATE TABLE IF NOT EXISTS raw_history(contest INTEGER NOT NULL REFERENCES contests(id) ON DELETE CASCADE, resource TEXT NOT NULL, id TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(contest,resource,id))",
-                "CREATE TABLE IF NOT EXISTS receipts(id TEXT PRIMARY KEY, created_at INTEGER NOT NULL)",
-                "CREATE TABLE IF NOT EXISTS totals(kind TEXT NOT NULL, mode TEXT NOT NULL, value REAL NOT NULL, PRIMARY KEY(kind,mode))"
+                "CREATE TABLE IF NOT EXISTS raw_history(contest INTEGER NOT NULL REFERENCES contests(id) ON DELETE CASCADE, resource TEXT NOT NULL, id TEXT NOT NULL, payload TEXT NOT NULL, PRIMARY KEY(contest,resource,id))"
             ).forEach(s::execute)
             val columns=s.executeQuery("PRAGMA table_info(contests)").use {r -> buildSet {while(r.next())add(r.getString("name"))}}
             if("active" !in columns) s.execute("ALTER TABLE contests ADD COLUMN active INTEGER NOT NULL DEFAULT 1")
@@ -78,17 +76,7 @@ open class Store(path: Path) : AutoCloseable {
     }
     @Synchronized fun cleanup(cutoff: Long) {
         db.prepareStatement("DELETE FROM contests WHERE (finished_at IS NOT NULL AND finished_at < ?) OR (active=0 AND snapshot IS NULL AND deactivated_at < ?)").use {it.setLong(1,cutoff);it.setLong(2,cutoff);it.executeUpdate()}
-        db.prepareStatement("DELETE FROM receipts WHERE created_at < ?").use {it.setLong(1,System.currentTimeMillis()-86400000);it.executeUpdate()}
     }
-    @Synchronized fun telemetry(id: String, kind: String, mode: String, seconds: Double?): Boolean = transaction {
-        val inserted = db.prepareStatement("INSERT OR IGNORE INTO receipts VALUES(?,?)").use {it.setString(1,id);it.setLong(2,System.currentTimeMillis());it.executeUpdate()==1}
-        if(inserted) {
-            fun add(k: String, value: Double) {db.prepareStatement("INSERT INTO totals VALUES(?,?,?) ON CONFLICT(kind,mode) DO UPDATE SET value=value+excluded.value").use {it.setString(1,k);it.setString(2,mode);it.setDouble(3,value);it.executeUpdate()}}
-            add(kind,1.0);if(seconds!=null) add("loading_seconds",seconds)
-        }
-        inserted
-    }
-    @Synchronized fun totals(): List<Triple<String,String,Double>> = db.createStatement().use {s -> s.executeQuery("SELECT * FROM totals").use {r -> buildList {while(r.next())add(Triple(r.getString(1),r.getString(2),r.getDouble(3)))} } }
     private fun <T> transaction(block: () -> T): T {
         check(db.autoCommit);db.autoCommit=false
         try {val result=block();db.commit();return result} catch(t: Throwable) {db.rollback();throw t} finally {db.autoCommit=true}

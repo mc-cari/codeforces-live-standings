@@ -201,29 +201,6 @@ class EngineTest {
             assertEquals(1,store.history(3,"submissions")!!.jsonArray.size)
         }
     }
-    @Test fun eventStreamAdmissionReleasesSlotsOnDisconnect(): Unit = runBlocking {
-        Fixture().use {f ->Store(Files.createTempDirectory("stream-limit").resolve("db")).use {store ->Manager(store,config(f)).use {manager ->Api(manager,emptyList(),maxStreams=1).use {api ->
-            manager.activate(1)
-            val server=api.start(InetSocketAddress("127.0.0.1",0))
-            val base="http://127.0.0.1:${server.address.port}"
-            val url=URI("$base/v1/contests/1/events?h=YWxpY2U")
-            val client=java.net.http.HttpClient.newHttpClient()
-            fun connect()=client.send(java.net.http.HttpRequest.newBuilder(url).build(),java.net.http.HttpResponse.BodyHandlers.ofInputStream())
-            val first=connect()
-            assertEquals(200,first.statusCode())
-            val rejected=connect()
-            assertEquals(429,rejected.statusCode());rejected.body().close()
-            first.body().close()
-            var accepted: java.net.http.HttpResponse<java.io.InputStream>?=null
-            withTimeout(8000) {
-                while(accepted==null) {
-                    val response=connect()
-                    if(response.statusCode()==200)accepted=response else {assertEquals(429,response.statusCode());response.body().close();delay(20)}
-                }
-            }
-            accepted!!.body().close()
-        }}}}
-    }
     @Test fun educationalRoundUsesTenMinutePenaltyAndMatchingProblemBreakdown(): Unit = runBlocking {
         Fixture().use {f ->
             f.type="ICPC"
@@ -306,32 +283,26 @@ class EngineTest {
             }}
         }
     }
-    @Test fun httpContractCorsTelemetryAndPrivateMetrics(): Unit = runBlocking {
-        Fixture().use {f -> Store(Files.createTempDirectory("http").resolve("db")).use {store ->Manager(store,config(f)).use {manager ->Api(manager,listOf("https://preview-*.example.test"),"secret").use {api ->
+    @Test fun internalViewsKeepPublicTransportInGo(): Unit = runBlocking {
+        Fixture().use {f ->Store(Files.createTempDirectory("internal-http").resolve("db")).use {store ->Manager(store,config(f)).use {manager ->Api(manager).use {api ->
             val server=api.start(InetSocketAddress("127.0.0.1",0))
-            val metrics=api.start(InetSocketAddress("127.0.0.1",0),true)
-            fun request(path: String,method: String="GET",body: String?=null,auth: Boolean=false,port: Int=server.address.port): Pair<Int,String> {
-                val connection=URI("http://127.0.0.1:$port$path").toURL().openConnection() as HttpURLConnection
-                connection.requestMethod=method;connection.connectTimeout=3000;connection.readTimeout=5000
-                connection.setRequestProperty("Origin","https://preview-abc.example.test")
-                if(auth)connection.setRequestProperty("Authorization","Bearer secret")
-                if(body!=null) {connection.doOutput=true;connection.outputStream.use {it.write(body.toByteArray())}}
+            fun request(path: String,method: String="GET"): Pair<Int,String> {
+                val connection=URI("http://127.0.0.1:${server.address.port}$path").toURL().openConnection() as HttpURLConnection
+                connection.requestMethod=method;connection.readTimeout=20000
                 val status=connection.responseCode
                 val value=(if(status>=400)connection.errorStream else connection.inputStream)?.bufferedReader()?.use {it.readText()}.orEmpty()
-                if(path=="/healthz") assertEquals("https://preview-abc.example.test",connection.getHeaderField("Access-Control-Allow-Origin"))
                 connection.disconnect();return status to value
             }
-            assertEquals(200,request("/healthz").first)
-            assertEquals(404,request("/metrics").first)
-            assertEquals(200,request("/metrics",port=metrics.address.port).first)
-            assertEquals(200,request("/v1/contests/1/activate","POST").first)
-            assertEquals(400,request("/v1/contests/1/events?h=%25%25%25").first)
-            val encoded=Base64.getUrlEncoder().withoutPadding().encodeToString("ALICE;alice".toByteArray())
-            assertEquals(setOf("alice"),api.decodeHandles("h=$encoded"))
-            val payload="""{"id":"abcdefghijklmnop","kind":"page_view","mode":"live"}"""
-            assertEquals(401,request("/v1/telemetry","POST",payload).first)
-            repeat(2) {assertEquals(204,request("/v1/telemetry","POST",payload,true).first)}
-            assertTrue("cf_usage_page_views_total{mode=\"live\"} 1.0" in request("/metrics",port=metrics.address.port).second)
+            assertEquals(404,request("/v1/contests/1/activate","POST").first)
+            assertEquals(404,request("/v1/telemetry","POST").first)
+            assertEquals(404,request("/internal/v1/contests/1/view?h=YWxpY2U").first)
+            assertEquals(200,request("/internal/v1/contests/1/activate","POST").first)
+            assertEquals(400,request("/internal/v1/contests/1/view?h=%25%25%25").first)
+            val (status,body)=request("/internal/v1/contests/1/view?h=YWxpY2U")
+            assertEquals(200,status)
+            val view=json.parseToJsonElement(body).jsonObject
+            assertEquals(setOf(101L,102L),view.array("submissions").map {it.jsonObject.number("id")}.toSet())
+            assertEquals("live",view.getValue("health").jsonObject.text("state"))
         }}}}
     }
 }

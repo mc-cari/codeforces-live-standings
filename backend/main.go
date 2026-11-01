@@ -7,11 +7,13 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/codeforces"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/livev3"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
@@ -53,11 +55,21 @@ func main() {
 		MaxActiveContests:         3,
 		SubmissionHistoryObserver: metrics,
 	})
-	if err := manager.Restore(ctx); err != nil {
-		slog.Error("restore active contests failed", "error", err)
-		os.Exit(1)
+	var provider application.LiveStandingsProvider = manager
+	if engineURL := os.Getenv("LIVE_V3_ENGINE_URL"); engineURL != "" {
+		remote, err := livev3.NewClient(engineURL)
+		if err != nil {
+			slog.Error("configure live-v3 engine failed", "error", err)
+			os.Exit(1)
+		}
+		provider = remote
+	} else {
+		if err := manager.Restore(ctx); err != nil {
+			slog.Error("restore active contests failed", "error", err)
+			os.Exit(1)
+		}
+		go manager.RunCleanup(ctx, time.Hour)
 	}
-	go manager.RunCleanup(ctx, time.Hour)
 
 	metricsMux := http.NewServeMux()
 	metricsMux.Handle("/metrics", metrics.Handler())
@@ -85,9 +97,14 @@ func main() {
 			}
 		}
 	}()
+	maxStreams, err := strconv.Atoi(env("MAX_SSE_CONNECTIONS", "128"))
+	if err != nil || maxStreams <= 0 {
+		slog.Error("MAX_SSE_CONNECTIONS must be a positive integer")
+		os.Exit(1)
+	}
 	server := &http.Server{
 		Addr:    env("LISTEN_ADDR", defaultListen),
-		Handler: httpapi.NewServer(manager, httpapi.Config{Metrics: metrics, TelemetryToken: os.Getenv("TELEMETRY_TOKEN"), AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200}),
+		Handler: httpapi.NewServer(provider, httpapi.Config{Metrics: metrics, TelemetryToken: os.Getenv("TELEMETRY_TOKEN"), AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200, MaxStreams: maxStreams}),
 	}
 	shutdownDone := make(chan struct{})
 	go func() {

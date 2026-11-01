@@ -39,7 +39,7 @@ class Projection(private val state: ContestStateWithScoreboard) {
                             (run.result as? RunResult.IOI)?.wrongVerdict?.isAddingPenalty == true && submission.text("verdict") != "OK"
                     }
                 }
-                obj("points" to num(points), "penalty" to num(if(result is ICPCProblemResult && result.isSolved) seconds/60 + wrongs*20 else 0),
+                obj("points" to num(points), "penalty" to num(if(result is ICPCProblemResult && result.isSolved) seconds/60 + wrongs*info.penaltyPerWrongAttempt.inWholeMinutes else 0),
                     "rejectedAttemptCount" to num(wrongs), "type" to str("FINAL"), "bestSubmissionTimeSeconds" to num(seconds))
             }
             val hacks = hacksByTeam[id].orEmpty().mapNotNull { it.customFields["codeforces.hack"]?.let { raw -> json.parseToJsonElement(raw).jsonObject } }

@@ -224,14 +224,15 @@ class EngineTest {
             accepted!!.body().close()
         }}}}
     }
-    @Test fun icpcServiceUsesEnginePenalty(): Unit = runBlocking {
+    @Test fun educationalRoundUsesTenMinutePenaltyAndMatchingProblemBreakdown(): Unit = runBlocking {
         Fixture().use {f ->
             f.type="ICPC"
             f.submissions=JsonArray(listOf(Fixture.submission(1,"WRONG_ANSWER",60),Fixture.submission(2,"OK",180),Fixture.submission(3,"WRONG_ANSWER",200)))
             Store(Files.createTempDirectory("icpc").resolve("db")).use {store ->Manager(store,config(f)).use {manager ->
                 val row=manager.activate(1).view()!!.snapshot.getValue("standings").jsonObject.array("rows").single().jsonObject
                 assertEquals(1.0,row.getValue("points").jsonPrimitive.double)
-                assertEquals(23,row.number("penalty"))
+                assertEquals(13,row.number("penalty"))
+                assertEquals(13,row.array("problemResults").single().jsonObject.number("penalty"))
             }}
         }
     }

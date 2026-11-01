@@ -60,7 +60,11 @@ CF reloads include the hacks endpoint, so pacing and response time can lengthen
 the effective refresh interval. Dedicated clients are explicitly closed after
 requests for transport compatibility; this does not claim a latency improvement.
 
-Supported: CF and ICPC scoring, individual official and out-of-competition entries.
+Supported: standard CF point scoring and ICPC scoring (including Educational
+rounds), with individual official and out-of-competition entries. The engine
+infers wrong-attempt penalties from official solved-problem results when available;
+otherwise it defaults to 10 minutes for public rounds and 20 minutes for Gym.
+The projected per-problem penalties use the same rule as the engine's total.
 Teams, practice/virtual sessions, IOI/BLITZ and a new replay UI are excluded from v1.
 The service returns conflict for unsupported scoring formats. Friend selection is
 case-insensitive and uses live-v3 ranking over precomputed selected rows, including

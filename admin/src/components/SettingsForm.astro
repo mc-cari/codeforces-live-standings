@@ -1,0 +1,25 @@
+---
+import ContestTable from './ContestTable.astro';
+import StatusMessage from './StatusMessage.astro';
+---
+<form id="settings">
+ <fieldset id="controls" disabled>
+  <legend>Automatic collection</legend>
+  <label for="mode">Collection mode</label>
+  <select id="mode" name="mode" aria-describedby="mode-help">
+   <option value="off">Off</option><option value="selected">Selected contests</option><option value="all">All public contests</option>
+  </select>
+  <p id="mode-help">Off starts no new sessions. Existing sessions continue until collection is complete.</p>
+  <ContestTable />
+ </fieldset>
+ <footer><button id="save" type="submit" disabled>Save settings</button><StatusMessage /></footer>
+</form>
+<style>
+ fieldset { border:0; padding:0; margin:0; min-width:0; } legend { font-size:1.4rem; font-weight:650; padding:0; margin-bottom:1.5rem; }
+ label { display:block; font-weight:600; margin-bottom:.5rem; } select { font:inherit; padding:.7rem 2.5rem .7rem .8rem; border:1px solid var(--line); background:white; color:var(--ink); border-radius:6px; max-width:100%; }
+ #mode-help { color:var(--muted); max-width:70ch; margin:.8rem 0 2.5rem; }
+ footer { display:flex; align-items:center; gap:1rem; padding:1.5rem 0; border-top:1px solid var(--line); }
+ button { background:var(--ink); color:white; font:inherit; font-weight:600; padding:.75rem 1.1rem; border:0; border-radius:6px; cursor:pointer; flex-shrink:0; }
+ button:hover:enabled { background:var(--green); } button:disabled { opacity:.5; cursor:default; }
+ @media(max-width:600px) { footer { align-items:start; flex-direction:column; } }
+</style>

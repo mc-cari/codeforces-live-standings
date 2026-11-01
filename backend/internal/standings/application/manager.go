@@ -16,20 +16,24 @@ type Config struct {
 	MaxActiveContests         int
 }
 
+var ErrCapacity = errors.New("active contest capacity reached")
+
 type Manager struct {
-	repository Repository
-	gateway    ContestGateway
-	config     Config
-	mu         sync.Mutex
-	sessions   map[int]*Session
-	activating int
+	activationMu sync.Mutex
+	runContext   context.Context
+	repository   Repository
+	gateway      ContestGateway
+	config       Config
+	mu           sync.Mutex
+	sessions     map[int]*Session
 }
 
 func NewManager(repository Repository, gateway ContestGateway, config Config) *Manager {
-	return &Manager{repository: repository, gateway: gateway, config: config, sessions: make(map[int]*Session)}
+	return &Manager{runContext: context.Background(), repository: repository, gateway: gateway, config: config, sessions: make(map[int]*Session)}
 }
 
 func (manager *Manager) Restore(ctx context.Context) error {
+	manager.runContext = ctx
 	records, err := manager.repository.LoadActive()
 	if err != nil {
 		return err
@@ -47,12 +51,25 @@ func (manager *Manager) Restore(ctx context.Context) error {
 }
 
 func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, error) {
+	return manager.activate(ctx, id, false)
+}
+
+// ActivateRunning rechecks eligibility against fresh standings before persisting.
+func (manager *Manager) ActivateRunning(ctx context.Context, id int) (*Session, bool, error) {
+	return manager.activate(ctx, id, true)
+}
+
+func (manager *Manager) activate(ctx context.Context, id int, runningOnly bool) (*Session, bool, error) {
+	// Serialize creation before any upstream or persistence work. Viewers and
+	// automatic collection must share one activation and one capacity decision.
+	manager.activationMu.Lock()
+	defer manager.activationMu.Unlock()
 	manager.mu.Lock()
 	if session := manager.sessions[id]; session != nil {
 		manager.mu.Unlock()
 		return session, false, nil
 	}
-	active := manager.activating
+	active := 0
 	for _, session := range manager.sessions {
 		finished, _ := session.Status()
 		if !finished {
@@ -61,22 +78,16 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 	}
 	if active >= manager.config.MaxActiveContests {
 		manager.mu.Unlock()
-		return nil, false, errors.New("active contest capacity reached")
+		return nil, false, ErrCapacity
 	}
-	manager.activating++
 	manager.mu.Unlock()
-	defer func() {
-		manager.mu.Lock()
-		manager.activating--
-		manager.mu.Unlock()
-	}()
 
 	standings, err := manager.gateway.FetchStandings(ctx, id)
 	if err != nil {
 		return nil, false, err
 	}
 	finished := strings.EqualFold(standings.Contest.Phase, "FINISHED")
-	if standings.Contest.Phase != "BEFORE" && standings.Contest.Phase != "CODING" && !finished {
+	if (runningOnly && !RunningPhase(standings.Contest.Phase)) || (!runningOnly && standings.Contest.Phase != "BEFORE" && !RunningPhase(standings.Contest.Phase) && !finished) {
 		return nil, false, fmt.Errorf("contest is %s", standings.Contest.Phase)
 	}
 	activatedAt := time.Now()
@@ -89,13 +100,9 @@ func (manager *Manager) Activate(ctx context.Context, id int) (*Session, bool, e
 	}
 	session := newSession(manager.repository, manager.gateway, manager.config.PollInterval, standings.Contest, &standings, 0, stored, manager.config.SubmissionHistoryObserver)
 	manager.mu.Lock()
-	if existing := manager.sessions[id]; existing != nil {
-		manager.mu.Unlock()
-		return existing, false, nil
-	}
 	manager.sessions[id] = session
 	manager.mu.Unlock()
-	go session.Run(context.Background())
+	go session.Run(manager.runContext)
 	return session, true, nil
 }
 
@@ -141,4 +148,22 @@ func (manager *Manager) Stop() {
 	for _, session := range sessions {
 		session.Stop()
 	}
+}
+
+func RunningPhase(phase string) bool {
+	switch phase {
+	case "CODING", "PENDING_SYSTEM_TEST", "SYSTEM_TEST":
+		return true
+	}
+	return false
+}
+
+func (manager *Manager) Sessions() []*Session {
+	manager.mu.Lock()
+	defer manager.mu.Unlock()
+	result := make([]*Session, 0, len(manager.sessions))
+	for _, session := range manager.sessions {
+		result = append(result, session)
+	}
+	return result
 }

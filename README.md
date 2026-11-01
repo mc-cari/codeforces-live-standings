@@ -145,3 +145,9 @@ Optional production telemetry records page views, completed setups, displayed sc
 countdowns, and basic loading reliability. Lifetime usage totals are persisted in SQLite;
 Alloy scrapes a private metrics listener and forwards to your existing Grafana destination.
 See [deployment, dashboard import, and metric definitions](monitoring/README.md).
+
+### Automatic collection admin
+
+The separate Astro admin supports Off, Selected contests, and All public contests.
+See [admin deployment and development](docs/admin.md) for Cloudflare Access setup,
+local development, settings, collection behavior, and rollout checks.

@@ -58,6 +58,11 @@ func NewClient(baseURL string, httpClient *http.Client, minimumInterval time.Dur
 	return client
 }
 
+func (client *Client) FetchContests(ctx context.Context) ([]domain.Contest, error) {
+	var result []domain.Contest
+	return result, client.fetch(ctx, "contest.list", 0, &result)
+}
+
 func (client *Client) FetchSubmissions(ctx context.Context, contestID int) ([]domain.Submission, error) {
 	var result []domain.Submission
 	return result, client.fetch(ctx, "contest.status", contestID, &result)
@@ -86,6 +91,9 @@ func (client *Client) fetch(ctx context.Context, method string, contestID int, t
 	waited := time.Since(queuedAt)
 
 	query := url.Values{"contestId": {strconv.Itoa(contestID)}}
+	if method == "contest.list" {
+		query = url.Values{"gym": {"false"}}
+	}
 	request, err := http.NewRequestWithContext(ctx, http.MethodGet, client.baseURL+method+"?"+query.Encode(), nil)
 	if err != nil {
 		return err

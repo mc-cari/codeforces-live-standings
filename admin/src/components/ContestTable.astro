@@ -1,0 +1,31 @@
+<section aria-labelledby="contests-heading">
+ <div class="heading"><h2 id="contests-heading">Contests</h2><span id="selection-count">0 selected</span></div>
+ <p class="help">Select contests to keep in Selected contests mode. Your selection is retained in every mode.</p>
+ <div class="table-wrap"><table>
+  <caption class="sr-only">Upcoming, running, and retained collection sessions</caption>
+  <thead><tr><th scope="col">Collect</th><th scope="col">Contest</th><th scope="col">Start / phase</th><th scope="col">Collection</th></tr></thead>
+  <tbody id="contests"><tr><td colspan="4">Loading contests…</td></tr></tbody>
+ </table></div>
+</section>
+<style>
+ h2 { margin:0; font-size:1.2rem; } .heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+ #selection-count,.help { color:var(--muted); font-size:.9rem; } .help { margin:.6rem 0 1rem; }
+ .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; text-align:left; font-size:.9rem; }
+ th { font-weight:600; color:var(--muted); font-size:.8rem; padding:.8rem .65rem; border-bottom:1px solid var(--line); }
+ tbody :global(td) { padding:1rem .65rem; vertical-align:top; border-bottom:1px solid var(--line); }
+ tbody :global(td:nth-child(2)) { min-width:190px; } tbody :global(small) { display:block; color:var(--muted); margin-top:.35rem; }
+ tbody :global(input) { width:1.15rem; height:1.15rem; accent-color:var(--green); cursor:pointer; }
+ tbody :global(.error) { color:var(--error); } tbody :global(.live) { color:var(--green); font-weight:600; }
+ @media(max-width:600px) {
+  .table-wrap { overflow:visible; } table { display:block; } thead { display:none; } tbody { display:block; }
+  tbody :global(tr) { display:grid; grid-template-columns:2rem minmax(0,1fr); padding:1rem 0; border-bottom:1px solid var(--line); }
+  tbody :global(td) { display:block; grid-column:2; padding:.35rem 0; border:0; overflow-wrap:anywhere; }
+  tbody :global(td:first-child:not([colspan])) { grid-column:1; grid-row:1 / span 3; }
+  tbody :global(td:nth-child(2)) { min-width:0; font-weight:600; }
+  tbody :global(td:nth-child(3)::before) { content:'Start / phase'; }
+  tbody :global(td:nth-child(4)::before) { content:'Collection'; }
+  tbody :global(td::before) { display:block; font-size:.75rem; font-weight:600; color:var(--muted); margin-bottom:.2rem; }
+  tbody :global(td[colspan]) { grid-column:1 / -1; }
+ }
+ .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+</style>

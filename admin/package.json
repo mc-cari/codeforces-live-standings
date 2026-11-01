@@ -1,0 +1,24 @@
+{
+ "name": "codeforces-collection-admin",
+ "private": true,
+ "type": "module",
+ "engines": {
+  "node": "24.x"
+ },
+ "packageManager": "pnpm@11.14.0",
+ "scripts": {
+  "dev": "astro dev --host 127.0.0.1",
+  "build": "astro check && astro build",
+  "preview": "astro preview --host 127.0.0.1",
+  "test": "playwright test"
+ },
+ "dependencies": {
+  "astro": "^6.0.0"
+ },
+ "devDependencies": {
+  "@astrojs/check": "^0.9.4",
+  "@playwright/test": "^1.58.0",
+  "@types/node": "^24.19.2",
+  "typescript": "^5.9.3"
+ }
+}

@@ -1,0 +1,12 @@
+**/node_modules
+**/.git
+**/.next
+**/dist
+**/.astro
+**/test-results
+**/playwright-report
+.live-data
+.env
+.env.*
+**/*.sqlite*
+.impeccable

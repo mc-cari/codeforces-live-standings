@@ -45,3 +45,7 @@ next-env.d.ts
 tries
 
 docs/performance/
+
+# Astro admin
+admin/dist/
+admin/.astro/

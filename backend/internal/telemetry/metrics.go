@@ -20,6 +20,8 @@ type Store interface {
 }
 
 type Metrics struct {
+	collectionWaiting   prometheus.Gauge
+	collectionFailures  prometheus.Counter
 	ingesting           chan struct{}
 	store               Store
 	registry            *prometheus.Registry
@@ -49,7 +51,7 @@ func New(store Store) *Metrics {
 	m.submissionOmissions = prometheus.NewCounter(prometheus.CounterOpts{Name: "cf_codeforces_submission_omissions_total", Help: "Known submission IDs absent from successful contest.status responses; repeated omissions count again."})
 	m.codeforcesLatency = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "cf_codeforces_request_duration_seconds", Help: "Backend Codeforces HTTP call duration including body decoding, excluding local rate-limit wait.", Buckets: []float64{0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30, 60}}, []string{"method", "outcome"})
 	m.codeforcesWait = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "cf_codeforces_rate_limit_wait_duration_seconds", Help: "Local pacing and mutex wait before started backend Codeforces calls.", Buckets: []float64{0.01, 0.1, 0.5, 1, 2, 3, 5, 10, 20, 30, 60}}, []string{"method"})
-	for _, method := range []string{"contest.status", "contest.standings"} {
+	for _, method := range []string{"contest.status", "contest.standings", "contest.list"} {
 		m.codeforcesWait.WithLabelValues(method)
 		for _, outcome := range []string{"success", "http_error", "api_error", "decode_error", "transport_error", "timeout", "canceled"} {
 			m.codeforcesLatency.WithLabelValues(method, outcome)
@@ -81,7 +83,9 @@ func New(store Store) *Metrics {
 			m.latency.WithLabelValues(endpoint.route, endpoint.method)
 		}
 	}
-	m.registry.MustRegister(m, m.failures, m.loading, m.requests, m.latency, m.SSE, m.submissionResponses, m.submissionOmissions, m.codeforcesLatency, m.codeforcesWait)
+	m.collectionWaiting = prometheus.NewGauge(prometheus.GaugeOpts{Name: "cf_collection_waiting_contests", Help: "Eligible automatic contests waiting for capacity."})
+	m.collectionFailures = prometheus.NewCounter(prometheus.CounterOpts{Name: "cf_collection_activation_failures_total", Help: "Failed automatic activation attempts, excluding capacity waits."})
+	m.registry.MustRegister(m.collectionWaiting, m.collectionFailures, m, m.failures, m.loading, m.requests, m.latency, m.SSE, m.submissionResponses, m.submissionOmissions, m.codeforcesLatency, m.codeforcesWait)
 	return m
 }
 
@@ -99,7 +103,7 @@ func (m *Metrics) ObserveSubmissionHistory(missing int) {
 // ObserveCodeforcesRequest bounds both label dimensions even for future callers.
 func (m *Metrics) ObserveCodeforcesRequest(method, outcome string, duration, wait time.Duration) {
 	switch method {
-	case "contest.status", "contest.standings":
+	case "contest.status", "contest.standings", "contest.list":
 	default:
 		method = "other"
 	}
@@ -248,4 +252,9 @@ func (m *Metrics) Instrument(next http.Handler) http.Handler {
 		next.ServeHTTP(wrapped, r)
 		completed = true
 	})
+}
+
+func (m *Metrics) ObserveCollection(waiting, failures int) {
+	m.collectionWaiting.Set(float64(waiting))
+	m.collectionFailures.Add(float64(failures))
 }

@@ -45,18 +45,18 @@ export function projectVisible(standings: ReplayStandings, events: ReplaySubmiss
   const solved = new Map(rows.map((row) => [getName(row.party), row.problemResults.filter((r) => r.points > 0).length]));
   const solvedAtEvent = new Map<string, Set<string>>();
   const ascendingVisible = [...visible].sort((a, b) => a.relativeTimeSeconds - b.relativeTimeSeconds || a.id - b.id);
-  const solvedBeforeEvent = new Map<number, number>();
+  const solvedByEvent = new Map<number, number>();
   ascendingVisible.forEach((event) => {
     const name = getName(event.author);
     const participantSolved = solvedAtEvent.get(name) || new Set<string>();
-    solvedBeforeEvent.set(event.id, participantSolved.size);
     if (event.verdict === 'OK') participantSolved.add(event.problem.index);
     solvedAtEvent.set(name, participantSolved);
+    solvedByEvent.set(event.id, participantSolved.size);
   });
   const submissions = ascendingVisible.reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((event) => ({ ...event,
     author: { ...event.author, rank: localStandings.get(getName(event.author)) || 0 },
     numberOfProblems: runningSolvedCount
-      ? (solvedBeforeEvent.get(event.id) || 0) + Number(event.verdict === 'OK')
+      ? solvedByEvent.get(event.id) || 0
       : solved.get(getName(event.author)) || 0,
   }));
   return { standings: { ...standings, rows }, localStandings, submissions, pending };

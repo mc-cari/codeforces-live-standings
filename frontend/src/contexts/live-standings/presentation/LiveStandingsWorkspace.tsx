@@ -52,7 +52,7 @@ export default function LiveStandingsWorkspace({
     globalStandings = freeze.projection.standings as Standings;
     localStandings = freeze.projection.localStandings;
     submissions = freeze.projection.submissions as Submission[];
-    newSubmissionsCount = 0;
+    if (freeze.state === 'frozen' || freeze.state === 'revealing') newSubmissionsCount = 0;
   }
   submissions = submissions.slice(0, MAX_SUBMISSIONS_IN_MEMORY);
   const liveStatus = isContestFinished
@@ -111,6 +111,7 @@ export default function LiveStandingsWorkspace({
               <StandingsList
                 pending={freeze.projection?.pending}
                 focused={freeze.focused}
+                isVisible={mobilePanel === 'standings'}
                 contestType={contestType}
                 globalStandings={globalStandings}
                 localStandings={localStandings}

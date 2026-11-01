@@ -15,7 +15,7 @@ export function parseFreeze(minutes: string | string[] | undefined, view: string
 }
 
 export function projectVisible(standings: ReplayStandings, events: ReplaySubmission[], elapsed: number,
-  cutoff?: number, revealed = new Set<string>(), authoritative = false) {
+  cutoff?: number, revealed = new Set<string>(), authoritative = false, runningSolvedCount = false) {
   const available = events.filter((event) => event.relativeTimeSeconds >= 0
     && event.relativeTimeSeconds <= Math.min(elapsed, standings.contest.durationSeconds));
   const pending = new Map<string, number>();
@@ -43,11 +43,22 @@ export function projectVisible(standings: ReplayStandings, events: ReplaySubmiss
     localStandings.set(getName(row.party), row.rank);
   });
   const solved = new Map(rows.map((row) => [getName(row.party), row.problemResults.filter((r) => r.points > 0).length]));
-  const submissions = [...visible].sort((a, b) => b.relativeTimeSeconds - a.relativeTimeSeconds || b.id - a.id)
-    .slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((event) => ({ ...event,
-      author: { ...event.author, rank: localStandings.get(getName(event.author)) || 0 },
-      numberOfProblems: solved.get(getName(event.author)) || 0,
-    }));
+  const solvedAtEvent = new Map<string, Set<string>>();
+  const ascendingVisible = [...visible].sort((a, b) => a.relativeTimeSeconds - b.relativeTimeSeconds || a.id - b.id);
+  const solvedBeforeEvent = new Map<number, number>();
+  ascendingVisible.forEach((event) => {
+    const name = getName(event.author);
+    const participantSolved = solvedAtEvent.get(name) || new Set<string>();
+    solvedBeforeEvent.set(event.id, participantSolved.size);
+    if (event.verdict === 'OK') participantSolved.add(event.problem.index);
+    solvedAtEvent.set(name, participantSolved);
+  });
+  const submissions = ascendingVisible.reverse().slice(0, MAX_SUBMISSIONS_IN_MEMORY).map((event) => ({ ...event,
+    author: { ...event.author, rank: localStandings.get(getName(event.author)) || 0 },
+    numberOfProblems: runningSolvedCount
+      ? (solvedBeforeEvent.get(event.id) || 0) + Number(event.verdict === 'OK')
+      : solved.get(getName(event.author)) || 0,
+  }));
   return { standings: { ...standings, rows }, localStandings, submissions, pending };
 }
 

@@ -264,9 +264,21 @@ export default function ReplayPage() {
     }
     if (!isPlaying) return undefined;
 
-    const releasedEvents = events.filter((event) => (
-      event.relativeTimeSeconds > previousTime && event.relativeTimeSeconds <= elapsedSeconds
-    )).slice(-REPLAY_RELEASE_BATCH_SIZE);
+    const firstAfter = (time: number) => {
+      let low = 0;
+      let high = events.length;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (events[middle].relativeTimeSeconds <= time) low = middle + 1;
+        else high = middle;
+      }
+      return low;
+    };
+    const windowStart = firstAfter(previousTime);
+    const windowEnd = firstAfter(elapsedSeconds);
+    const releasedEvents = events.slice(
+      Math.max(windowStart, windowEnd - REPLAY_RELEASE_BATCH_SIZE), windowEnd,
+    );
     releasedEvents.forEach((submission) => {
       if (judgingJobs.current.has(submission.id)) return;
       const totalTests = submission.verdict === 'OK'
@@ -325,8 +337,9 @@ export default function ReplayPage() {
   const replaySnapshot = useMemo(() => (
     finalStandings ? buildReplaySnapshot(finalStandings, settledEvents, elapsedSeconds) : undefined
   ), [elapsedSeconds, finalStandings, settledEvents]);
-  const freeze = useFreeze(finalStandings, events, elapsedSeconds,
-    Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds), 'replay', String(seekVersion));
+  const freeze = useFreeze(finalStandings, settledEvents, elapsedSeconds,
+    Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds),
+    'replay', String(seekVersion), testingSubmissions.size > 0);
   const snapshot = freeze.cutoff !== undefined ? freeze.projection : replaySnapshot;
   const cinematicSubmissions = useMemo(() => {
     if (freeze.cutoff !== undefined) return snapshot?.submissions || [];
@@ -455,6 +468,7 @@ export default function ReplayPage() {
             <StandingsList
               pending={freeze.projection?.pending}
               focused={freeze.focused}
+              isVisible={mobilePanel === 'standings'}
               contestType={contestType as string}
               globalStandings={snapshot.standings as unknown as Standings}
               localStandings={snapshot.localStandings}

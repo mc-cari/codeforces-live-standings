@@ -12,14 +12,15 @@ import NormalPoints from './NormalPoints';
 import EducationalPoints from './EducationalPoints';
 
 export default function StandingsList({
-  localStandings, globalStandings, contestType, userRank, pending, focused,
+  localStandings, globalStandings, contestType, userRank, pending, focused, isVisible = true,
 } :
 { localStandings: Map<string, number>, globalStandings: Standings, contestType: string,
-  userRank: Map<string, string>, pending?: Map<string, number>, focused?: string }) {
+  userRank: Map<string, string>, pending?: Map<string, number>, focused?: string, isVisible?: boolean }) {
   const reduced = useReducedMotion();
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Measure after row movement so the focused cell is scrolled to its new position.
+    if (!isVisible) return undefined;
     const timer = window.setTimeout(() => {
       const element = Array.from(panel.current?.querySelectorAll<HTMLElement>('[data-freeze-cell]') || [])
         .find((cell) => cell.dataset.freezeCell === focused);
@@ -36,7 +37,7 @@ export default function StandingsList({
       }
     }, reduced ? 0 : 450);
     return () => window.clearTimeout(timer);
-  }, [focused, reduced]);
+  }, [focused, reduced, isVisible]);
   const problemsSolved : Map<string, number> = new Map<string, number>();
 
   globalStandings.rows.forEach((row) => {
@@ -57,6 +58,7 @@ export default function StandingsList({
           <motion.div
             layout={reduced ? false : 'position'}
             transition={{ duration: reduced ? 0 : 0.45, ease: 'easeOut' }}
+            data-standings-row={getName(row.party)}
             className="flex min-w-0 shrink-0 flex-row h-12 w-full hover:bg-gray-800/40 transition-colors border-b border-gray-800/50"
             key={getName(row.party)}
           >
@@ -98,9 +100,17 @@ export default function StandingsList({
                 >
                   {count ? (
                     <div
-                      className="flex h-full items-center justify-center bg-[#3b2c0d] font-data text-sm text-[#ffe8a3]"
-                      aria-label={`${count} pending submissions`}
-                    >? {count}</div>
+                      className="relative h-full shadow-[inset_0_0_0_2px_#f3b83f]"
+                    >
+                      <div className="h-full">
+                        {contestType === 'normal' ? <ProblemStatusNormal problem={problem} />
+                          : <ProblemStatusEdu problem={problem} />}
+                      </div>
+                      <span
+                        className="absolute right-0 top-0 z-10 bg-[#3b2c0d] px-1.5 font-data text-xs leading-5 text-[#ffe8a3]"
+                        aria-label={`${count} pending submissions`}
+                      >? {count}</span>
+                    </div>
                   ) : (
                     <motion.div
                       key={`${problem.points}/${problem.rejectedAttemptCount}`}

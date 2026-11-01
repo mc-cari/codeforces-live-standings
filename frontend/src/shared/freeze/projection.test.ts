@@ -78,6 +78,16 @@ test('team identities are consistent between standings, pending cells and the fe
   assert.equal(visible.submissions[0].numberOfProblems, 1);
 });
 
+test('live freeze feed records solved count as of each visible submission', () => {
+  const events = [event(1, 'alpha', 100, 'OK'), event(2, 'alpha', 200, 'OK', 'B'),
+    event(3, 'alpha', 3600, 'WRONG_ANSWER')];
+  const running = projectVisible(board(), events, 7200, 3600, new Set(), false, true);
+  assert.equal(running.submissions.find((item) => item.id === 2)?.numberOfProblems, 2);
+  assert.equal(running.submissions.find((item) => item.id === 1)?.numberOfProblems, 1);
+  const replay = projectVisible(board(), events, 7200, 3600);
+  assert.equal(replay.submissions.find((item) => item.id === 1)?.numberOfProblems, 2);
+});
+
 test('live history survives partial responses, exceeds rendering cap, and replaces verdicts by ID', () => {
   const history = Array.from({ length: 10001 }, (_, i) => event(i, 'alpha', 100, 'TESTING')) as Submission[];
   const snapshot = projectLiveUpdate(board() as Standings, [{ ...history[0], verdict: 'OK' }], history, ['alpha']);

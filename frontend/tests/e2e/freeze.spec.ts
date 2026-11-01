@@ -39,12 +39,18 @@ for (const mode of ['standings', 'replay'] as const) {
     await page.goto(link(mode));
     await expect(page.getByText(/Standings frozen/)).toBeVisible();
     await expect(page.getByLabel('1 pending submissions')).toHaveCount(2);
+    const alphaRow = page.locator('[data-standings-row="alpha"]');
+    const betaRow = page.locator('[data-standings-row="beta"]');
+    await expect(alphaRow).toContainText('1');
+    await expect(betaRow).toContainText('0');
     const panel = page.getByRole('region', { name: mode === 'replay' ? 'Replay submissions' : 'Live submissions', includeHidden: true });
     await expect(panel.locator('a[href*="/submission/"]')).toHaveCount(1);
     await page.screenshot({ path: info.outputPath('frozen.png'), fullPage: true });
     await page.getByRole('button', { name: 'Unfreeze now' }).click();
     await expect(page).toHaveURL(/freezeView=unfrozen/);
     await expect(page.getByLabel('1 pending submissions')).toHaveCount(0);
+    await expect(alphaRow).toContainText('2');
+    await expect(betaRow).toContainText('1');
     await expect(panel.locator('a[href*="/submission/"]')).toHaveCount(3);
     await page.reload();
     await expect(page.getByText('Standings unfrozen', { exact: true })).toBeVisible();
@@ -64,6 +70,8 @@ for (const mode of ['standings', 'replay'] as const) {
     await page.getByRole('button', { name: 'Auto reveal' }).click();
     await page.getByRole('button', { name: 'Pause', exact: true }).last().click();
     await expect(page.getByRole('button', { name: 'Auto reveal' })).toBeVisible();
+    await page.waitForTimeout(1600);
+    await expect(page.getByLabel('1 pending submissions')).toHaveCount(1);
     await page.getByRole('button', { name: 'Auto reveal' }).click();
     await expect(page.getByText('Reveal complete', { exact: true })).toBeVisible();
     await expect(page.getByLabel('1 pending submissions')).toHaveCount(0);

@@ -4,7 +4,7 @@ import type { ReplayStandings, ReplaySubmission } from '../../contexts/replay/do
 import { nextPending, parseFreeze, projectVisible } from './projection';
 
 export function useFreeze(standings: ReplayStandings | undefined, events: ReplaySubmission[], elapsed: number,
-  finished: boolean, mode: 'live' | 'replay' = 'live', resetKey = '') {
+  finished: boolean, mode: 'live' | 'replay' = 'live', resetKey = '', judging = false) {
   const router = useRouter();
   const config = parseFreeze(router.query.freezeMinutes, router.query.freezeView, standings?.contest.durationSeconds || 0);
   const identity = `${standings?.contest.id}/${config.cutoff}/${resetKey}`;
@@ -13,22 +13,25 @@ export function useFreeze(standings: ReplayStandings | undefined, events: Replay
     identity, revealed: new Set<string>(), started: false, auto: false, focused: '', announcement: '',
   }, [progress, identity]);
   const active = config.cutoff !== undefined && elapsed >= config.cutoff && !config.unfrozen;
-  const projection = useMemo(() => standings ? projectVisible(standings, events, elapsed,
-    active ? config.cutoff : undefined, current.revealed, !active && (mode === 'live' || elapsed >= standings.contest.durationSeconds)) : undefined,
+  const projection = useMemo(() => standings && config.cutoff !== undefined
+    ? projectVisible(standings, events, elapsed,
+      active ? config.cutoff : undefined, current.revealed,
+      !active && (mode === 'live' || elapsed >= standings.contest.durationSeconds), mode === 'live')
+    : undefined,
   [standings, events, elapsed, active, config.cutoff, current.revealed, mode]);
-  const complete = active && current.started && projection?.pending.size === 0;
+  const complete = active && current.started && projection?.pending.size === 0 && !judging;
   const display = complete && standings ? projectVisible(standings, events, elapsed, undefined, undefined, true) : projection;
   const next = useCallback(() => {
-    if (!projection || !finished || !active) return;
+    if (!projection || !finished || !active || judging) return;
     const target = nextPending(projection);
     setProgress({ ...current, started: true, revealed: target ? new Set([...current.revealed, target.key]) : current.revealed,
       focused: target?.key || '', announcement: target ? `Revealed ${target.name}, problem ${target.problem}.` : 'Reveal complete.' });
-  }, [projection, finished, active, current]);
+  }, [projection, finished, active, judging, current]);
   useEffect(() => {
-    if (!current.auto || complete || !active || !finished) return;
+    if (!current.auto || complete || !active || !finished || judging) return;
     const timer = window.setTimeout(next, 1500);
     return () => window.clearTimeout(timer);
-  }, [current.auto, complete, active, finished, next]);
+  }, [current.auto, complete, active, finished, judging, next]);
   return {
     ...config, projection: display, focused: active ? current.focused : '', announcement: complete ? 'Reveal complete' : current.announcement,
     state: config.unfrozen ? 'unfrozen' : !active ? 'scheduled' : complete ? 'revealed' : current.started ? 'revealing' : 'frozen',

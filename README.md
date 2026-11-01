@@ -146,6 +146,8 @@ countdowns, and basic loading reliability. Lifetime usage totals are persisted i
 Alloy scrapes a private metrics listener and forwards to your existing Grafana destination.
 See [deployment, dashboard import, and metric definitions](monitoring/README.md).
 
-## Live standings backend
+## Alternative live-v3 engine
 
-The Go backend owns the public HTTP/SSE API, Codeforces polling, standings projections, and persistence. See the [Go backend architecture](docs/architecture/go-backend-architecture.png) and [deployment guide](#live-streaming-backend).
+Go owns the public activation/SSE API and telemetry for both providers. The optional Kotlin engine service is maintained in the pinned [live-v3 fork](https://github.com/mc-cari/live-v3), under `services/codeforces-engine`; this repository keeps the Go client and deployment configuration.
+
+Run `git submodule update --init vendor/live-v3` before building, then use `docker compose -f docker-compose.live-v3.yml up --build -d`. This starts the Go API and a private engine with separate data volumes. The frontend always points to Go. Set `LIVE_V3_ENGINE_URL` when running Go against a separately hosted engine.

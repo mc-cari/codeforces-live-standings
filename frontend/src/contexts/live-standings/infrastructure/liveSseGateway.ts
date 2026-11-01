@@ -1,10 +1,5 @@
 import { encodeHandles } from '@/src/shared/domain/participantHandles';
-import type {
-  LiveActivationDto,
-  LiveSnapshotDto,
-  LivePatchDto,
-  LiveStateDto,
-} from '@/src/integrations/codeforces/contracts';
+import type { Activation, LiveSnapshot, LivePatch, LiveState } from '@/src/integrations/live-api/contracts';
 import { mapContestDto, mapStandingsDto, mapSubmissionDto } from '@/src/integrations/codeforces/mapper';
 import type { LiveStreamGateway } from '../application/ports';
 
@@ -29,7 +24,7 @@ export const liveSseGateway: LiveStreamGateway = {
       headers: { Accept: 'application/json' },
     });
     if (!response.ok) throw new Error(await readError(response, 'Unable to activate live contest'));
-    const value = await response.json() as LiveActivationDto;
+    const value = await response.json() as Activation;
     return { state: value.state, contest: mapContestDto(value.contest) };
   },
 
@@ -46,7 +41,7 @@ export const liveSseGateway: LiveStreamGateway = {
     );
     source.addEventListener('snapshot', (event) => {
       try {
-        const value = JSON.parse((event as MessageEvent).data) as LiveSnapshotDto;
+        const value = JSON.parse((event as MessageEvent).data) as LiveSnapshot;
         onSnapshot({
           ...value,
           contest: mapContestDto(value.contest),
@@ -57,7 +52,7 @@ export const liveSseGateway: LiveStreamGateway = {
     });
     source.addEventListener('patch', (event) => {
       try {
-        const value = JSON.parse((event as MessageEvent).data) as LivePatchDto;
+        const value = JSON.parse((event as MessageEvent).data) as LivePatch;
         onPatch({
           ...value,
           contest: mapContestDto(value.contest),
@@ -68,7 +63,7 @@ export const liveSseGateway: LiveStreamGateway = {
     });
     source.addEventListener('state', (event) => {
       try {
-        const value = JSON.parse((event as MessageEvent).data) as LiveStateDto;
+        const value = JSON.parse((event as MessageEvent).data) as LiveState;
         onState(value.state, value.contest ? mapContestDto(value.contest) : undefined);
       } catch { onError(); }
     });

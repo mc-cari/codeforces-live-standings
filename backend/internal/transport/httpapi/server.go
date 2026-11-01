@@ -20,29 +20,24 @@ type Config struct {
 	AllowedOrigin  string
 	AllowedOrigins []string
 	MaxHandles     int
-	MaxStreams     int
 }
 
 type Server struct {
 	metrics        *telemetry.Metrics
-	provider       application.LiveStandingsProvider
-	streamSlots    chan struct{}
+	manager        *application.Manager
 	allowedOrigins []string
 	maxHandles     int
 }
 
-func NewServer(provider application.LiveStandingsProvider, config Config) http.Handler {
+func NewServer(manager *application.Manager, config Config) http.Handler {
 	if config.MaxHandles <= 0 {
 		config.MaxHandles = 200
-	}
-	if config.MaxStreams <= 0 {
-		config.MaxStreams = 128
 	}
 	allowedOrigins := append([]string{}, config.AllowedOrigins...)
 	if len(allowedOrigins) == 0 && config.AllowedOrigin != "" {
 		allowedOrigins = []string{config.AllowedOrigin}
 	}
-	server := &Server{metrics: config.Metrics, provider: provider, streamSlots: make(chan struct{}, config.MaxStreams), allowedOrigins: allowedOrigins, maxHandles: config.MaxHandles}
+	server := &Server{metrics: config.Metrics, manager: manager, allowedOrigins: allowedOrigins, maxHandles: config.MaxHandles}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", server.health)
 	mux.HandleFunc("/readyz", server.ready)
@@ -126,7 +121,7 @@ func (server *Server) contest(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) activate(w http.ResponseWriter, r *http.Request, id int) {
-	activation, err := server.provider.ActivateContest(r.Context(), id)
+	session, _, err := server.manager.Activate(r.Context(), id)
 	if err != nil {
 		status := http.StatusBadGateway
 		if strings.HasPrefix(err.Error(), "contest is ") {
@@ -141,33 +136,29 @@ func (server *Server) activate(w http.ResponseWriter, r *http.Request, id int) {
 		writeJSON(w, status, map[string]string{"comment": err.Error()})
 		return
 	}
-	writeJSON(w, http.StatusOK, activation)
+	contest := session.Contest()
+	state := "warming"
+	if finished, _ := session.Status(); finished {
+		state = "finished"
+	} else {
+		state = "live"
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"state": state, "contest": contest})
 }
 
 func (server *Server) events(w http.ResponseWriter, r *http.Request, id int) {
+	session := server.manager.Get(id)
+	if session == nil {
+		http.Error(w, "contest is not activated", http.StatusNotFound)
+		return
+	}
 	handles, err := decodeHandles(r.URL.Query().Get("h"), server.maxHandles)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	select {
-	case server.streamSlots <- struct{}{}:
-		defer func() { <-server.streamSlots }()
-	default:
-		w.Header().Set("Retry-After", "1")
-		http.Error(w, "event stream capacity reached", http.StatusTooManyRequests)
-		return
-	}
-	feed, err := server.provider.SubscribeContest(r.Context(), id, handles)
-	if err != nil {
-		status := http.StatusBadGateway
-		if errors.Is(err, application.ErrContestInactive) {
-			status = http.StatusNotFound
-		}
-		http.Error(w, err.Error(), status)
-		return
-	}
-	defer feed.Close()
+	subscription := session.Subscribe(handles)
+	defer session.Unsubscribe(subscription)
 
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache, no-transform")
@@ -186,10 +177,7 @@ func (server *Server) events(w http.ResponseWriter, r *http.Request, id int) {
 	defer heartbeat.Stop()
 	for {
 		select {
-		case event, ok := <-feed.Events:
-			if !ok {
-				return
-			}
+		case event := <-subscription.Events:
 			if err := writeEvent(w, event); err != nil {
 				return
 			}
@@ -199,7 +187,7 @@ func (server *Server) events(w http.ResponseWriter, r *http.Request, id int) {
 				return
 			}
 			flusher.Flush()
-		case <-feed.Done:
+		case <-subscription.Done:
 			return
 		case <-r.Context().Done():
 			return

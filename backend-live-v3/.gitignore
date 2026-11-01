@@ -1,6 +1,0 @@
-.gradle/
-build/
-.kotlin/
-*.sqlite*
-__pycache__/
-*.pyc

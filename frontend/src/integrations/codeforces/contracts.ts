@@ -122,3 +122,16 @@ export type CodeforcesApiResponse<Result> = {
   result?: Result;
   comment?: string;
 };
+
+export type LiveActivationDto = { state: string; contest: CodeforcesContestDto };
+export type LiveSnapshotDto = {
+  revision: number;
+  contest: CodeforcesContestDto;
+  standings: CodeforcesStandingsDto;
+  submissions: CodeforcesSubmissionDto[];
+  health: { state: string };
+};
+export type LivePatchDto = Omit<LiveSnapshotDto, 'submissions'> & {
+  submissionUpserts: CodeforcesSubmissionDto[];
+};
+export type LiveStateDto = { state: string; contest?: CodeforcesContestDto };

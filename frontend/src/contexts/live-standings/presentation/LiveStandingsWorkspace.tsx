@@ -1,3 +1,4 @@
+import { hasPendingContestJudging } from '@/src/shared/domain/judging';
 import type { Hack } from '@/src/shared/domain/hacks';
 import { useEffect, useState } from 'react';
 import { useFreeze } from '@/src/shared/freeze/useFreeze';
@@ -51,8 +52,13 @@ export default function LiveStandingsWorkspace({
   }, []);
   const source = globalStandings;
   const elapsed = source ? (isContestFinished ? source.contest.durationSeconds
-    : Math.max(source.contest.relativeTimeSeconds, now - source.contest.startTimeSeconds)) : 0;
-  const freeze = useFreeze(source, submissions, elapsed, isContestFinished, 'live', '', false, hacks, hacksIncomplete);
+    : Math.min(source.contest.durationSeconds, Math.max(source.contest.relativeTimeSeconds, now - source.contest.startTimeSeconds))) : 0;
+  const ended = Boolean(source && (elapsed >= source.contest.durationSeconds
+    || ['PENDING_SYSTEM_TEST', 'SYSTEM_TEST', 'FINISHED'].includes(source.contest.phase)));
+  const waitingForJudging = ended && (!isContestFinished || isUpdateStale
+    || hasPendingContestJudging(submissions, source?.contest.durationSeconds || 0));
+  const freeze = useFreeze(source, submissions, elapsed, isContestFinished, 'live', '', false, hacks, hacksIncomplete,
+    { waitingForJudging, canOverride: ended });
   if (freeze.cutoff !== undefined && freeze.projection) {
     globalStandings = freeze.projection.standings as Standings;
     localStandings = freeze.projection.localStandings;
@@ -61,7 +67,7 @@ export default function LiveStandingsWorkspace({
     if (freeze.state === 'frozen' || freeze.state === 'revealing') newSubmissionsCount = 0;
   }
   submissions = submissions.slice(0, MAX_SUBMISSIONS_IN_MEMORY);
-  const liveStatus = isContestFinished
+  const liveStatus = waitingForJudging ? 'Waiting for judging' : isContestFinished
     ? 'Contest finished'
     : isPaused ? 'Synchronizing' : 'Connected';
 

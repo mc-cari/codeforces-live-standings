@@ -181,7 +181,7 @@ func addMissingRows(standings *Standings, all map[int]Submission, handles Handle
 
 func penalized(verdict string) bool {
 	switch verdict {
-	case "OK", "COMPILATION_ERROR", "SKIPPED", "TESTING":
+	case "", "SUBMITTED", "OK", "COMPILATION_ERROR", "SKIPPED", "TESTING":
 		return false
 	default:
 		return true

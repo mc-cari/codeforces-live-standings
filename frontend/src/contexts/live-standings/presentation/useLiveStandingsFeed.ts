@@ -1,3 +1,4 @@
+import { hasPendingContestJudging } from '@/src/shared/domain/judging';
 import { mergeHacks, selectsHack, hackCoverageIncomplete, type Hack } from '@/src/shared/domain/hacks';
 import { track } from '@/src/shared/telemetry/telemetry';
 import {
@@ -292,11 +293,13 @@ export const useLiveStandingsFeed = ({
     return () => { controller.abort(); window.clearInterval(timer); };
   }, [contestId, isContestReady, useLiveBackend, userHandles, isContestFinished, hackSourceKey, hacksIncomplete, applyProjection]);
 
+  const awaitingVerdicts = hasPendingContestJudging(submissions, globalStandings?.contest.durationSeconds || 0);
   useInterval(async () => {
     setIsPaused(true);
     if (contestId && userHandles.length > 0 && contestType) await fetchSubmissions();
     setIsPaused(false);
-  }, useLiveBackend || isPaused || !isContestReady || isContestFinished ? null : delay);
+  }, useLiveBackend || isPaused || !isContestReady || (isContestFinished && !awaitingVerdicts && !isUpdateStale) ? null
+    : isContestFinished ? 30_000 : delay);
 
   return {
     hacks,

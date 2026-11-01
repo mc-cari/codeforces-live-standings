@@ -246,3 +246,20 @@ func TestFinishedContestRetriesMissingHackDetailsForTenMinutes(t *testing.T) {
 		t.Fatal("retry window did not expire")
 	}
 }
+
+func TestFinishedContestKeepsPollingPendingJudging(t *testing.T) {
+	contest := domain.Contest{ID: 42, Phase: "FINISHED", DurationSeconds: 7200}
+	standings := domain.Standings{Contest: contest}
+	repository := &memoryRepository{submissions: make(map[int]domain.Submission)}
+	gateway := staticGateway{standings: standings, submissions: []domain.Submission{{ID: 1, Verdict: "SUBMITTED", RelativeTimeSeconds: 7000}}}
+	session := newSession(repository, gateway, time.Second, contest, &standings, 0, repository.submissions, nil)
+	session.poll(context.Background())
+	if !session.poll(context.Background()) {
+		t.Fatal("collector stopped before pending verdict settled")
+	}
+	gateway.submissions[0].Verdict = "OK"
+	session.gateway = gateway
+	if session.poll(context.Background()) {
+		t.Fatal("collector did not finish after verdict settled")
+	}
+}

@@ -256,8 +256,15 @@ func (session *Session) poll(ctx context.Context) bool {
 	}
 	session.mu.RLock()
 	incompleteHacks := session.hacksIncompleteLocked(nil)
+	pendingJudging := false
+	for _, submission := range session.submissions {
+		if submission.Author.ParticipantType != "PRACTICE" && submission.RelativeTimeSeconds >= 0 && submission.RelativeTimeSeconds <= session.contest.DurationSeconds && (submission.Verdict == "" || submission.Verdict == "TESTING" || submission.Verdict == "SUBMITTED") {
+			pendingJudging = true
+			break
+		}
+	}
 	session.mu.RUnlock()
-	if finished && session.finishedPolls >= 2 && (!incompleteHacks || now.Sub(session.finishObserved) >= 10*time.Minute) {
+	if finished && !pendingJudging && session.finishedPolls >= 2 && (!incompleteHacks || now.Sub(session.finishObserved) >= 10*time.Minute) {
 		session.mu.Lock()
 		session.finished = true
 		session.finishedAt = now

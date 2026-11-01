@@ -16,7 +16,12 @@ export default function FreezeControls({ freeze }: { freeze: ReturnType<typeof u
             : freeze.state === 'revealing' ? (freeze.announcement || 'Reveal ready')
               : `Standings frozen · ${formatFreezeTime(freeze.cutoff)} from start`}
     </span>
+    {freeze.waitingForJudging && freeze.state !== 'unfrozen' && <span role="status" className="text-sm">Waiting for judging</span>}
     {freeze.state !== 'unfrozen' && <>
+      {freeze.canOverride && <button className={button} onClick={() => {
+        freeze.revealAnyway();
+        requestAnimationFrame(() => nextButton.current?.focus());
+      }} type="button">Reveal anyway</button>}
       {freeze.state === 'frozen' && <button className={button} disabled={!freeze.finished} onClick={() => {
         freeze.start();
         requestAnimationFrame(() => nextButton.current?.focus());

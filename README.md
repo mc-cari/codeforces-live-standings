@@ -51,6 +51,13 @@ problem order, then hacks in creation-time/ID order. A hack involving two select
 reveals and scores once. Use **Next**, or **Auto reveal** to advance every 1.5 seconds; **Pause** stops automatic
 advancement. Reloading restarts the ceremony, and seeking a replay clears reveal progress.
 
+Reveal normally waits for Codeforces `FINISHED` and settled verdicts for the selected participants'
+contest submissions. A generic **Waiting for judging** indicator exposes no pending-submission
+count. **Reveal anyway** becomes available after the contest ends, so a stuck submission or delayed
+system testing can be bypassed manually. Results can still change after this override. Practice
+submissions do not block reveal; live polling continues while contest verdicts remain pending.
+Replay offers the same override at the end of its timeline.
+
 **Share setup** copies a link from setup or either viewer. Links preserve the contest, selected
 participants, `freezeMinutes`, and `freezeView=unfrozen` when used. Replay sharing also includes
 the current playback time, speed, and play state. If clipboard access is unavailable, a selectable

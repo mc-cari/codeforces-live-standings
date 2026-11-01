@@ -89,7 +89,8 @@ data: ${JSON.stringify(patch)}
   await page.goto('/contests/566/standings?contestType=normal&handles=alpha&handles=beta&freezeMinutes=60');
   await expect(page.getByText(/Standings frozen/)).toBeVisible();
   await expect(page.locator('[data-hack-id]')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Start reveal' }).click();
+  // This mock closes each stream response, so the latest connection is stale.
+  await page.getByRole('button', { name: 'Reveal anyway' }).click();
   await page.getByRole('button', { name: 'Next', exact: true }).click();
   await expect(page.getByText('Reveal complete', { exact: true })).toBeVisible();
   await expect(page.locator('[data-hack-id="1"]')).toHaveCount(1);

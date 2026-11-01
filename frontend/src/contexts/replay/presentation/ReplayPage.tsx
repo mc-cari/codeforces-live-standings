@@ -1,3 +1,4 @@
+import { hasPendingContestJudging } from '@/src/shared/domain/judging';
 import { mergeHacks, selectsHack, selectsParty, hackCoverageIncomplete, type Hack } from '@/src/shared/domain/hacks';
 import { useFreeze } from '@/src/shared/freeze/useFreeze';
 import FreezeControls from '@/src/shared/freeze/FreezeControls';
@@ -366,7 +367,11 @@ export default function ReplayPage() {
   ), [elapsedSeconds, finalStandings, settledEvents, hacks]);
   const freeze = useFreeze(finalStandings, settledEvents, elapsedSeconds,
     Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds),
-    'replay', String(seekVersion), testingSubmissions.size > 0, hacks, hacksIncomplete);
+     'replay', String(seekVersion), testingSubmissions.size > 0, hacks, hacksIncomplete, {
+      waitingForJudging: Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds
+        && (finalStandings.contest.phase !== 'FINISHED' || hasPendingContestJudging(events, finalStandings.contest.durationSeconds))),
+      canOverride: Boolean(finalStandings && elapsedSeconds >= finalStandings.contest.durationSeconds),
+    });
   const snapshot = freeze.cutoff !== undefined ? freeze.projection : replaySnapshot;
   const cinematicSubmissions = useMemo(() => {
     if (freeze.cutoff !== undefined) return snapshot?.submissions || [];

@@ -22,6 +22,7 @@ type Repository interface {
 }
 
 type ContestGateway interface {
+	FetchHacks(context.Context, int) ([]domain.Hack, error)
 	FetchSubmissions(context.Context, int) ([]domain.Submission, error)
 	FetchStandings(context.Context, int) (domain.Standings, error)
 }

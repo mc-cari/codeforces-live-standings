@@ -155,3 +155,111 @@ func TestSubmissionHistoryDoesNotTreatVerdictUpdatesAsOmissions(t *testing.T) {
 		t.Fatal("verdict update was lost")
 	}
 }
+
+func (gateway staticGateway) FetchHacks(context.Context, int) ([]domain.Hack, error) { return nil, nil }
+
+type hackTestGateway struct {
+	staticGateway
+	hacks []domain.Hack
+	err   error
+	calls int
+}
+
+func (gateway *hackTestGateway) FetchHacks(context.Context, int) ([]domain.Hack, error) {
+	gateway.calls++
+	return gateway.hacks, gateway.err
+}
+
+func TestHackEnrichmentRetainsIDsUpdatesVerdictsAndDoesNotBlockStandings(t *testing.T) {
+	party := domain.Party{Members: []domain.Member{{Handle: "Member"}}, TeamName: "Team One", ParticipantType: "CONTESTANT"}
+	defender := domain.Party{Members: []domain.Member{{Handle: "Defender"}}, ParticipantType: "CONTESTANT"}
+	contest := domain.Contest{ID: 42, Phase: "CODING"}
+	standings := domain.Standings{Contest: contest, Rows: []domain.RanklistRow{{Party: party, SuccessfulHackCount: 1}}}
+	gateway := &hackTestGateway{staticGateway: staticGateway{standings: standings}, hacks: []domain.Hack{
+		{ID: 1, Hacker: party, Defender: defender, Verdict: "HACK_SUCCESSFUL"},
+		{ID: 1, Hacker: party, Defender: defender, Verdict: "HACK_SUCCESSFUL"},
+	}}
+	repository := &memoryRepository{submissions: make(map[int]domain.Submission)}
+	session := newSession(repository, gateway, time.Second, contest, &standings, 0, repository.submissions, nil)
+	if !session.poll(context.Background()) {
+		t.Fatal("coding collection stopped")
+	}
+	if len(session.hacks) != 1 {
+		t.Fatal("duplicate IDs retained")
+	}
+	session.poll(context.Background())
+	if gateway.calls != 1 {
+		t.Fatal("hack requests were not paced")
+	}
+	for _, handles := range [][]string{{"member"}, {"team one"}, {"DEFENDER"}, {"member", "defender"}} {
+		subscriber := session.Subscribe(handles)
+		snapshot := (<-subscriber.Events).Payload.(Snapshot)
+		if len(snapshot.Hacks) != 1 || !snapshot.HacksIncomplete {
+			t.Fatalf("unexpected selected snapshot: %#v", snapshot)
+		}
+		session.Unsubscribe(subscriber)
+	}
+	gateway.hacks = nil
+	gateway.err = errors.New("hacks unavailable")
+	session.lastHackFetch = time.Now().Add(-31 * time.Second)
+	session.poll(context.Background())
+	if session.stale || len(session.hacks) != 1 || session.hacksLoaded {
+		t.Fatal("optional failure damaged standings or lost events")
+	}
+	gateway.err = nil
+	session.lastHackFetch = time.Now().Add(-31 * time.Second)
+	session.poll(context.Background())
+	if len(session.hacks) != 1 {
+		t.Fatal("partial response removed known event")
+	}
+	gateway.hacks = []domain.Hack{{ID: 1, Hacker: party, Defender: defender, Verdict: "HACK_UNSUCCESSFUL"}}
+	session.lastHackFetch = time.Now().Add(-31 * time.Second)
+	session.poll(context.Background())
+	if session.hacks[1].Verdict != "HACK_UNSUCCESSFUL" {
+		t.Fatal("latest verdict was not retained")
+	}
+	gateway.standings.Contest.Phase = "FINISHED"
+	session.poll(context.Background())
+	if !session.hacksIncompleteLocked(nil) {
+		t.Fatal("count mismatch was not detected")
+	}
+	gateway.standings.Rows[0].SuccessfulHackCount = 0
+	gateway.standings.Rows[0].UnsuccessfulHackCount = 1
+	session.poll(context.Background())
+	if session.hacksIncompleteLocked(nil) {
+		t.Fatal("complete final data was marked incomplete")
+	}
+}
+
+func TestFinishedContestRetriesMissingHackDetailsForTenMinutes(t *testing.T) {
+	contest := domain.Contest{ID: 42, Phase: "FINISHED"}
+	standings := domain.Standings{Contest: contest}
+	gateway := &hackTestGateway{staticGateway: staticGateway{standings: standings}, err: errors.New("not published yet")}
+	repository := &memoryRepository{submissions: make(map[int]domain.Submission)}
+	session := newSession(repository, gateway, time.Second, contest, &standings, 0, repository.submissions, nil)
+	session.poll(context.Background())
+	if !session.poll(context.Background()) {
+		t.Fatal("stopped before delayed hack data could be published")
+	}
+	session.finishObserved = time.Now().Add(-10 * time.Minute)
+	if session.poll(context.Background()) {
+		t.Fatal("retry window did not expire")
+	}
+}
+
+func TestFinishedContestKeepsPollingPendingJudging(t *testing.T) {
+	contest := domain.Contest{ID: 42, Phase: "FINISHED", DurationSeconds: 7200}
+	standings := domain.Standings{Contest: contest}
+	repository := &memoryRepository{submissions: make(map[int]domain.Submission)}
+	gateway := staticGateway{standings: standings, submissions: []domain.Submission{{ID: 1, Verdict: "SUBMITTED", RelativeTimeSeconds: 7000}}}
+	session := newSession(repository, gateway, time.Second, contest, &standings, 0, repository.submissions, nil)
+	session.poll(context.Background())
+	if !session.poll(context.Background()) {
+		t.Fatal("collector stopped before pending verdict settled")
+	}
+	gateway.submissions[0].Verdict = "OK"
+	session.gateway = gateway
+	if session.poll(context.Background()) {
+		t.Fatal("collector did not finish after verdict settled")
+	}
+}

@@ -1,4 +1,9 @@
-import { useState } from 'react';
+import { hasPendingContestJudging } from '@/src/shared/domain/judging';
+import type { Hack } from '@/src/shared/domain/hacks';
+import { useEffect, useState } from 'react';
+import { useFreeze } from '@/src/shared/freeze/useFreeze';
+import FreezeControls from '@/src/shared/freeze/FreezeControls';
+import { MAX_SUBMISSIONS_IN_MEMORY } from '@/src/shared/config/contestTiming';
 import StandingsList from '@/components/standings/StandingsList';
 import LiveSubmissionsList from '@/components/LiveSubmissionsList';
 import ContestRibbon from '@/src/shared/presentation/ContestRibbon';
@@ -10,6 +15,8 @@ type LiveStandingsWorkspaceProps = {
   contest: Contest | undefined;
   contestId: string;
   contestType: string;
+  hacks?: Hack[];
+  hacksIncomplete?: boolean;
   submissions: Submission[];
   newSubmissionsCount: number;
   localStandings: Map<string, number> | undefined;
@@ -27,6 +34,8 @@ export default function LiveStandingsWorkspace({
   contestId,
   contestType,
   submissions,
+  hacks = [],
+  hacksIncomplete = true,
   newSubmissionsCount,
   localStandings,
   globalStandings,
@@ -36,7 +45,29 @@ export default function LiveStandingsWorkspace({
   isUpdateStale,
 }: LiveStandingsWorkspaceProps) {
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('standings');
-  const liveStatus = isContestFinished
+  const [now, setNow] = useState(() => Date.now() / 1000);
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now() / 1000), 1000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const source = globalStandings;
+  const elapsed = source ? (isContestFinished ? source.contest.durationSeconds
+    : Math.min(source.contest.durationSeconds, Math.max(source.contest.relativeTimeSeconds, now - source.contest.startTimeSeconds))) : 0;
+  const ended = Boolean(source && (elapsed >= source.contest.durationSeconds
+    || ['PENDING_SYSTEM_TEST', 'SYSTEM_TEST', 'FINISHED'].includes(source.contest.phase)));
+  const waitingForJudging = ended && (!isContestFinished || isUpdateStale
+    || hasPendingContestJudging(submissions, source?.contest.durationSeconds || 0));
+  const freeze = useFreeze(source, submissions, elapsed, isContestFinished, 'live', '', false, hacks, hacksIncomplete,
+    { waitingForJudging, canOverride: ended });
+  if (freeze.cutoff !== undefined && freeze.projection) {
+    globalStandings = freeze.projection.standings as Standings;
+    localStandings = freeze.projection.localStandings;
+    submissions = freeze.projection.submissions as Submission[];
+    hacks = freeze.projection.hacks;
+    if (freeze.state === 'frozen' || freeze.state === 'revealing') newSubmissionsCount = 0;
+  }
+  submissions = submissions.slice(0, MAX_SUBMISSIONS_IN_MEMORY);
+  const liveStatus = waitingForJudging ? 'Waiting for judging' : isContestFinished
     ? 'Contest finished'
     : isPaused ? 'Synchronizing' : 'Connected';
 
@@ -49,6 +80,7 @@ export default function LiveStandingsWorkspace({
         status={liveStatus}
         statusTone={isContestFinished ? 'finished' : 'live'}
       />
+      <FreezeControls freeze={freeze} />
       {isUpdateStale && (
         <div className="border-b border-[#7a5b19] bg-[#3b2c0d] px-4 py-2 text-center text-sm text-[#ffe8a3]" role="status">
           Live updates are unavailable. Showing the latest standings.
@@ -78,6 +110,9 @@ export default function LiveStandingsWorkspace({
               globalStandings={globalStandings}
               newSubmissionsCount={newSubmissionsCount}
               submissions={submissions}
+              hacks={hacks}
+              focused={freeze.focused}
+              hacksIncomplete={hacksIncomplete}
               userRank={userRank}
             />
           </div>
@@ -89,6 +124,9 @@ export default function LiveStandingsWorkspace({
           >
             <div className="broadcast-panel h-full w-full overflow-hidden rounded-sm">
               <StandingsList
+                pending={freeze.projection?.pending}
+                focused={freeze.focused}
+                isVisible={mobilePanel === 'standings'}
                 contestType={contestType}
                 globalStandings={globalStandings}
                 localStandings={localStandings}

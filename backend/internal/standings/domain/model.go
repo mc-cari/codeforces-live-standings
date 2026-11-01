@@ -78,3 +78,13 @@ type Submission struct {
 	Points              float64 `json:"points,omitempty"`
 	NumberOfProblems    int     `json:"numberOfProblems,omitempty"`
 }
+
+// Hack deliberately excludes test contents and judge protocols.
+type Hack struct {
+	ID                  int     `json:"id"`
+	CreationTimeSeconds int64   `json:"creationTimeSeconds"`
+	Hacker              Party   `json:"hacker"`
+	Defender            Party   `json:"defender"`
+	Problem             Problem `json:"problem"`
+	Verdict             string  `json:"verdict"`
+}

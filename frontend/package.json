@@ -14,7 +14,8 @@
     "test": "pnpm test:unit && pnpm test:e2e",
     "test:unit": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test \"src/**/*.test.ts\"",
     "test:e2e": "playwright test && playwright test --config playwright.sse.config.ts",
-    "generate-demo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generateDemoSnapshot.mjs"
+    "generate-demo": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/generateDemoSnapshot.mjs",
+    "test:integration:codeforces": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/integration/codeforces-hacks.test.ts"
   },
   "dependencies": {
     "@fontsource/barlow-condensed": "^5.3.0",

@@ -45,7 +45,9 @@ type Submission = {
 type ParticipantName = (party: Participant) => string;
 
 const isPenalizedAttempt = (submission: Submission) => (
-  submission.verdict !== 'OK'
+  Boolean(submission.verdict)
+  && submission.verdict !== 'SUBMITTED'
+  && submission.verdict !== 'OK'
   && submission.verdict !== 'COMPILATION_ERROR'
   && submission.verdict !== 'SKIPPED'
   && submission.verdict !== 'TESTING'

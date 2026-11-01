@@ -49,7 +49,7 @@ func New(store Store) *Metrics {
 	m.submissionOmissions = prometheus.NewCounter(prometheus.CounterOpts{Name: "cf_codeforces_submission_omissions_total", Help: "Known submission IDs absent from successful contest.status responses; repeated omissions count again."})
 	m.codeforcesLatency = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "cf_codeforces_request_duration_seconds", Help: "Backend Codeforces HTTP call duration including body decoding, excluding local rate-limit wait.", Buckets: []float64{0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20, 30, 60}}, []string{"method", "outcome"})
 	m.codeforcesWait = prometheus.NewHistogramVec(prometheus.HistogramOpts{Name: "cf_codeforces_rate_limit_wait_duration_seconds", Help: "Local pacing and mutex wait before started backend Codeforces calls.", Buckets: []float64{0.01, 0.1, 0.5, 1, 2, 3, 5, 10, 20, 30, 60}}, []string{"method"})
-	for _, method := range []string{"contest.status", "contest.standings"} {
+	for _, method := range []string{"contest.status", "contest.standings", "contest.hacks"} {
 		m.codeforcesWait.WithLabelValues(method)
 		for _, outcome := range []string{"success", "http_error", "api_error", "decode_error", "transport_error", "timeout", "canceled"} {
 			m.codeforcesLatency.WithLabelValues(method, outcome)
@@ -99,7 +99,7 @@ func (m *Metrics) ObserveSubmissionHistory(missing int) {
 // ObserveCodeforcesRequest bounds both label dimensions even for future callers.
 func (m *Metrics) ObserveCodeforcesRequest(method, outcome string, duration, wait time.Duration) {
 	switch method {
-	case "contest.status", "contest.standings":
+	case "contest.status", "contest.standings", "contest.hacks":
 	default:
 		method = "other"
 	}

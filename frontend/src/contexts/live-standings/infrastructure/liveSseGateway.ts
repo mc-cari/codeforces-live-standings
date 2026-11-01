@@ -1,3 +1,4 @@
+import type { Hack } from '@/src/shared/domain/hacks';
 import { encodeHandles } from '@/src/shared/domain/participantHandles';
 import type {
   CodeforcesApiResponse,
@@ -6,6 +7,8 @@ import type {
 } from '@/src/integrations/codeforces/contracts';
 
 export type LiveSnapshot = {
+  hacks?: Hack[];
+  hacksIncomplete?: boolean;
   revision: number;
   contest: CodeforcesStandingsDto['contest'];
   standings: CodeforcesStandingsDto;
@@ -14,6 +17,8 @@ export type LiveSnapshot = {
 };
 
 export type LivePatch = {
+  hackUpserts?: Hack[];
+  hacksIncomplete?: boolean;
   revision: number;
   contest: LiveSnapshot['contest'];
   standings: CodeforcesStandingsDto;

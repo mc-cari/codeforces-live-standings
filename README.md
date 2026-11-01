@@ -36,6 +36,59 @@ It has support for:
 
 The website works with old contests and live contests and also shows the practice submissions.
 
+### Freeze, reveal, and share
+
+Enable **Freeze standings** during setup to hide results from the last chosen number of minutes.
+The cutoff is measured from contest start; submissions and hacks exactly at the cutoff are hidden too.
+Amber cells show pending submission counts, while scores, ranks, and the submission feed use only
+visible results. Freezing is a viewer presentation feature: source results remain available on
+Codeforces and in the browser.
+
+**Unfreeze now** shows all currently available results and persists that choice in the URL.
+After a live contest finishes, or a replay reaches its end, **Start reveal** opens a bottom-up
+ceremony. The lowest currently ranked participant with pending activity reveals problem cells in
+problem order, then hacks in creation-time/ID order. A hack involving two selected participants
+reveals and scores once. Use **Next**, or **Auto reveal** to advance every 1.5 seconds; **Pause** stops automatic
+advancement. Reloading restarts the ceremony, and seeking a replay clears reveal progress.
+
+Reveal normally waits for Codeforces `FINISHED` and settled verdicts for the selected participants'
+contest submissions. A generic **Waiting for judging** indicator exposes no pending-submission
+count. **Reveal anyway** becomes available after the contest ends, so a stuck submission or delayed
+system testing can be bypassed manually. Results can still change after this override. Practice
+submissions do not block reveal; live polling continues while contest verdicts remain pending.
+Replay offers the same override at the end of its timeline.
+
+**Share setup** copies a link from setup or either viewer. Links preserve the contest, selected
+participants, `freezeMinutes`, and `freezeView=unfrozen` when used. Replay sharing also includes
+the current playback time, speed, and play state. If clipboard access is unavailable, a selectable
+link appears. Links without freeze settings retain the default unfrozen behavior; invalid freeze
+parameters disable freezing and show a warning.
+
+### Hacks and replay fidelity
+
+The submissions panel also shows hacks involving either side of a selected participant or team.
+CF contests award +100 for `HACK_SUCCESSFUL`, subtract 50 for `HACK_UNSUCCESSFUL`, and award zero
+for other outcomes; ICPC contests receive no hack adjustment. These adjustments apply once to
+the hacker. Defender scores come from their submissions' latest API verdicts, including
+`CHALLENGED`; replay does not invent an earlier accepted verdict or retain verdict history.
+See the [Codeforces scoring rules](https://codeforces.com/blog/entry/4088?locale=en).
+
+Hacks use their creation time on the replay timeline. Events after the contest appear at its
+terminal position with an **After contest** label. Frozen hacks expose neither their rows nor
+their score/rank effects until revealed. A live viewer present before the cutoff retains one
+in-memory official board as the freeze baseline, preserving observed points even when hack
+details are missing. Late arrivals and replays reconstruct from available timestamped records.
+Ordinary live standings, instant unfreeze, and completed reveals use authoritative totals.
+
+Hack loading is optional. **Hack details may be incomplete** remains visible during live contests,
+on fetch failure, or when selected participants' hack counts disagree with official standings.
+Codeforces [publishes full hack details only after some delay](https://codeforces.com/apiHelp/methods#contest.hacks).
+Live collection requests hacks initially and at most every 30 seconds through the existing
+limiter; missing/inconsistent final data is retried for up to 10 minutes. Replay provides **Retry**.
+A frozen reveal with missing data retains its available projection until retry or unfreeze.
+Latest records merge by ID in memory across partial/failed responses. Hack tests and judge
+protocols are discarded, and database retention is unchanged.
+
 [Codeforces blog post](https://codeforces.com/blog/entry/114892).
 
 The wesite uses the [Codeforces API](https://codeforces.com/apiHelp) to get the data. During competitions, the API doesn't provide all the submissions, becuase they are beign updated at the same time, so the API responses are merged with the local status.
@@ -79,6 +132,33 @@ pnpm test
 
 The Playwright suite mocks Codeforces responses, covers desktop and mobile layouts, and verifies
 that friend-import credentials are used only for the browser-to-Codeforces request.
+
+### Optional real-Codeforces integration test
+
+A saved public API fixture for [contest 566 — VK Cup 2015 Finals, online mirror](https://codeforces.com/contest/566)
+contains `Misha100896`, `fruwajacybyk`, 18 relevant hacks, and 17 submissions (including three
+latest `CHALLENGED` verdicts). Regular unit and browser tests use this fixture without network
+access. They verify event timing, freeze/reveal, seeking, retry, and the official final scores
+of **690** and **150**. Misha100896's 3 successful and 8 unsuccessful hacks contribute **−100**.
+
+To optionally fetch current Codeforces data and compare reconstructed replay scores with the
+current official standings (no API credentials required):
+
+```sh
+cd frontend
+CF_LIVE_INTEGRATION=1 pnpm test:integration:codeforces
+```
+
+This test is excluded from `pnpm test`; without `CF_LIVE_INTEGRATION=1` it reports a skip.
+It uses public `contest.standings`, `contest.hacks`, and per-handle `contest.status` requests,
+paced at least 2.1 seconds apart. Upstream failures fail this opt-in check. It never rewrites
+the saved fixture. Fixture provenance is recorded in `frontend/tests/fixtures/codeforces-566-hacks.json`.
+To run only the saved-fixture browser cases: `pnpm exec playwright test tests/e2e/hacks.spec.ts`.
+
+For manual testing, open the local replay at
+`/contests/566/replay?contestType=normal&handles=Misha100896&handles=fruwajacybyk&autoplay=false`.
+Seek to **27:57 → 27:58** for the first −50 adjustment, or **32:20 → 32:21** for a +100 adjustment.
+Add `freezeMinutes=152&startTime=180` to try a final-position reveal.
 
 ### API behavior and caching
 

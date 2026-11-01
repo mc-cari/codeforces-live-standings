@@ -18,7 +18,8 @@ export default function LiveStandingsPage() {
   const { contestId, handles, contestType, h } = router.query;
   const resolvedContestId = queryString(contestId);
   const resolvedContestType = queryString(contestType);
-  const userHandles = useMemo(() => getHandlesFromQuery(handles, h), [h, handles]);
+  const selectedHandlesKey = JSON.stringify(getHandlesFromQuery(handles, h));
+  const userHandles = useMemo<string[]>(() => JSON.parse(selectedHandlesKey), [selectedHandlesKey]);
   const contest = useContestDetails(resolvedContestId, userHandles);
   const feed = useLiveStandingsFeed({
     contestId: resolvedContestId,
@@ -56,6 +57,8 @@ export default function LiveStandingsPage() {
       isUpdateStale={feed.isUpdateStale}
       localStandings={feed.localStandings}
       newSubmissionsCount={feed.newSubmissionsCount}
+      hacks={feed.hacks}
+      hacksIncomplete={feed.hacksIncomplete}
       submissions={feed.submissions}
       userRank={contest.userRank}
     />

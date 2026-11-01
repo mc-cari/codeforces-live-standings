@@ -1,3 +1,5 @@
+import { hasPendingContestJudging } from '@/src/shared/domain/judging';
+import { mergeHacks, selectsHack, hackCoverageIncomplete, type Hack } from '@/src/shared/domain/hacks';
 import { track } from '@/src/shared/telemetry/telemetry';
 import {
   useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction,
@@ -20,6 +22,8 @@ type LiveStandingsFeedOptions = {
 };
 
 export type LiveStandingsFeed = {
+  hacks: Hack[];
+  hacksIncomplete: boolean;
   submissions: Submission[];
   newSubmissionsCount: number;
   localStandings: Map<string, number> | undefined;
@@ -40,6 +44,18 @@ export const useLiveStandingsFeed = ({
   contestError,
   setContestInfo,
 }: LiveStandingsFeedOptions): LiveStandingsFeed => {
+  const hackSourceKey = JSON.stringify([contestId, userHandles]);
+  const [hackSource, setHackSource] = useState(hackSourceKey);
+  const [hacks, setHacks] = useState<Hack[]>([]);
+  const [hacksLoaded, setHacksLoaded] = useState(false);
+  if (hackSource !== hackSourceKey) {
+    setHackSource(hackSourceKey);
+    setHacks([]);
+    setHacksLoaded(false);
+  }
+  const [remoteHacksIncomplete, setRemoteHacksIncomplete] = useState(true);
+  const lastHackFetch = useRef({ key: '', time: 0 });
+  const finishedHackRetrySince = useRef<number | undefined>(undefined);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [newSubmissionsCount, setNewSubmissionsCount] = useState(0);
   const [localStandings, setLocalStandings] = useState<Map<string, number>>();
@@ -175,6 +191,9 @@ export const useLiveStandingsFeed = ({
     streamedSubmissionsRef.current = [];
 
     const applySnapshot = (snapshot: LiveSnapshot) => {
+      setHacks((previous) => mergeHacks(previous, snapshot.hacks || []));
+      setHacksLoaded(snapshot.hacksIncomplete !== undefined);
+      setRemoteHacksIncomplete(snapshot.hacksIncomplete ?? true);
       const snapshotSubmissions = snapshot.submissions.map(mapSubmissionDto);
       streamedSubmissionsRef.current = snapshotSubmissions;
       applyProjection(mapStandingsDto(snapshot.standings), snapshotSubmissions, true);
@@ -183,6 +202,9 @@ export const useLiveStandingsFeed = ({
       completeInitialLoad();
     };
     const applyPatch = (patch: LivePatch) => {
+      setHacks((previous) => mergeHacks(previous, patch.hackUpserts || []));
+      setHacksLoaded(patch.hacksIncomplete !== undefined);
+      setRemoteHacksIncomplete(patch.hacksIncomplete ?? true);
       const current = new Map(streamedSubmissionsRef.current.map((submission) => [submission.id, submission]));
       patch.submissionUpserts.map(mapSubmissionDto).forEach((submission) => current.set(submission.id, submission));
       streamedSubmissionsRef.current = [...current.values()];
@@ -236,13 +258,52 @@ export const useLiveStandingsFeed = ({
     userHandles,
   ]);
 
+  const hacksIncomplete = (useLiveBackend && remoteHacksIncomplete) || !globalStandings
+    || hackCoverageIncomplete(globalStandings, hacks, hacksLoaded);
+
+  useEffect(() => { finishedHackRetrySince.current = undefined; }, [hackSourceKey]);
+
+  useEffect(() => {
+    if (useLiveBackend || !contestId || !isContestReady || (isContestFinished && !hacksIncomplete)) return;
+    const controller = new AbortController();
+    if (isContestFinished && finishedHackRetrySince.current === undefined) finishedHackRetrySince.current = Date.now();
+    const load = async () => {
+      if (finishedHackRetrySince.current !== undefined && Date.now() - finishedHackRetrySince.current >= 600_000) return;
+      if (lastHackFetch.current.key === hackSourceKey && Date.now() - lastHackFetch.current.time < 30_000) return;
+      lastHackFetch.current = { key: hackSourceKey, time: Date.now() };
+      const finalData = isContestFinished ? Promise.all([
+        codeforcesLiveContestGateway.getStandings(contestId, controller.signal),
+        codeforcesLiveContestGateway.getSubmissions(contestId, userHandles, controller.signal),
+      ]).then(([official, remote]) => {
+        if (!controller.signal.aborted) applyProjection(official, remote, true);
+      }).catch(() => {}) : Promise.resolve();
+      try {
+        const incoming = await codeforcesLiveContestGateway.getHacks(contestId, controller.signal);
+        if (controller.signal.aborted) return;
+        setHacks((previous) => mergeHacks(previous, incoming.filter((hack) => selectsHack(hack, userHandles))));
+        setHacksLoaded(true);
+      } catch {
+        if (!controller.signal.aborted) setHacksLoaded(false);
+      }
+      await finalData;
+    };
+    // Do not restart the 30 second cadence when the phase changes.
+    const timer = window.setInterval(load, 30_000);
+    void load();
+    return () => { controller.abort(); window.clearInterval(timer); };
+  }, [contestId, isContestReady, useLiveBackend, userHandles, isContestFinished, hackSourceKey, hacksIncomplete, applyProjection]);
+
+  const awaitingVerdicts = hasPendingContestJudging(submissions, globalStandings?.contest.durationSeconds || 0);
   useInterval(async () => {
     setIsPaused(true);
     if (contestId && userHandles.length > 0 && contestType) await fetchSubmissions();
     setIsPaused(false);
-  }, useLiveBackend || isPaused || !isContestReady || isContestFinished ? null : delay);
+  }, useLiveBackend || isPaused || !isContestReady || (isContestFinished && !awaitingVerdicts && !isUpdateStale) ? null
+    : isContestFinished ? 30_000 : delay);
 
   return {
+    hacks,
+    hacksIncomplete,
     submissions,
     newSubmissionsCount,
     localStandings,

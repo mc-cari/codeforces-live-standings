@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Party } from '@/src/shared/domain/contest';
+import type { PartyNameSource } from '@/src/shared/domain/party';
 import getName from '@/src/shared/domain/party';
 
 export default function userHandle({ author, userRank }
-: { author : Party, userRank : Map<string, string> }) {
+: { author : PartyNameSource, userRank : Map<string, string> }) {
   let rankColor = 'text-white';
 
   const colorPerRank = new Map<string, string>([

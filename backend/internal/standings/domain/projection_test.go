@@ -2,6 +2,17 @@ package domain
 
 import "testing"
 
+func TestProjectionRetainsFullSelectedHistory(t *testing.T) {
+	all := make(map[int]Submission)
+	for id := 1; id <= 10001; id++ {
+		all[id] = Submission{ID: id, Author: Party{Members: []Member{{Handle: "alpha"}}}}
+	}
+	_, submissions := Project(Contest{ID: 1}, nil, all, NewHandleSet([]string{"alpha"}))
+	if len(submissions) != 10001 {
+		t.Fatalf("history was truncated: got %d submissions", len(submissions))
+	}
+}
+
 func TestProjectionFiltersAnyTeamMember(t *testing.T) {
 	contest := Contest{ID: 1}
 	standings := &Standings{Contest: contest}
@@ -22,5 +33,20 @@ func TestProjectionReconstructsMissingParticipantRow(t *testing.T) {
 	}, NewHandleSet([]string{"tourist"}))
 	if len(projected.Rows) != 1 || projected.Rows[0].Party.Members[0].Handle != "tourist" || projected.Rows[0].Points != 500 {
 		t.Fatalf("unexpected reconstructed rows: %#v", projected.Rows)
+	}
+}
+
+func TestSamePartyHandlesTeamsAndCase(t *testing.T) {
+	first := Party{ParticipantType: "CONTESTANT", TeamName: "Team One", Members: []Member{{Handle: "Member"}}}
+	for _, other := range []Party{
+		{ParticipantType: "CONTESTANT", TeamName: "team one"},
+		{ParticipantType: "CONTESTANT", Members: []Member{{Handle: "member"}}},
+	} {
+		if !SameParty(first, other) {
+			t.Fatal("matching party not recognized")
+		}
+	}
+	if SameParty(first, Party{ParticipantType: "PRACTICE", Members: first.Members}) {
+		t.Fatal("practice party matched contestant")
 	}
 }

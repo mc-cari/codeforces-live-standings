@@ -1,3 +1,4 @@
+import { sanitizeHack, type Hack } from '@/src/shared/domain/hacks';
 import { codeforcesFetch } from '@/src/integrations/codeforces/browser/client';
 import type {
   CodeforcesApiResponse,
@@ -78,6 +79,10 @@ const mapUser = (user: CodeforcesUserDto): ReplayUser => ({
 });
 
 export const codeforcesReplayGateway: ReplayGateway = {
+  async getHacks(contestId, signal) {
+    const response = await codeforcesFetch('contest.hacks', { contestId }, { signal });
+    return (await readResponse<Hack[]>(response, 'Unable to load hack details')).map(sanitizeHack);
+  },
   async getStandings(contestId, signal) {
     const response = await codeforcesFetch('contest.standings', { contestId }, { signal });
     const standings = await readResponse<CodeforcesStandingsDto>(response, 'Unable to load contest standings');

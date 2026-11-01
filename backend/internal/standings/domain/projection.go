@@ -16,6 +16,11 @@ func NewHandleSet(handles []string) HandleSet {
 }
 
 func (set HandleSet) Selects(party Party) bool {
+	if party.TeamName != "" {
+		if _, ok := set[strings.ToLower(party.TeamName)]; ok {
+			return true
+		}
+	}
 	for _, member := range party.Members {
 		if _, ok := set[strings.ToLower(member.Handle)]; ok {
 			return true
@@ -83,9 +88,6 @@ func decorateSubmissions(all map[int]Submission, handles HandleSet, standings St
 		}
 		return result[i].ID > result[j].ID
 	})
-	if len(result) > 10000 {
-		result = result[:10000]
-	}
 	return result
 }
 
@@ -179,9 +181,27 @@ func addMissingRows(standings *Standings, all map[int]Submission, handles Handle
 
 func penalized(verdict string) bool {
 	switch verdict {
-	case "OK", "COMPILATION_ERROR", "SKIPPED", "TESTING":
+	case "", "SUBMITTED", "OK", "COMPILATION_ERROR", "SKIPPED", "TESTING":
 		return false
 	default:
 		return true
 	}
+}
+
+// SameParty accepts either a matching team label or a shared member identity.
+func SameParty(first, second Party) bool {
+	if first.ParticipantType != second.ParticipantType {
+		return false
+	}
+	if first.TeamName != "" && second.TeamName != "" && strings.EqualFold(first.TeamName, second.TeamName) {
+		return true
+	}
+	for _, member := range first.Members {
+		for _, other := range second.Members {
+			if strings.EqualFold(member.Handle, other.Handle) {
+				return true
+			}
+		}
+	}
+	return false
 }

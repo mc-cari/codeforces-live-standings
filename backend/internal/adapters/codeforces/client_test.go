@@ -2,6 +2,7 @@ package codeforces
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"net"
@@ -159,5 +160,28 @@ func TestCancellationWhileQueuedDoesNotRecordAPICall(t *testing.T) {
 	}
 	if len(recorder.calls) != 0 {
 		t.Fatalf("unstarted call recorded: %v", recorder.calls)
+	}
+}
+
+func TestFetchHacksDiscardsTestAndJudgeProtocols(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/contest.hacks" || r.URL.Query().Get("contestId") != "566" {
+			t.Errorf("unexpected request: %s", r.URL)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"OK","result":[{"id":160429,"creationTimeSeconds":1438275141,"hacker":{"members":[{"handle":"Misha100896"}]},"defender":{"members":[{"handle":"fruwajacybyk"}]},"problem":{"index":"F"},"verdict":"HACK_SUCCESSFUL","test":"private test","judgeProtocol":{"manual":true}}]}`))
+	}))
+	defer server.Close()
+	client := NewClient(server.URL+"/", server.Client(), 0)
+	hacks, err := client.FetchHacks(context.Background(), 566)
+	if err != nil || len(hacks) != 1 || hacks[0].ID != 160429 {
+		t.Fatalf("fetch: %v %#v", err, hacks)
+	}
+	body, err := json.Marshal(hacks)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(body), "private test") || strings.Contains(string(body), "judgeProtocol") {
+		t.Fatal("hack test details retained")
 	}
 }

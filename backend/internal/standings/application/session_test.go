@@ -155,3 +155,39 @@ func TestSubmissionHistoryDoesNotTreatVerdictUpdatesAsOmissions(t *testing.T) {
 		t.Fatal("verdict update was lost")
 	}
 }
+
+// Completion must remain recoverable after the first FINISHED response.
+type completionRepository struct {
+	memoryRepository
+	completions []bool
+}
+
+func (r *completionRepository) BumpRevision(_ int, _ string, finished bool, _ time.Time) (int64, error) {
+	r.completions = append(r.completions, finished)
+	return int64(len(r.completions)), nil
+}
+func TestCompletionPersistsOnlyAfterTwoSuccessfulFinishedPolls(t *testing.T) {
+	contest := domain.Contest{ID: 1, Phase: "FINISHED"}
+	repository := &completionRepository{memoryRepository: memoryRepository{submissions: map[int]domain.Submission{7: {ID: 7, Author: domain.Party{Members: []domain.Member{{Handle: "tourist"}}}}}}}
+	session := newSession(repository, staticGateway{standings: domain.Standings{Contest: contest}}, time.Hour, contest, nil, 0, repository.submissions, nil)
+	sub := session.Subscribe([]string{"tourist"})
+	defer session.Unsubscribe(sub)
+	if (<-sub.Events).Kind != "state" {
+		t.Fatal("restored session must begin warming")
+	}
+	if !session.poll(context.Background()) || repository.completions[0] {
+		t.Fatal("first finished poll must remain recoverable")
+	}
+	event := <-sub.Events
+	snapshot, ok := event.Payload.(Snapshot)
+	if !ok || len(snapshot.Submissions) != 1 {
+		t.Fatal("warming subscriber did not receive full retained history", event)
+	}
+	if session.poll(context.Background()) || !repository.completions[1] {
+		t.Fatal("second finished poll must complete collection")
+	}
+	state, poll, err := session.CollectionStatus()
+	if state != "finished" || poll.IsZero() || err != "" {
+		t.Fatal(state, poll, err)
+	}
+}

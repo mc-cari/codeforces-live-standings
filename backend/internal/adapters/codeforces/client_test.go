@@ -161,3 +161,31 @@ func TestCancellationWhileQueuedDoesNotRecordAPICall(t *testing.T) {
 		t.Fatalf("unstarted call recorded: %v", recorder.calls)
 	}
 }
+
+func TestPublicDiscoverySharesPacingWithSessionRequests(t *testing.T) {
+	var calls []time.Time
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		calls = append(calls, time.Now())
+		w.Header().Set("Content-Type", "application/json")
+		if r.URL.Path == "/contest.list" {
+			if r.URL.Query().Get("gym") != "false" || r.URL.Query().Has("contestId") {
+				t.Error("discovery must request non-Gym public contests")
+			}
+			io.WriteString(w, `{"status":"OK","result":[{"id":42,"phase":"CODING"}]}`)
+		} else {
+			io.WriteString(w, `{"status":"OK","result":[]}`)
+		}
+	}))
+	defer server.Close()
+	client := NewClient(server.URL+"/", server.Client(), 30*time.Millisecond)
+	contests, err := client.FetchContests(context.Background())
+	if err != nil || len(contests) != 1 || contests[0].ID != 42 {
+		t.Fatal(contests, err)
+	}
+	if _, err := client.FetchSubmissions(context.Background(), 42); err != nil {
+		t.Fatal(err)
+	}
+	if len(calls) != 2 || calls[1].Sub(calls[0]) < 20*time.Millisecond {
+		t.Fatal("discovery bypassed the shared limiter")
+	}
+}

@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"log/slog"
 	"reflect"
 	"strings"
@@ -63,6 +64,8 @@ type Session struct {
 	finishedPolls int
 	finished      bool
 	finishedAt    time.Time
+	lastPoll      time.Time
+	latestError   string
 	stale         bool
 	stop          chan struct{}
 	stopped       chan struct{}
@@ -213,6 +216,7 @@ func (session *Session) poll(ctx context.Context) bool {
 		slog.Warn("contest poll incomplete", "contest", contestID, "status_error", statusErr, "standings_error", standingsErr)
 		session.mu.Lock()
 		session.stale = true
+		session.latestError = errors.Join(statusErr, standingsErr).Error()
 		session.mu.Unlock()
 		session.broadcastState("stale")
 		return true
@@ -224,20 +228,35 @@ func (session *Session) poll(ctx context.Context) bool {
 		session.finishedPolls = 0
 	}
 	now := time.Now()
-	revision, err := session.repository.BumpRevision(contestID, standings.Contest.Phase, finished, now)
+	revision, err := session.repository.BumpRevision(contestID, standings.Contest.Phase, finished && session.finishedPolls >= 2, now)
 	if err != nil {
 		slog.Error("revision update failed", "error", err)
+		session.mu.Lock()
+		session.stale = true
+		session.latestError = err.Error()
+		session.mu.Unlock()
+		session.broadcastState("stale")
 		return true
 	}
 	session.mu.Lock()
 	wasStale := session.stale
 	session.stale = false
+	session.lastPoll = now
+	session.latestError = ""
 	session.revision = revision
 	session.mu.Unlock()
 	standingsChanged := previousStandings == nil || !reflect.DeepEqual(*previousStandings, standings)
 	contestChanged := !reflect.DeepEqual(previousContest, standings.Contest)
 	if len(changed) > 0 || standingsChanged || contestChanged || wasStale {
-		session.broadcast(changed)
+		if previousStandings == nil {
+			session.mu.Lock()
+			for subscriber := range session.subscribers {
+				session.offer(subscriber, session.snapshotLocked(subscriber), true)
+			}
+			session.mu.Unlock()
+		} else {
+			session.broadcast(changed)
+		}
 	}
 	if finished && session.finishedPolls >= 2 {
 		session.mu.Lock()
@@ -312,4 +331,10 @@ func (session *Session) offer(subscriber *Subscription, event Event, replace boo
 	case subscriber.Events <- event:
 	default:
 	}
+}
+
+func (session *Session) CollectionStatus() (string, time.Time, string) {
+	session.mu.RLock()
+	defer session.mu.RUnlock()
+	return session.healthStateLocked(), session.lastPoll, session.latestError
 }

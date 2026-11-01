@@ -61,7 +61,7 @@ func Open(path string) (*Repository, error) {
 			return nil, err
 		}
 	}
-	if err := database.AutoMigrate(&contestRecord{}, &submissionRecord{}, &usageTotal{}, &eventReceipt{}); err != nil {
+	if err := database.AutoMigrate(&contestRecord{}, &submissionRecord{}, &usageTotal{}, &eventReceipt{}, &collectionSettingsRecord{}); err != nil {
 		_ = sqlDatabase.Close()
 		return nil, err
 	}

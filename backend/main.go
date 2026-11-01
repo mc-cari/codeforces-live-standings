@@ -15,6 +15,7 @@ import (
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/transport/adminapi"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/transport/httpapi"
 )
 
@@ -58,6 +59,25 @@ func main() {
 		os.Exit(1)
 	}
 	go manager.RunCleanup(ctx, time.Hour)
+	collector, err := application.NewCollector(repository, upstream, manager, metrics)
+	if err != nil {
+		slog.Error("load collection settings failed", "error", err)
+		os.Exit(1)
+	}
+	go collector.Run(ctx)
+	adminServer := &http.Server{
+		Addr: env("ADMIN_LISTEN_ADDR", "127.0.0.1:8081"), ReadHeaderTimeout: 5 * time.Second,
+		Handler: adminapi.NewServer(collector, adminapi.Config{
+			AssetsDir: env("ADMIN_ASSETS_DIR", "../admin/dist"), Origin: os.Getenv("ADMIN_ORIGIN"),
+			AccessTeamDomain: os.Getenv("CF_ACCESS_TEAM_DOMAIN"), AccessAudience: os.Getenv("CF_ACCESS_AUDIENCE"), AllowedEmail: os.Getenv("ADMIN_EMAIL"), Development: os.Getenv("ADMIN_DEV_MODE") == "true",
+		}),
+	}
+	go func() {
+		if err := adminServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			slog.Error("admin listener failed", "error", err)
+			stop()
+		}
+	}()
 
 	metricsMux := http.NewServeMux()
 	metricsMux.Handle("/metrics", metrics.Handler())
@@ -97,6 +117,7 @@ func main() {
 		defer cancel()
 		_ = server.Shutdown(shutdownCtx)
 		_ = metricsServer.Shutdown(shutdownCtx)
+		_ = adminServer.Shutdown(shutdownCtx)
 		manager.Stop()
 	}()
 

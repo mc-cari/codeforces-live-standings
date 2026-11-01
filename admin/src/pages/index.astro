@@ -1,0 +1,21 @@
+---
+import SettingsForm from '../components/SettingsForm.astro';
+---
+<!doctype html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="robots" content="noindex,nofollow" /><title>Collection admin · Codeforces Live Standings</title></head>
+<body><main>
+ <header><h1>Collection admin</h1><p>Codeforces Live Standings</p></header>
+ <aside aria-label="Collector status"><p id="discovery" role="status">Checking discovery…</p><p id="capacity"></p><p id="discovery-error" role="alert"></p><button id="refresh" type="button">Refresh status</button></aside>
+ <SettingsForm />
+ <p class="footnote">Status refreshes every 15 seconds. Unsaved changes stay in this browser.</p>
+</main></body></html>
+<script>import '../scripts/admin';</script>
+<style>
+ :global(:root) { --ink:#1c302a; --muted:#53685f; --green:#176442; --error:#a52d29; --line:#d4ded7; background:#f5f7f4; color:var(--ink); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.5; color-scheme:light; }
+ :global(*) { box-sizing:border-box; } :global(body) { margin:0; } :global(:focus-visible) { outline:3px solid var(--green); outline-offset:3px; } :global(::selection) { background:#c8e8d5; color:var(--ink); }
+ main { max-width:1080px; padding:3rem 2rem; margin:auto; } header { padding-bottom:1.5rem; margin-bottom:1.5rem; border-bottom:1px solid var(--line); }
+ h1 { margin:0; font-size:2rem; font-weight:650; letter-spacing:-.025em; } header p { color:var(--muted); margin:.4rem 0 0; }
+ aside { margin-bottom:2.5rem; } aside p { margin:.35rem 0; } #discovery { font-weight:600; } #capacity { color:var(--muted); } #discovery-error { color:var(--error); overflow-wrap:anywhere; }
+ aside button { font:inherit; font-size:.9rem; border:0; padding:.3rem 0; background:none; color:var(--green); text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+ aside button:hover { color:var(--ink); } .footnote { color:var(--muted); font-size:.85rem; }
+ @media(max-width:600px) { main { padding:1.5rem 1rem; } h1 { font-size:1.7rem; } }
+</style>

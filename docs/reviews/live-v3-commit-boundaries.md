@@ -2,7 +2,9 @@
 
 Review date: **2026-11-01**. Scope: the current implementation and its independently reviewable upstream contribution boundaries.
 
-**Correction follow-up (2026-11-01).** Duration-based CF score decay has been restored in the vendored engine and aligned in the Go and browser direct-source fallbacks. Section 6.3 records fresh API comparisons and the correction. The commit revisions and original audit results below remain historical snapshots; this follow-up does not rewrite them. The engine correction is committed as `2f45141a`, and the parent repository pins that revision.
+**Correction follow-up (2026-11-01).** Duration-based CF score decay has been restored in the vendored engine and aligned in the Go and browser direct-source fallbacks. Section 6.3 records fresh API comparisons and the correction. The commit revisions and original audit results below remain historical snapshots; this follow-up does not rewrite them. The engine correction is committed as `9c90da3f`, and the parent repository pins that revision.
+
+**Shared reload follow-up.** The source replacement and its logging-only fix from former sections 6.10/6.11 have been removed from the engine history. A focused configuration commit (`6eb46e14`) preserves anonymous access, API URL configuration, unofficial inclusion, and the existing penalty override using the original shared reload flow. The replayed engine tip is `9c90da3f`. The earlier audit findings describe historical implementations; the new finished-contest regression test verifies delivery before auto-finalization.
 
 ## 1. What this review covers
 
@@ -212,7 +214,7 @@ Audit E3 reconstructs the relevant input from that published result; it is not a
 
 Contest 1110 additionally matched both formulas on all 13,461 scored results at 120 minutes. Contest 1739 uses ICPC scoring and was excluded from the CF decay comparison. At 135 minutes, rounding the duration down to 120 makes both decay formulas agree. The long-round discrepancies also occur with wrong attempts: `sunset`, problem E in contest 1137, has maximum 2,500, acceptance at 4,072 seconds and one rejected attempt. The API and duration formula give 1,914; the fixed formula gives 1,780.
 
-**Correction applied (`2f45141a` and the matching application changes).** Restore the original duration-based decay in live-v3 and apply the same full scoring calculation to the Go and browser direct-source missing-participant fallbacks:
+**Correction applied (`9c90da3f` and the matching application changes).** Restore the original duration-based decay in live-v3 and apply the same full scoring calculation to the Go and browser direct-source missing-participant fallbacks:
 
 ```text
 D = max(1, floor(durationSeconds / 60 / 30)) * 30
@@ -260,7 +262,7 @@ This issue is not a reason to add application-specific score reconstruction to t
 
 ### 6.6 `36c5cf9a` — honor extended ICPC wrong-attempt penalties
 
-[Amended commit](https://github.com/mc-cari/live-v3/commit/36c5cf9a7326aca6abac5e97cd4f604819fa8d72) (previously `e0837f40`; descendants were replayed, with the final engine tip now `2f45141a`).
+[Amended commit](https://github.com/mc-cari/live-v3/commit/36c5cf9a7326aca6abac5e97cd4f604819fa8d72) (previously `e0837f40`; descendants were replayed, with the final engine tip now `9c90da3f`).
 
 **Purpose.** Correct the penalty setting used by the engine for Codeforces ICPC-format contests, including Educational rounds.
 
@@ -341,55 +343,21 @@ Focused Go/Kotlin tests cover agreement, conflicts, missing evidence, overrides 
 
 The ID change needs particular care during migration: use the same canonical identity for engine teams, sidecar joins, restored snapshots, and requested handles. Preserve the original presentation spelling separately.
 
-### 6.10 `7820d537` — expose durable ingestion and reload observation hooks
+### 6.10 Removed source replacement; retained source configuration
 
-[Full commit](https://github.com/mc-cari/live-v3/commit/7820d537c5c85f724a2f4a57b0234d60498292b8)
+The former `d82c47cb` (`7820d537` before the penalty amendment) source-hook commit was removed from the branch history. [The focused replacement](https://github.com/mc-cari/live-v3/commit/6eb46e14) configures the existing private `CFDataSource`, which extends `FullReloadContestDataSource`.
 
-**Current behavior.** The plugin exposes a configurable acquisition source with public embedding hooks. The standard converter uses this source through `CFSettings.toDataSource()`; the Go application consumes CLICS and does not call the hooks directly.
+Required settings remain: anonymous public access, optional manager credentials, `baseUrl`, `includeUnofficial`, and `penaltyPerWrongAttemptMinutes`. The settings schema and API declarations match those settings. Parser scoring, retained submissions, native metadata and CLICS exports remain separate responsibilities.
 
-**Before.** An internal `CFDataSource` extended `FullReloadContestDataSource`, used the existing loaders, and returned a parsed batch each poll. The shared reload implementation controlled how that batch became events.
+The public `createSource`, `CFHistoryStore`, duplicate raw-history cache, custom event loop, and reload/request/history/failure callbacks have been removed. Go did not consume those APIs. The shared source performs five-second polling and existing error/retry handling; the parser retains observed submission updates.
 
-**After.** `CFSettings.toDataSource()` uses a new public `createSource()` and a new manually implemented event flow. This is a replacement of the existing source path, not merely an additional opt-in helper. It also changes generated settings constructors because API credentials now have defaults.
+For the first finished-contest batch, the shared flow emits temporary RUNNING, then the sorted runs, then OVER. This restores the original ordering that avoids audit E4's premature auto-finalization. `CFReloadFlowTest` serves actual HTTP responses for CF and ICPC fixtures and asserts run delivery before OVER/FINALIZED, anonymous request shape, unofficial inclusion, credential validation and the ICPC penalty override. The configuration commit passed its plugin tests independently before replaying the exporter and decay commits.
 
-| Available source capability | Current use and upstream boundary |
-| --- | --- |
-| `CFHistoryStore`, `read`, `merge`, and the in-memory implementation | Acquisition retention remains inside the converter. Go stores application views and does not supply a durable engine-history implementation. Raw-history hooks are separate from the parser omission fix. |
-| `baseUrl` | Exposed through standard settings by `e03fc8e1`; Go configures it when starting the worker. Propose the generic setting separately from source replacement/hooks. |
-| Anonymous public mode and optional credentials | Configure the converter's Codeforces access mode. This is a potential independent plugin feature with credential-validation and settings-compatibility obligations. |
-| `interval`, `beforeRequest`, fresh connections | Available source controls; the Go integration uses converter defaults rather than calling these hooks. Generic polling/transport configuration can be proposed separately. No latency improvement is established. |
-| `onReload(restored)` | Available synchronous-source callback, unused by Go. Go publishes after matching a CLICS scoreboard watermark, which is not a whole-reload transaction boundary. |
-| `onFailure` | Available source error callback. Its behavior must preserve source compatibility, cancellation, and retry semantics; Go separately handles worker/CLICS failures. |
-| `onRequest`, `onHistory` | Available observation hooks, unused by the Go integration. Their public API is not a prerequisite for the smaller parser fixes. |
-| `supportedTypes` | Optional source restriction, unused by Go's standard converter configuration. Product support policy is separate from parser correctness. |
-| `includeUnofficial`, `individualsOnly` | Separate source capabilities from viewer policy. Go enables supported unofficial inclusion; friend filtering remains in the application. |
+Configuration is documented in `vendor/live-v3/docs/codeforces-settings.md`. No custom source bridge or durable engine-history store is required by this integration.
 
-**Existing tests.** They check history upserts, anonymous URLs, dedicated connections, completion after synchronous events, credential validation, restoration failures, and cancellation. Cancellation means intentionally stopping asynchronous work; it must propagate rather than be treated as a retriable failure.
+### 6.11 Removed logging code for the replacement source
 
-Anonymous-URL tests prove the generated request shape, not that every real Codeforces endpoint permits anonymous access in every live-contest phase. Validate endpoint access requirements separately before making that broader operational claim.
-
-**Retained source regression, audit E4.** The replacement source emits contest information before saved runs. For a restored `FINISHED` contest that means an `OVER` event is seen while the consumer knows no pending runs. `autoFinalize()` immediately finalizes and stops the flow, so the saved submission is never delivered. The original `FullReloadContestDataSource` deliberately emits a temporary running status for the first over batch, emits the runs, and then emits `OVER`; the same one-run case reaches the consumer there.
-
-This remains relevant even though the current converter is explicitly run with `--no-auto-finalize`. `toDataSource()` now redirects ordinary plugin users to the replacement, so adapter-driven changes affect existing live-v3 behavior.
-
-**Additional contract considerations.** The completion callback is only meaningful for a synchronous pipeline. Adding an asynchronous buffer can make it run before the actual consumer finishes. The settings ABI also removes old credential-taking constructor/function signatures. These are API and sequencing changes, not merely new optional parameters.
-
-**Current ownership and recommendation.** Acquisition and in-memory retention now remain inside live-v3's standard converter. Go owns process supervision, application persistence, viewer policy, and publication after CLICS reconciliation. It does not call `CFHistoryStore`, `beforeRequest`, `onReload`, `onRequest`, or `onHistory`. The public hooks remain in the fork and have not been removed merely because the app stopped embedding them.
-
-Do not submit this whole replacement as a dependency of the smaller parser fixes. Extract optional public-mode/base-URL configuration where useful, against the ordinary upstream source path. If source replacement is proposed, fix E4 and test existing final-state helpers and settings compatibility independently. A new conversion bridge is no longer required by the Go integration.
-
-### 6.11 `f310cc41` — include safe diagnostics in reload failure logs
-
-[Full commit](https://github.com/mc-cari/live-v3/commit/f310cc418f4c8f308186945783542bbd3eb7bdad)
-
-**Purpose.** Distinguish failures of the same exception class without printing signed URL parameters.
-
-**Before.** The new source's default failure handler logged only the exception class name. Different illegal-state failures looked identical.
-
-**After.** It includes the exception message but removes everything from its first `?` onward. The associated test checks an HTTP failure description, a signed-looking URL, and a missing message. It verifies that the sample secret/signature do not appear.
-
-**Ownership.** The deficient default handler was introduced by `7820d537`. The original reload source used its existing logger and passed the exception. This commit is therefore a fix to the integration source, not a separately discovered original live-v3 bug.
-
-**Recommendation.** Keep it with the replacement source currently retained in the fork. It is not a reason to require that replacement in an otherwise independent upstream bug-fix PR. More complete redaction may be needed for credentials outside a URL query, but the existing test does not establish a universal secret-scrubbing guarantee. Avoid logging exception stacks indiscriminately if their messages can contain credentials.
+The former `03364265` (`f310cc41` before history replay) logging-only fix was removed with the replacement source. Its failure callback and `reloadFailureDescription` helper no longer exist. The restored source uses the shared reload implementation's existing logging and retry behavior. Historical audit results remain evidence about the removed implementation rather than claims about the restored flow.
 
 ### 6.12 `e03fc8e1` — optional CLICS metadata, synchronization, and unofficial scoreboards
 

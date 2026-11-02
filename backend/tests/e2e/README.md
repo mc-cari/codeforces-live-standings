@@ -135,10 +135,9 @@ go test -tags=e2e ./tests/e2e -run 'TestSnapshotScoringAgreement/.*-unofficial' 
 `TestICPCPenaltyRetention` is an additional synthetic HTTP/SSE regression using
 `scenarios/icpc-penalty.json`. It learns a custom seven-minute Gym penalty from an
 unselected official row, removes that evidence, then provides conflicting nine-minute
-evidence while adding unofficial solves. Both providers must retain seven minutes;
-a second run must honor an explicit five-minute override throughout. The Go case
-also verifies that SQLite stores the resolved rule and reactivation preserves it
-despite conflicting current API evidence. This scenario is deliberately
+evidence while adding unofficial solves. Both providers must retain seven minutes.
+The Go case also verifies that SQLite stores the resolved rule and reactivation
+preserves it despite conflicting current API evidence. This scenario is deliberately
 separate from the 18 captured real-contest snapshots.
 
 ```sh

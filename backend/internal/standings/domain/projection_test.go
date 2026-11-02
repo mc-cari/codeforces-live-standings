@@ -1,6 +1,12 @@
 package domain
 
-import "testing"
+import (
+	"encoding/json"
+	"os"
+	"reflect"
+	"strconv"
+	"testing"
+)
 
 func TestProjectionFiltersAnyTeamMember(t *testing.T) {
 	contest := Contest{ID: 1}
@@ -11,6 +17,78 @@ func TestProjectionFiltersAnyTeamMember(t *testing.T) {
 	}, NewHandleSet([]string{"beta"}))
 	if len(submissions) != 1 || submissions[0].ID != 1 {
 		t.Fatalf("unexpected submissions: %#v", submissions)
+	}
+}
+
+func TestTeamSelectionThroughEitherMemberProjectsOneTeamAndUniqueRuns(t *testing.T) {
+	team := Party{TeamID: 77, TeamName: "team", ParticipantType: "CONTESTANT", Members: []Member{{Handle: "Alpha"}, {Handle: "Beta"}}}
+	rows := []RanklistRow{{Party: team, Rank: 1, Points: 7}}
+	all := map[int]Submission{
+		11: {ID: 11, Author: team, Verdict: "WRONG_ANSWER"},
+		12: {ID: 12, Author: team, Verdict: "OK"},
+		13: {ID: 13, Author: Party{Members: []Member{{Handle: "other"}}}},
+	}
+	for _, handles := range [][]string{{"beta"}, {"alpha", "beta"}} {
+		projected, runs := Project(Contest{}, &Standings{Rows: rows, Authoritative: true}, all, NewHandleSet(handles))
+		if len(projected.Rows) != 1 || len(runs) != 2 || runs[0].ID == runs[1].ID {
+			t.Fatalf("handles %v produced rows=%d runs=%#v", handles, len(projected.Rows), runs)
+		}
+	}
+}
+
+func TestCapturedTeamHistoriesPreserveDirectProviderOracleForEitherMember(t *testing.T) {
+	type capture struct {
+		Contest  Contest       `json:"contest"`
+		Problems []Problem     `json:"problems"`
+		Rows     []RanklistRow `json:"selectedOfficialRows"`
+		Teams    map[string]struct {
+			Submissions []Submission `json:"submissions"`
+		} `json:"selectedTeams"`
+	}
+	for _, contestID := range []int{639, 640} {
+		raw, err := os.ReadFile("../../../../docs/reviews/evidence/live-v3-commit-review/team-replay/contest-" + strconv.Itoa(contestID) + ".json")
+		if err != nil {
+			t.Fatal(err)
+		}
+		var data capture
+		if err := json.Unmarshal(raw, &data); err != nil {
+			t.Fatal(err)
+		}
+		source := Standings{Contest: data.Contest, Problems: data.Problems, Rows: data.Rows, Authoritative: true}
+		for teamID, team := range data.Teams {
+			if teamID == "18211" {
+				continue
+			}
+			party := team.Submissions[0].Author
+			if len(party.Members) == 0 {
+				t.Fatalf("contest %d team %s has no members", contestID, teamID)
+			}
+			all := make(map[int]Submission, len(team.Submissions))
+			for _, submission := range team.Submissions {
+				all[submission.ID] = submission
+			}
+			members := make([]string, len(party.Members))
+			for i, member := range party.Members {
+				members[i] = member.Handle
+			}
+			selections := [][]string{members[len(members)-1:], members}
+			for _, handles := range selections {
+				projected, runs := Project(data.Contest, &source, all, NewHandleSet(handles))
+				var apiRow RanklistRow
+				for _, row := range source.Rows {
+					if row.Party.TeamID == party.TeamID {
+						apiRow = row
+						break
+					}
+				}
+				if len(projected.Rows) != 1 || projected.Rows[0].Rank != apiRow.Rank || projected.Rows[0].Points != apiRow.Points || projected.Rows[0].Penalty != apiRow.Penalty || !reflect.DeepEqual(projected.Rows[0].ProblemResults, apiRow.ProblemResults) {
+					t.Fatalf("contest %d team %s changed API score row for handles %v: %#v", contestID, teamID, handles, projected.Rows)
+				}
+				if len(runs) != len(team.Submissions) {
+					t.Fatalf("contest %d team %s duplicated or lost runs: got %d want %d", contestID, teamID, len(runs), len(team.Submissions))
+				}
+			}
+		}
 	}
 }
 

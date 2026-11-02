@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/audit"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 )
 
@@ -45,6 +46,7 @@ type worker struct {
 }
 type Client struct {
 	config  Config
+	audit   *audit.Reporter
 	mu      sync.Mutex
 	workers map[int]*worker
 }
@@ -74,7 +76,7 @@ func New(config Config) (*Client, error) {
 	if config.APIBaseURL == "" {
 		config.APIBaseURL = "https://codeforces.com/api/"
 	}
-	return &Client{config: config, workers: make(map[int]*worker)}, nil
+	return &Client{config: config, workers: make(map[int]*worker), audit: audit.NewReporter()}, nil
 }
 func (c *Client) get(id int) (*worker, error) {
 	c.mu.Lock()
@@ -311,7 +313,7 @@ func (c *Client) consume(ctx context.Context, id int, base string, publish func(
 			return e
 		}
 		if saved != nil && saved.Entities != nil {
-			entities = saved.Entities
+			entities = stageFreshTeamEntities(saved.Entities)
 		}
 	}
 	currentToken := ""
@@ -376,9 +378,52 @@ func (c *Client) consume(ctx context.Context, id int, base string, publish func(
 		if err != nil {
 			return err
 		}
+		c.auditUpdate(view, entities)
 		publish(view)
 		if view.Finished {
 			return nil
+		}
+	}
+}
+
+// A restarted engine publishes a complete team catalogue with new identity spelling.
+// Keep the saved published view untouched while the fresh feed is staged, but do not
+// seed the new catalogue with IDs from the prior worker.
+func stageFreshTeamEntities(saved map[string]map[string][]byte) map[string]map[string][]byte {
+	staged := make(map[string]map[string][]byte, len(saved)+1)
+	for resource, values := range saved {
+		if resource == "teams" { continue }
+		copy := make(map[string][]byte, len(values))
+		for id, payload := range values { copy[id] = payload }
+		staged[resource] = copy
+	}
+	staged["teams"] = make(map[string][]byte)
+	return staged
+}
+
+func (c *Client) auditUpdate(view application.ContestUpdate, entities map[string]map[string][]byte) {
+	submissions := make([]domain.Submission, 0, len(view.Submissions))
+	for _, submission := range view.Submissions {
+		submissions = append(submissions, submission)
+	}
+	c.audit.ObserveSubmissions(view.Standings, submissions)
+	for _, payload := range entities["runs"] {
+		var item entity
+		if json.Unmarshal(payload, &item) != nil {
+			continue
+		}
+		raw := item.Live.Fields["codeforces.hack"]
+		if raw == "" {
+			continue
+		}
+		var hack struct {
+			ID                  int          `json:"id"`
+			CreationTimeSeconds int64        `json:"creationTimeSeconds"`
+			Hacker              domain.Party `json:"hacker"`
+			Defender            domain.Party `json:"defender"`
+		}
+		if json.Unmarshal([]byte(raw), &hack) == nil {
+			c.audit.ObserveHack(view.Standings.Contest, hack.ID, hack.CreationTimeSeconds, hack.Hacker, hack.Defender, view.Standings)
 		}
 	}
 }

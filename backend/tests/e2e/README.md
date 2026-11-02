@@ -12,7 +12,7 @@ per-problem points, penalty, friend order and tie ranks, complete history arriva
 and case-insensitive selection in a different input order for both providers.
 The catalog in `contests.json` also verifies contest identity, scoring type, and duration.
 Global ranks are not compared: the converter sees only the selected competitors.
-This suite does not cover hack scoring, teams, or live rejudges.
+This suite does not cover hack scoring or live rejudges.
 
 | Contest | Round | Scoring | Duration |
 | --- | --- | --- | --- |
@@ -81,6 +81,22 @@ The four remaining new contests expose strict live-v3 compatibility failures:
 The suite intentionally fails on these differences. Snapshot expectations retain
 Codeforces scores and ranks. Existing failures also remain: virtual/practice
 participants are omitted by live-v3, and the educational 1739 penalty discrepancy.
+
+`TestCapturedTeamHistoryThroughProvidersAndSSE` adds real team-history coverage for
+contests 639 and 640. It replays two official teams per contest through both providers
+and the actual HTTP/SSE routes. Multi-member teams are selected through the second
+member and through both members; the single-member team is selected through its member.
+It checks one team row, unique submission IDs, per-problem results, total points, and
+penalties against the standings API. The Kotlin replay tests also check the selected
+teams' relative order. The source records are retained in
+`docs/reviews/evidence/live-v3-commit-review/team-replay/`; the test makes no live
+Codeforces requests. Contest 639's unofficial TLE #98 has no standings oracle and
+remains covered by the Kotlin engine replay for zero score and unofficial status.
+
+```sh
+# From backend/, with LIVE_V3_TEST_BINARY set as above:
+go test -tags=e2e ./tests/e2e -run TestCapturedTeamHistoryThroughProvidersAndSSE -count=1 -timeout=5m
+```
 
 Both engines pass contest 1735. The
 1739 fixture exposes an educational scoring disagreement: Codeforces reports

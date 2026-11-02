@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/audit"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 )
 
@@ -48,6 +49,7 @@ type Subscription struct {
 }
 
 type Session struct {
+	anomalyReporter   *audit.Reporter
 	historyObserver   SubmissionHistoryObserver
 	historyIncomplete bool
 	repository        Repository
@@ -70,7 +72,7 @@ type Session struct {
 }
 
 func newSession(repository Repository, gateway ContestGateway, pollInterval time.Duration, contest domain.Contest, standings *domain.Standings, revision int64, stored map[int]domain.Submission, observer SubmissionHistoryObserver) *Session {
-	return &Session{historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
+	return &Session{anomalyReporter: audit.NewReporter(), historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
 }
 
 func (session *Session) Contest() domain.Contest {
@@ -236,6 +238,9 @@ func (session *Session) poll(ctx context.Context) bool {
 		if err := session.repository.SaveContest(standings.Contest, time.Now()); err != nil {
 			standingsErr = err
 		}
+	}
+	if statusErr == nil && standingsErr == nil {
+		session.anomalyReporter.ObserveSubmissions(standings, status)
 	}
 	if statusErr != nil || standingsErr != nil {
 		slog.Warn("contest poll incomplete", "contest", contestID, "status_error", statusErr, "standings_error", standingsErr)

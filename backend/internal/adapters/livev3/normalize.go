@@ -173,7 +173,9 @@ func normalize(id int, entities map[string]map[string][]byte, board scoreboard) 
 					points = *result.Score
 				}
 				wrong := result.Judged
-				if result.Solved {
+				// CF accepts earn decayed positive points, so the CLICS `solved`
+				// flag remains false even though this judged run was accepted.
+				if result.Solved || (native.Contest.Type == "CF" && points > 0) {
 					wrong--
 				}
 				kind := "FINAL"

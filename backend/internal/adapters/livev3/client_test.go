@@ -39,6 +39,27 @@ func TestEntityUpsertReplayAndExplicitDeletion(t *testing.T) {
 		t.Fatal("explicit deletion ignored")
 	}
 }
+
+func TestFreshTeamFeedReplacesPersistedLowercaseIdentityAfterStaging(t *testing.T) {
+	published := map[string]map[string][]byte{
+		"teams":       {"alice": []byte(`{"data":{"id":"alice"}}`)},
+		"submissions": {"1": []byte(`{"data":{"id":"1"}}`)},
+	}
+	staged := stageFreshTeamEntities(published)
+	if _, ok := published["teams"]["alice"]; !ok {
+		t.Fatal("staging changed the published view before the new feed completed")
+	}
+	if len(staged["teams"]) != 0 || len(staged["submissions"]) != 1 {
+		t.Fatalf("unexpected initial staged set: %#v", staged)
+	}
+	applyEvent(staged, feedEvent{Type: "teams", ID: "Alice", Data: json.RawMessage(`{"id":"Alice"}`), Live: extension{Fields: map[string]string{"codeforces.party": `{"members":[{"handle":"Alice"}]}`}}})
+	if _, ok := staged["teams"]["alice"]; ok || len(staged["teams"]) != 1 {
+		t.Fatalf("fresh team identity was not replaced cleanly: %#v", staged["teams"])
+	}
+	if _, ok := published["teams"]["alice"]; !ok {
+		t.Fatal("published view was mutated while staging")
+	}
+}
 func TestNormalizePreservesProgressAndEngineRows(t *testing.T) {
 	entities := make(map[string]map[string][]byte)
 	native := `{"contest":{"id":1,"phase":"CODING","type":"CF"},"problems":[{"index":"A"}]}`
@@ -61,6 +82,18 @@ func TestNormalizePreservesProgressAndEngineRows(t *testing.T) {
 		if view.Submissions[1].PassedTestCount != count || view.Submissions[1].MemoryConsumedBytes != 1234 || view.Standings.Rows[0].Points != 430 || view.Standings.Rows[0].Rank != 4 {
 			t.Fatal(view)
 		}
+	}
+}
+
+func TestNormalizeJoinsRestoredHandleSpellingExactly(t *testing.T) {
+	entities := map[string]map[string][]byte{}
+	applyEvent(entities, feedEvent{Type: "teams", ID: "ALICE", Data: json.RawMessage(`{"id":"ALICE"}`), Live: extension{Fields: map[string]string{"codeforces.party": `{"members":[{"handle":"ALICE"}],"participantType":"CONTESTANT"}`}}})
+	var row boardRow
+	row.Team = "ALICE"
+	board := scoreboard{Rows: []boardRow{row}, Live: extension{Fields: map[string]string{"codeforces.standings": `{"contest":{"id":1,"phase":"CODING","type":"CF"},"problems":[]}`}}}
+	view, err := normalize(1, entities, board)
+	if err != nil || len(view.Standings.Rows) != 1 || view.Standings.Rows[0].Party.Members[0].Handle != "ALICE" {
+		t.Fatalf("upper-case CLICS join failed: %#v %v", view, err)
 	}
 }
 

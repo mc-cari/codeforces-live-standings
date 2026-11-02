@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1735,
+    "name": "Codeforces Round 824 (Div. 2)",
+    "type": "CF",
+    "durationSeconds": 8100
+  },
+  {
+    "id": 1739,
+    "name": "Educational Codeforces Round 136 (Rated for Div. 2)",
+    "type": "ICPC",
+    "durationSeconds": 7200
+  },
+  {
+    "id": 1753,
+    "name": "Codeforces Round 829 (Div. 1)",
+    "type": "CF",
+    "durationSeconds": 7200
+  },
+  {
+    "id": 1754,
+    "name": "Codeforces Round 829 (Div. 2)",
+    "type": "CF",
+    "durationSeconds": 7200
+  },
+  {
+    "id": 1741,
+    "name": "Codeforces Round 826 (Div. 3)",
+    "type": "ICPC",
+    "durationSeconds": 8100
+  },
+  {
+    "id": 1742,
+    "name": "Codeforces Round 827 (Div. 4)",
+    "type": "ICPC",
+    "durationSeconds": 8700
+  },
+  {
+    "id": 1740,
+    "name": "Codeforces Round 831 (Div. 1 + Div. 2)",
+    "type": "CF",
+    "durationSeconds": 9900
+  },
+  {
+    "id": 1750,
+    "name": "CodeTON Round 3 (Div. 1 + Div. 2, Rated, Prizes!)",
+    "type": "CF",
+    "durationSeconds": 9000
+  },
+  {
+    "id": 1743,
+    "name": "Educational Codeforces Round 137 (Rated for Div. 2)",
+    "type": "ICPC",
+    "durationSeconds": 7200
+  },
+  {
+    "id": 1749,
+    "name": "Educational Codeforces Round 138 (Rated for Div. 2)",
+    "type": "ICPC",
+    "durationSeconds": 7200
+  },
+  {
+    "id": 1737,
+    "name": "Dytechlab Cup 2022",
+    "type": "CF",
+    "durationSeconds": 9000
+  },
+  {
+    "id": 1799,
+    "name": "Codeforces Round 854 by cybercats (Div. 1 + Div. 2)",
+    "type": "CF",
+    "durationSeconds": 10800
+  }
+]

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -28,6 +29,26 @@ type stagedGateway struct {
 	firstStatusStarted chan struct{}
 	releaseFirstStatus chan struct{}
 	secondStatus       chan struct{}
+}
+
+type teamGateway struct {
+	standings   domain.Standings
+	submissions []domain.Submission
+}
+
+func (gateway teamGateway) InitialUpdate(context.Context, int) (application.ContestUpdate, error) {
+	all := make(map[int]domain.Submission, len(gateway.submissions))
+	for _, submission := range gateway.submissions {
+		all[submission.ID] = submission
+	}
+	return application.ContestUpdate{Standings: gateway.standings, Submissions: all}, nil
+}
+
+func (gateway teamGateway) FetchStandings(context.Context, int) (domain.Standings, error) {
+	return gateway.standings, nil
+}
+func (gateway teamGateway) FetchSubmissions(context.Context, int) ([]domain.Submission, error) {
+	return gateway.submissions, nil
 }
 
 func (gateway *stagedGateway) FetchStandings(_ context.Context, _ int) (domain.Standings, error) {
@@ -164,6 +185,56 @@ func TestLateSubscriberGetsReconciledSubmissionHistory(t *testing.T) {
 			t.Fatal("SSE gauge did not return to zero")
 		}
 		time.Sleep(time.Millisecond)
+	}
+}
+
+func TestTeamMemberSelectionOverSSEReturnsOneTeamAndNoDuplicateRuns(t *testing.T) {
+	contest := domain.Contest{ID: 9100, Name: "team replay", Type: "ICPC", Phase: "CODING", DurationSeconds: 7200}
+	team := domain.Party{ContestID: contest.ID, TeamID: 77, TeamName: "pair", ParticipantType: "CONTESTANT", Members: []domain.Member{{Handle: "Alpha"}, {Handle: "Beta"}}}
+	problem := domain.Problem{ContestID: contest.ID, Index: "A", Name: "A", Type: "PROGRAMMING"}
+	standings := domain.Standings{Contest: contest, Problems: []domain.Problem{problem}, Rows: []domain.RanklistRow{{Party: team, Rank: 1, Points: 1, ProblemResults: []domain.ProblemResult{{Points: 1, Type: "FINAL", BestSubmissionTimeSecs: 300}}}}}
+	source := teamGateway{standings: standings, submissions: []domain.Submission{
+		{ID: 1, ContestID: contest.ID, RelativeTimeSeconds: 100, Verdict: "WRONG_ANSWER", Problem: problem, Author: team},
+		{ID: 2, ContestID: contest.ID, RelativeTimeSeconds: 300, Verdict: "OK", Problem: problem, Author: team},
+	}}
+	repository, err := sqlite.Open(filepath.Join(t.TempDir(), "team.sqlite"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer repository.Close()
+	manager := application.NewManager(repository, source, application.Config{PollInterval: time.Hour, RetentionPeriod: time.Hour, MaxActiveContests: 1})
+	defer manager.Stop()
+	server := httptest.NewServer(NewServer(manager, Config{MaxHandles: 20}))
+	defer server.Close()
+	response, err := http.Post(server.URL+"/v1/contests/9100/activate", "application/json", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("activation status %d", response.StatusCode)
+	}
+	for _, selected := range [][]string{{"beta"}, {"Alpha", "BETA"}} {
+		handles := base64.RawURLEncoding.EncodeToString([]byte(strings.Join(selected, ";")))
+		feed, err := http.Get(server.URL + "/v1/contests/9100/events?h=" + handles)
+		if err != nil {
+			t.Fatal(err)
+		}
+		event := readEvent(t, bufio.NewReader(feed.Body))
+		feed.Body.Close()
+		if event["event"] != "snapshot" {
+			t.Fatalf("expected snapshot: %#v", event)
+		}
+		var payload struct {
+			Standings   domain.Standings    `json:"standings"`
+			Submissions []domain.Submission `json:"submissions"`
+		}
+		if err := json.Unmarshal([]byte(event["data"]), &payload); err != nil {
+			t.Fatal(err)
+		}
+		if len(payload.Standings.Rows) != 1 || len(payload.Submissions) != 2 || payload.Submissions[0].ID == payload.Submissions[1].ID {
+			t.Fatalf("handles %v returned %d rows and submissions %#v", selected, len(payload.Standings.Rows), payload.Submissions)
+		}
 	}
 }
 

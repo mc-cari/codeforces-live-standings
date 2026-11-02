@@ -1,0 +1,83 @@
+name: live-v3 backend
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'vendor/live-v3'
+      - '.gitmodules'
+      - 'docker-compose.live-v3.yml'
+      - '.github/workflows/live-v3.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'vendor/live-v3'
+      - '.gitmodules'
+permissions:
+  contents: read
+jobs:
+  compatibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          submodules: recursive
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - name: Build standard CDS converter
+        working-directory: vendor/live-v3
+        run: ./gradlew --no-daemon :cds-converter:test :cds-converter:installDist -Plive.dev.embedFrontend=false
+      - name: Test pinned engine and exported APIs
+        working-directory: vendor/live-v3
+        run: ./gradlew --no-daemon :cds:plugins:codeforces:test :cds:core:test :cds:plugins:codeforces:apiCheck :cds:core:apiCheck
+      - name: Test existing Go backend
+        working-directory: backend
+        run: go test -race ./... && go build -o /tmp/live-go .
+      - name: Go API with real live-v3 engine
+        working-directory: backend
+        env:
+          LIVE_V3_TEST_BINARY: ${{ github.workspace }}/vendor/live-v3/src/cds-converter/build/install/cds-converter/bin/cds-converter
+        run: go test -race ./internal/adapters/livev3 -count=1
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1
+        with:
+          version: 11.14.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Browser dependencies
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+      - name: Frontend unit tests and type checks
+        working-directory: frontend
+        run: pnpm test:unit && pnpm exec tsc --noEmit --ignoreDeprecations 6.0
+      - name: Frontend SSE behavior
+        working-directory: frontend
+        run: |
+          pnpm exec playwright install --with-deps chromium
+          pnpm exec playwright test --config playwright.sse.config.ts
+      - name: Validate Compose configuration
+        run: docker compose -f docker-compose.live-v3.yml config --quiet
+      - name: Build combined deployment image
+        run: docker build -f backend/Dockerfile.live-v3 -t live-v3-backend:test .
+      - name: Smoke test combined deployment
+        run: |
+          docker run -d --name live-v3-smoke -p 127.0.0.1:18080:8080 live-v3-backend:test
+          trap 'docker logs live-v3-smoke; docker rm -f live-v3-smoke' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:18080/healthz; then break; fi
+            sleep 1
+          done
+          curl --fail --silent http://127.0.0.1:18080/healthz
+          docker stop --time 10 live-v3-smoke

@@ -1,0 +1,1055 @@
+{
+  "capturedAt": "2026-11-01T23:55:31.425956+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1750",
+    "https://codeforces.com/api/contest.status?contestId=1750&handle=yougali",
+    "https://codeforces.com/api/contest.status?contestId=1750&handle=uocgimauxam",
+    "https://codeforces.com/api/contest.status?contestId=1750&handle=Russian_Pank",
+    "https://codeforces.com/api/contest.status?contestId=1750&handle=I_HATE_GEOMETRY"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1750,
+        "name": "CodeTON Round 3 (Div. 1 + Div. 2, Rated, Prizes!)",
+        "type": "CF",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 9000,
+        "startTimeSeconds": 1667745300,
+        "relativeTimeSeconds": 125832017
+      },
+      "problems": [
+        {
+          "contestId": 1750,
+          "index": "A",
+          "name": "Indirect Sort",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "implementation",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "B",
+          "name": "Maximum Substring",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 800,
+          "tags": [
+            "brute force",
+            "greedy",
+            "implementation"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "C",
+          "name": "Complementary XOR",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "constructive algorithms",
+            "implementation"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "D",
+          "name": "Count GCD",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1800,
+          "tags": [
+            "combinatorics",
+            "math",
+            "number theory"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "E",
+          "name": "Bracket Cost",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "binary search",
+            "data structures",
+            "divide and conquer",
+            "dp",
+            "greedy",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "F",
+          "name": "Majority",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 2700,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "G",
+          "name": "Doping",
+          "type": "PROGRAMMING",
+          "points": 3250.0,
+          "rating": 3300,
+          "tags": [
+            "combinatorics",
+            "dp",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1750,
+          "index": "H",
+          "name": "BinaryStringForces",
+          "type": "PROGRAMMING",
+          "points": 3500.0,
+          "rating": 3500,
+          "tags": [
+            "constructive algorithms",
+            "data structures",
+            "dp"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1750,
+            "participantId": 143650420,
+            "members": [
+              {
+                "handle": "yougali"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 397,
+            "startTimeSeconds": 1667745300
+          },
+          "rank": 1488,
+          "points": 2794.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 488.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 512
+            },
+            {
+              "points": 724.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 702
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 1582.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1834
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1750,
+            "participantId": 143552676,
+            "members": [
+              {
+                "handle": "uocgimauxam"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 351,
+            "startTimeSeconds": 1667745300
+          },
+          "rank": 1494,
+          "points": 2750.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 459.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1586
+            },
+            {
+              "points": 664.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2192
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 1627.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1340
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1750,
+            "participantId": 143652950,
+            "members": [
+              {
+                "handle": "Russian_Pank"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 324,
+            "startTimeSeconds": 1667745300
+          },
+          "rank": 1495,
+          "points": 2739.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 497.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 144
+            },
+            {
+              "points": 738.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 302
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 1504.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2691
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1750,
+            "participantId": 143647802,
+            "members": [
+              {
+                "handle": "I_HATE_GEOMETRY"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 227,
+            "startTimeSeconds": 1667745300
+          },
+          "rank": 1499,
+          "points": 2686.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 1594.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1698
+            },
+            {
+              "points": 1092.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 8876
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 179652389,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667754176,
+        "relativeTimeSeconds": 8876,
+        "problem": {
+          "contestId": 1750,
+          "index": "E",
+          "name": "Bracket Cost",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "binary search",
+            "data structures",
+            "divide and conquer",
+            "dp",
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143647802,
+          "members": [
+            {
+              "handle": "I_HATE_GEOMETRY"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 227,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 29,
+        "timeConsumedMillis": 826,
+        "memoryConsumedBytes": 26419200
+      },
+      {
+        "id": 179639723,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667753963,
+        "relativeTimeSeconds": 8663,
+        "problem": {
+          "contestId": 1750,
+          "index": "E",
+          "name": "Bracket Cost",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "binary search",
+            "data structures",
+            "divide and conquer",
+            "dp",
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143647802,
+          "members": [
+            {
+              "handle": "I_HATE_GEOMETRY"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 227,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 811,
+        "memoryConsumedBytes": 26419200
+      },
+      {
+        "id": 179633494,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667753881,
+        "relativeTimeSeconds": 8581,
+        "problem": {
+          "contestId": 1750,
+          "index": "E",
+          "name": "Bracket Cost",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "binary search",
+            "data structures",
+            "divide and conquer",
+            "dp",
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143647802,
+          "members": [
+            {
+              "handle": "I_HATE_GEOMETRY"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 227,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 780,
+        "memoryConsumedBytes": 26419200
+      },
+      {
+        "id": 179619783,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667751287,
+        "relativeTimeSeconds": 5987,
+        "problem": {
+          "contestId": 1750,
+          "index": "C",
+          "name": "Complementary XOR",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "constructive algorithms",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143552676,
+          "members": [
+            {
+              "handle": "uocgimauxam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 351,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 179617564,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667750719,
+        "relativeTimeSeconds": 5419,
+        "problem": {
+          "contestId": 1750,
+          "index": "C",
+          "name": "Complementary XOR",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "constructive algorithms",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143652950,
+          "members": [
+            {
+              "handle": "Russian_Pank"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 324,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 179615731,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667750276,
+        "relativeTimeSeconds": 4976,
+        "problem": {
+          "contestId": 1750,
+          "index": "C",
+          "name": "Complementary XOR",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "constructive algorithms",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143652950,
+          "members": [
+            {
+              "handle": "Russian_Pank"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 324,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 179606837,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667748500,
+        "relativeTimeSeconds": 3200,
+        "problem": {
+          "contestId": 1750,
+          "index": "E",
+          "name": "Bracket Cost",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "binary search",
+            "data structures",
+            "divide and conquer",
+            "dp",
+            "greedy",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143650420,
+          "members": [
+            {
+              "handle": "yougali"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 397,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 2000,
+        "memoryConsumedBytes": 4505600
+      },
+      {
+        "id": 179603751,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667747991,
+        "relativeTimeSeconds": 2691,
+        "problem": {
+          "contestId": 1750,
+          "index": "D",
+          "name": "Count GCD",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1800,
+          "tags": [
+            "combinatorics",
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143652950,
+          "members": [
+            {
+              "handle": "Russian_Pank"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 324,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 36,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 179600516,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667747492,
+        "relativeTimeSeconds": 2192,
+        "problem": {
+          "contestId": 1750,
+          "index": "B",
+          "name": "Maximum Substring",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 800,
+          "tags": [
+            "brute force",
+            "greedy",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143552676,
+          "members": [
+            {
+              "handle": "uocgimauxam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 351,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 4505600
+      },
+      {
+        "id": 179591805,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667747134,
+        "relativeTimeSeconds": 1834,
+        "problem": {
+          "contestId": 1750,
+          "index": "D",
+          "name": "Count GCD",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1800,
+          "tags": [
+            "combinatorics",
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143650420,
+          "members": [
+            {
+              "handle": "yougali"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 397,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 36,
+        "timeConsumedMillis": 78,
+        "memoryConsumedBytes": 2048000
+      },
+      {
+        "id": 179584809,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667746998,
+        "relativeTimeSeconds": 1698,
+        "problem": {
+          "contestId": 1750,
+          "index": "D",
+          "name": "Count GCD",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1800,
+          "tags": [
+            "combinatorics",
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143647802,
+          "members": [
+            {
+              "handle": "I_HATE_GEOMETRY"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 227,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 36,
+        "timeConsumedMillis": 109,
+        "memoryConsumedBytes": 512000
+      },
+      {
+        "id": 179583643,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667746886,
+        "relativeTimeSeconds": 1586,
+        "problem": {
+          "contestId": 1750,
+          "index": "A",
+          "name": "Indirect Sort",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143552676,
+          "members": [
+            {
+              "handle": "uocgimauxam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 351,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 179577322,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667746640,
+        "relativeTimeSeconds": 1340,
+        "problem": {
+          "contestId": 1750,
+          "index": "D",
+          "name": "Count GCD",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1800,
+          "tags": [
+            "combinatorics",
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143552676,
+          "members": [
+            {
+              "handle": "uocgimauxam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 351,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 36,
+        "timeConsumedMillis": 62,
+        "memoryConsumedBytes": 3276800
+      },
+      {
+        "id": 179568079,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667746002,
+        "relativeTimeSeconds": 702,
+        "problem": {
+          "contestId": 1750,
+          "index": "B",
+          "name": "Maximum Substring",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 800,
+          "tags": [
+            "brute force",
+            "greedy",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143650420,
+          "members": [
+            {
+              "handle": "yougali"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 397,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 512000
+      },
+      {
+        "id": 179565120,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667745812,
+        "relativeTimeSeconds": 512,
+        "problem": {
+          "contestId": 1750,
+          "index": "A",
+          "name": "Indirect Sort",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143650420,
+          "members": [
+            {
+              "handle": "yougali"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 397,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 2048000
+      },
+      {
+        "id": 179561622,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667745602,
+        "relativeTimeSeconds": 302,
+        "problem": {
+          "contestId": 1750,
+          "index": "B",
+          "name": "Maximum Substring",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 800,
+          "tags": [
+            "brute force",
+            "greedy",
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143652950,
+          "members": [
+            {
+              "handle": "Russian_Pank"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 324,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 512000
+      },
+      {
+        "id": 179559339,
+        "contestId": 1750,
+        "creationTimeSeconds": 1667745444,
+        "relativeTimeSeconds": 144,
+        "problem": {
+          "contestId": 1750,
+          "index": "A",
+          "name": "Indirect Sort",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "implementation",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1750,
+          "participantId": 143652950,
+          "members": [
+            {
+              "handle": "Russian_Pank"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 324,
+          "startTimeSeconds": 1667745300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      }
+    ]
+  }
+}

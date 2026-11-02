@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import type { Party, Standings, Submission } from '../../../shared/domain/contest.ts';
 import { projectLiveUpdate } from './projectLiveUpdate.ts';
+import { mapStandingsDto, mapSubmissionDto } from '../../../integrations/codeforces/mapper.ts';
 
 const party = (handle: string): Party => ({
   contestId: 1,
@@ -74,4 +75,33 @@ test('projects live updates without mutating prior submissions', () => {
   assert.equal(projection.submissions[0].author.rank, 1);
   assert.equal(projection.submissions[0].numberOfProblems, 1);
   assert.equal(projection.newSubmissionCount, 1);
+});
+
+
+test('SSE projections preserve source order, ties, deletions and decorated submissions', () => {
+  const source = structuredClone(standings);
+  source.rows = [
+    { ...source.rows[0], party: party('b'), rank: 2, points: 400 },
+    { ...source.rows[0], party: party('a'), rank: 3, points: 400 },
+    { ...source.rows[0], party: party('c'), rank: 3, points: 400 },
+  ];
+  const retained = { ...submission(2), author: { ...party('b'), rank: 1 }, numberOfProblems: 7 };
+  const projection = projectLiveUpdate(source, [retained], [submission(1)], ['a', 'b', 'c', 'Tourist'], true);
+  assert.deepEqual(projection.standings.rows.map((row) => row.party.members[0].handle), ['b', 'a', 'c']);
+  assert.equal(projection.localStandings.get('b'), 1);
+  assert.equal(projection.localStandings.get('a'), 2);
+  assert.equal(projection.localStandings.get('c'), 2);
+  assert.deepEqual(projection.submissions.map(({ id }) => id), [2]);
+  assert.equal(projection.submissions[0].numberOfProblems, 7);
+  assert.equal(projection.standings.rows.length, 3);
+});
+
+
+test('SSE DTO mapping retains the Go participant position and solved count', () => {
+  const mapped = mapSubmissionDto({ ...submission(1), author: { ...party('Tourist'), rank: 2 }, numberOfProblems: 7 });
+  const source = structuredClone(standings);
+  source.rows[0].party.rank = 2;
+  assert.equal(mapStandingsDto(source).rows[0].party.rank, 2);
+  assert.equal(mapped.author.rank, 2);
+  assert.equal(mapped.numberOfProblems, 7);
 });

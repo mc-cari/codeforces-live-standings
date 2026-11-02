@@ -1,0 +1,1285 @@
+{
+  "capturedAt": "2026-11-01T23:54:51.767161+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1741",
+    "https://codeforces.com/api/contest.status?contestId=1741"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1741,
+        "name": "Codeforces Round 826 (Div. 3)",
+        "type": "ICPC",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 8100,
+        "startTimeSeconds": 1665498900,
+        "relativeTimeSeconds": 128078272
+      },
+      "problems": [
+        {
+          "contestId": 1741,
+          "index": "A",
+          "name": "Compare T-Shirt Sizes",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "C",
+          "name": "Minimize the Thickness",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "brute force",
+            "greedy",
+            "math",
+            "two pointers"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "F",
+          "name": "Multi-Colored Segments",
+          "type": "PROGRAMMING",
+          "rating": 2000,
+          "tags": [
+            "binary search",
+            "data structures",
+            "math",
+            "sortings"
+          ]
+        },
+        {
+          "contestId": 1741,
+          "index": "G",
+          "name": "Kirill and Company",
+          "type": "PROGRAMMING",
+          "rating": 2200,
+          "tags": [
+            "bitmasks",
+            "brute force",
+            "dfs and similar",
+            "dp",
+            "flows",
+            "graphs",
+            "shortest paths"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1741,
+            "participantId": 141725246,
+            "members": [
+              {
+                "handle": "Baaaraa"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1665498900
+          },
+          "rank": 3463,
+          "points": 3.0,
+          "penalty": 30,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 281
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 433
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1142
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 5,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1741,
+            "participantId": 141900948,
+            "members": [
+              {
+                "handle": "hritik3878"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1665498900
+          },
+          "rank": 3469,
+          "points": 3.0,
+          "penalty": 40,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 452
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 661
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1362
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1741,
+            "participantId": 141783456,
+            "members": [
+              {
+                "handle": "vadsam"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1665498900
+          },
+          "rank": 3469,
+          "points": 3.0,
+          "penalty": 40,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 317
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 708
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1495
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1741,
+            "participantId": 141745779,
+            "members": [
+              {
+                "handle": "rewq"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1665498900
+          },
+          "rank": 3469,
+          "points": 3.0,
+          "penalty": 40,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 300
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 863
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1318
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 175659192,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665506784,
+        "relativeTimeSeconds": 7884,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 5632000
+      },
+      {
+        "id": 175653247,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665505987,
+        "relativeTimeSeconds": 7087,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 3993600
+      },
+      {
+        "id": 175648919,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665505423,
+        "relativeTimeSeconds": 6523,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 5632000
+      },
+      {
+        "id": 175644799,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665504918,
+        "relativeTimeSeconds": 6018,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 5632000
+      },
+      {
+        "id": 175644039,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665504826,
+        "relativeTimeSeconds": 5926,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 5632000
+      },
+      {
+        "id": 175639743,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665504326,
+        "relativeTimeSeconds": 5426,
+        "problem": {
+          "contestId": 1741,
+          "index": "E",
+          "name": "Sending a Sequence Over the Network",
+          "type": "PROGRAMMING",
+          "rating": 1600,
+          "tags": [
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 17,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 3174400
+      },
+      {
+        "id": 175632915,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665503574,
+        "relativeTimeSeconds": 4674,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175631601,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665503434,
+        "relativeTimeSeconds": 4534,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141783456,
+          "members": [
+            {
+              "handle": "vadsam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 2560000
+      },
+      {
+        "id": 175629899,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665503258,
+        "relativeTimeSeconds": 4358,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141783456,
+          "members": [
+            {
+              "handle": "vadsam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 2560000
+      },
+      {
+        "id": 175611434,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665501649,
+        "relativeTimeSeconds": 2749,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 171,
+        "memoryConsumedBytes": 5427200
+      },
+      {
+        "id": 175607546,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665501363,
+        "relativeTimeSeconds": 2463,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 218,
+        "memoryConsumedBytes": 7372800
+      },
+      {
+        "id": 175605178,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665501200,
+        "relativeTimeSeconds": 2300,
+        "problem": {
+          "contestId": 1741,
+          "index": "D",
+          "name": "Masha and a Beautiful Tree",
+          "type": "PROGRAMMING",
+          "rating": 1300,
+          "tags": [
+            "dfs and similar",
+            "divide and conquer",
+            "graphs",
+            "sortings",
+            "trees"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 171,
+        "memoryConsumedBytes": 5324800
+      },
+      {
+        "id": 175591384,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665500395,
+        "relativeTimeSeconds": 1495,
+        "problem": {
+          "contestId": 1741,
+          "index": "C",
+          "name": "Minimize the Thickness",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "brute force",
+            "greedy",
+            "math",
+            "two pointers"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141783456,
+          "members": [
+            {
+              "handle": "vadsam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 24,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 175588746,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665500262,
+        "relativeTimeSeconds": 1362,
+        "problem": {
+          "contestId": 1741,
+          "index": "C",
+          "name": "Minimize the Thickness",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "brute force",
+            "greedy",
+            "math",
+            "two pointers"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 24,
+        "timeConsumedMillis": 108,
+        "memoryConsumedBytes": 2048000
+      },
+      {
+        "id": 175587788,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665500218,
+        "relativeTimeSeconds": 1318,
+        "problem": {
+          "contestId": 1741,
+          "index": "C",
+          "name": "Minimize the Thickness",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "brute force",
+            "greedy",
+            "math",
+            "two pointers"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 24,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175583854,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665500042,
+        "relativeTimeSeconds": 1142,
+        "problem": {
+          "contestId": 1741,
+          "index": "C",
+          "name": "Minimize the Thickness",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "brute force",
+            "greedy",
+            "math",
+            "two pointers"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 24,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175576984,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499763,
+        "relativeTimeSeconds": 863,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 819200
+      },
+      {
+        "id": 175575563,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499709,
+        "relativeTimeSeconds": 809,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175572943,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499608,
+        "relativeTimeSeconds": 708,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141783456,
+          "members": [
+            {
+              "handle": "vadsam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 3379200
+      },
+      {
+        "id": 175571787,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499561,
+        "relativeTimeSeconds": 661,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 108,
+        "memoryConsumedBytes": 10240000
+      },
+      {
+        "id": 175570027,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499492,
+        "relativeTimeSeconds": 592,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175566773,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499352,
+        "relativeTimeSeconds": 452,
+        "problem": {
+          "contestId": 1741,
+          "index": "A",
+          "name": "Compare T-Shirt Sizes",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141900948,
+          "members": [
+            {
+              "handle": "hritik3878"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "PyPy 3",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 139,
+        "memoryConsumedBytes": 6041600
+      },
+      {
+        "id": 175566334,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499333,
+        "relativeTimeSeconds": 433,
+        "problem": {
+          "contestId": 1741,
+          "index": "B",
+          "name": "Funny Permutation",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 10,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175564323,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499217,
+        "relativeTimeSeconds": 317,
+        "problem": {
+          "contestId": 1741,
+          "index": "A",
+          "name": "Compare T-Shirt Sizes",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141783456,
+          "members": [
+            {
+              "handle": "vadsam"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 175564126,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499200,
+        "relativeTimeSeconds": 300,
+        "problem": {
+          "contestId": 1741,
+          "index": "A",
+          "name": "Compare T-Shirt Sizes",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141745779,
+          "members": [
+            {
+              "handle": "rewq"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 175563956,
+        "contestId": 1741,
+        "creationTimeSeconds": 1665499181,
+        "relativeTimeSeconds": 281,
+        "problem": {
+          "contestId": 1741,
+          "index": "A",
+          "name": "Compare T-Shirt Sizes",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1741,
+          "participantId": 141725246,
+          "members": [
+            {
+              "handle": "Baaaraa"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1665498900
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 11,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      }
+    ]
+  }
+}

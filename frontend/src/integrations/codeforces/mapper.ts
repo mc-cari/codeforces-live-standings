@@ -60,7 +60,7 @@ const mapPartyDto = (party: CodeforcesPartyDto): Party => ({
   ghost: party.ghost ?? false,
   room: party.room,
   startTimeSeconds: party.startTimeSeconds,
-  rank: 0,
+  rank: party.rank ?? 0,
 });
 
 export const mapSubmissionDto = (submission: CodeforcesSubmissionDto): Submission => ({
@@ -68,7 +68,7 @@ export const mapSubmissionDto = (submission: CodeforcesSubmissionDto): Submissio
   problem: mapProblemDto(submission.problem),
   author: mapPartyDto(submission.author),
   points: submission.points ?? 0,
-  numberOfProblems: 0,
+  numberOfProblems: submission.numberOfProblems ?? 0,
 });
 
 export const mapStandingsDto = (standings: CodeforcesStandingsDto): Standings => ({

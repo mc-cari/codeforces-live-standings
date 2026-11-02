@@ -56,10 +56,18 @@ type RanklistRow struct {
 	LastSubmissionTimeSecs int             `json:"lastSubmissionTimeSeconds"`
 }
 
+// PenaltyRule stores only an explicit or evidence-backed rule; defaults are not learned.
+type PenaltyRule struct {
+	Minutes int    `json:"minutes"`
+	Source  string `json:"source"`
+}
+
 type Standings struct {
-	Contest  Contest       `json:"contest"`
-	Problems []Problem     `json:"problems"`
-	Rows     []RanklistRow `json:"rows"`
+	ICPCPenaltyRule *PenaltyRule  `json:"icpcPenaltyRule,omitempty"`
+	Authoritative   bool          `json:"-"`
+	Contest         Contest       `json:"contest"`
+	Problems        []Problem     `json:"problems"`
+	Rows            []RanklistRow `json:"rows"`
 }
 
 type Submission struct {

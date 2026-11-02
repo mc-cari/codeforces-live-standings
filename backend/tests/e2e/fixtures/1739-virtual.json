@@ -1,0 +1,590 @@
+{
+  "capturedAt": "2026-11-01T23:26:48.787260+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1739",
+    "https://codeforces.com/api/contest.status?contestId=1739"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1739,
+        "name": "Educational Codeforces Round 136 (Rated for Div. 2)",
+        "type": "ICPC",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 7200,
+        "startTimeSeconds": 1664462100,
+        "relativeTimeSeconds": 129113470
+      },
+      "problems": [
+        {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "D",
+          "name": "Reset K Edges",
+          "type": "PROGRAMMING",
+          "rating": 1900,
+          "tags": [
+            "binary search",
+            "data structures",
+            "dfs and similar",
+            "graphs",
+            "greedy",
+            "trees"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        {
+          "contestId": 1739,
+          "index": "F",
+          "name": "Keyboard Design",
+          "type": "PROGRAMMING",
+          "rating": 2600,
+          "tags": [
+            "bitmasks",
+            "data structures",
+            "dp",
+            "string suffix structures",
+            "strings"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1739,
+            "participantId": 141097181,
+            "members": [
+              {
+                "handle": "minpago"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "startTimeSeconds": 1664462100
+          },
+          "rank": 792,
+          "points": 3.0,
+          "penalty": 24,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 132
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 350
+            },
+            {
+              "points": 1.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1028
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 5,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 174002229,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664471443,
+        "relativeTimeSeconds": 43,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141115622,
+          "members": [
+            {
+              "handle": "sudoaccessdenied"
+            }
+          ],
+          "participantType": "VIRTUAL",
+          "ghost": false,
+          "startTimeSeconds": 1664471400
+        },
+        "programmingLanguage": "Java 8",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 109,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 173989959,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664468034,
+        "relativeTimeSeconds": 5934,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 16,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 6451200
+      },
+      {
+        "id": 173989517,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467949,
+        "relativeTimeSeconds": 5849,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 16,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 6451200
+      },
+      {
+        "id": 173988352,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664467711,
+        "relativeTimeSeconds": 5611,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173984131,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466942,
+        "relativeTimeSeconds": 4842,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173981803,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664466515,
+        "relativeTimeSeconds": 4415,
+        "problem": {
+          "contestId": 1739,
+          "index": "E",
+          "name": "Cleaning Robot",
+          "type": "PROGRAMMING",
+          "rating": 2400,
+          "tags": [
+            "bitmasks",
+            "dp"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 173951794,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664463128,
+        "relativeTimeSeconds": 1028,
+        "problem": {
+          "contestId": 1739,
+          "index": "C",
+          "name": "Card Game",
+          "type": "PROGRAMMING",
+          "rating": 1500,
+          "tags": [
+            "combinatorics",
+            "constructive algorithms",
+            "dp",
+            "games"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 5,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 307200
+      },
+      {
+        "id": 173938393,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462450,
+        "relativeTimeSeconds": 350,
+        "problem": {
+          "contestId": 1739,
+          "index": "B",
+          "name": "Array Recovery",
+          "type": "PROGRAMMING",
+          "rating": 1100,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 171,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 7987200
+      },
+      {
+        "id": 173934742,
+        "contestId": 1739,
+        "creationTimeSeconds": 1664462232,
+        "relativeTimeSeconds": 132,
+        "problem": {
+          "contestId": 1739,
+          "index": "A",
+          "name": "Immobile Knight",
+          "type": "PROGRAMMING",
+          "rating": 800,
+          "tags": [
+            "implementation"
+          ]
+        },
+        "author": {
+          "contestId": 1739,
+          "participantId": 141097181,
+          "members": [
+            {
+              "handle": "minpago"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "startTimeSeconds": 1664462100
+        },
+        "programmingLanguage": "C++14 (GCC 6-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 4,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      }
+    ]
+  },
+  "expectedRows": [
+    {
+      "party": {
+        "contestId": 1739,
+        "participantId": 141097181,
+        "members": [
+          {
+            "handle": "minpago"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "ghost": false,
+        "startTimeSeconds": 1664462100
+      },
+      "rank": 792,
+      "points": 3.0,
+      "penalty": 24,
+      "successfulHackCount": 0,
+      "unsuccessfulHackCount": 0,
+      "problemResults": [
+        {
+          "points": 1.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 132
+        },
+        {
+          "points": 1.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 350
+        },
+        {
+          "points": 1.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 1028
+        },
+        {
+          "points": 0.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        },
+        {
+          "points": 0.0,
+          "rejectedAttemptCount": 5,
+          "type": "FINAL"
+        },
+        {
+          "points": 0.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        }
+      ]
+    },
+    {
+      "party": {
+        "contestId": 1739,
+        "participantId": 141115622,
+        "members": [
+          {
+            "handle": "sudoaccessdenied"
+          }
+        ],
+        "participantType": "VIRTUAL",
+        "ghost": false,
+        "startTimeSeconds": 1664471400
+      },
+      "points": 1,
+      "penalty": 0,
+      "rank": 0,
+      "problemResults": [
+        {
+          "points": 1,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 43
+        },
+        {
+          "points": 0,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        },
+        {
+          "points": 0,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        },
+        {
+          "points": 0,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        },
+        {
+          "points": 0,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        },
+        {
+          "points": 0,
+          "penalty": 0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        }
+      ]
+    }
+  ],
+  "participantType": "VIRTUAL",
+  "oracleNote": "Unofficial standings unavailable anonymously. Expected missing-row scores use a single real accepted/skipped submission with no rejected attempts; API standings are unmodified apart from filtering official rows."
+}

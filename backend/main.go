@@ -7,11 +7,13 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/codeforces"
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/livev3"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/adapters/sqlite"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/application"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/telemetry"
@@ -47,12 +49,32 @@ func main() {
 		2100*time.Millisecond,
 		codeforces.WithRequestObserver(metrics),
 	)
-	manager := application.NewManager(repository, upstream, application.Config{
-		PollInterval:              4200 * time.Millisecond,
-		RetentionPeriod:           retentionPeriod,
-		MaxActiveContests:         3,
-		SubmissionHistoryObserver: metrics,
+	sourceName := env("STANDINGS_SOURCE", "codeforces")
+	scoped, err := repository.Scope(sourceName)
+	if err != nil {
+		slog.Error("configure contest storage failed", "error", err)
+		os.Exit(1)
+	}
+	var gateway application.ContestGateway = upstream
+	if sourceName == "livev3" {
+		source, err := livev3.New(livev3.Config{
+			Binary:     env("LIVE_V3_CONVERTER", "/opt/live-v3/bin/cds-converter"),
+			APIBaseURL: env("CF_API_BASE_URL", defaultCodeforces),
+			APIKey:     os.Getenv("CF_API_KEY"), APISecret: os.Getenv("CF_API_SECRET"),
+			ManagerMode: env("CF_MANAGER_MODE", "false") == "true",
+			MaxWorkers:  3, Store: scoped,
+		})
+		if err != nil {
+			slog.Error("configure contest source failed", "error", err)
+			os.Exit(1)
+		}
+		gateway = source
+	}
+	manager := application.NewManager(scoped, gateway, application.Config{
+		PollInterval: 4200 * time.Millisecond, RetentionPeriod: retentionPeriod,
+		MaxActiveContests: 3, SubmissionHistoryObserver: metrics,
 	})
+	var provider application.LiveStandingsProvider = manager
 	if err := manager.Restore(ctx); err != nil {
 		slog.Error("restore active contests failed", "error", err)
 		os.Exit(1)
@@ -85,9 +107,14 @@ func main() {
 			}
 		}
 	}()
+	maxStreams, err := strconv.Atoi(env("MAX_SSE_CONNECTIONS", "128"))
+	if err != nil || maxStreams <= 0 {
+		slog.Error("MAX_SSE_CONNECTIONS must be a positive integer")
+		os.Exit(1)
+	}
 	server := &http.Server{
 		Addr:    env("LISTEN_ADDR", defaultListen),
-		Handler: httpapi.NewServer(manager, httpapi.Config{Metrics: metrics, TelemetryToken: os.Getenv("TELEMETRY_TOKEN"), AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200}),
+		Handler: httpapi.NewServer(provider, httpapi.Config{Metrics: metrics, TelemetryToken: os.Getenv("TELEMETRY_TOKEN"), AllowedOrigins: splitCSV(env("ALLOWED_ORIGINS", os.Getenv("ALLOWED_ORIGIN"))), MaxHandles: 200, MaxStreams: maxStreams}),
 	}
 	shutdownDone := make(chan struct{})
 	go func() {
@@ -95,9 +122,9 @@ func main() {
 		<-ctx.Done()
 		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
+		manager.Stop()
 		_ = server.Shutdown(shutdownCtx)
 		_ = metricsServer.Shutdown(shutdownCtx)
-		manager.Stop()
 	}()
 
 	slog.Info("live backend listening", "addr", server.Addr)

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>One Go application, two contest sources</title>
+<style>*{box-sizing:border-box}body{margin:0;padding:32px;background:#f5f5f5;color:#2d3142;font-family:Arial,sans-serif}main{max-width:1280px;margin:auto}h1{font:400 28px Georgia,serif}p{color:#4f5d75;line-height:1.5}svg{display:block;width:100%;height:auto}</style>
+</head>
+<body>
+<main>
+<h1>One Go application, two contest sources</h1>
+<p>The frontend always connects to Go. Live-v3 owns contest interpretation; Go owns durable views and browser delivery.</p>
+<svg viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="live-v3-architecture-title live-v3-architecture-desc">
+<title id="live-v3-architecture-title">One Go application, two contest sources</title>
+<desc id="live-v3-architecture-desc">The frontend always connects to Go. Live-v3 owns contest interpretation; Go owns durable views and browser delivery.</desc>
+<defs>
+<marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+<path d="M0 0 L8 3 L0 6 Z" fill="#4f5d75"/>
+</marker>
+</defs>
+<rect width="1280" height="720" fill="#f5f5f5"/>
+<g fill="#2d3142" font-family="Arial,sans-serif">
+<text x="40" y="52" fill="#2e5aa8" font-size="13" letter-spacing="1.5">LIVE STANDINGS · APPLICATION AND DEPENDENCY BOUNDARY</text>
+<text x="40" y="96" font-family="Georgia,serif" font-size="30">One Go application, two contest sources</text>
+<path d="M220 332 H252 Q260 332 260 324 V252 Q260 244 268 244 H300" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M220 364 H252 Q260 364 260 372 V460 Q260 468 268 468 H300" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M580 244 H620 Q628 244 628 252 V316 Q628 324 636 324 H680" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M580 468 H620 Q628 468 628 460 V364 Q628 356 636 356 H680" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M940 340 H1000" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M810 414 V520" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="40" y="290" width="180" height="116" rx="8" fill="#fff" stroke="#bfc0c0"/>
+<text x="130.0" y="324" text-anchor="middle" font-size="18" font-weight="600">Codeforces API</text>
+<text x="130.0" y="352" text-anchor="middle" fill="#4f5d75" font-size="14">contest data</text>
+<rect x="300" y="186" width="280" height="116" rx="8" fill="#fff" stroke="#bfc0c0"/>
+<text x="440.0" y="220" text-anchor="middle" font-size="18" font-weight="600">Direct Go polling</text>
+<text x="440.0" y="248" text-anchor="middle" fill="#4f5d75" font-size="14">source scores + retained history</text>
+<text x="440.0" y="271" text-anchor="middle" fill="#4f5d75" font-size="14">missing-row fallback only here</text>
+<rect x="300" y="398" width="280" height="140" rx="8" fill="#fff" stroke="#bfc0c0"/>
+<text x="440.0" y="432" text-anchor="middle" font-size="18" font-weight="600">Standard CDS converter</text>
+<text x="440.0" y="460" text-anchor="middle" fill="#4f5d75" font-size="14">ingestion · scoring · status</text>
+<text x="440.0" y="483" text-anchor="middle" fill="#4f5d75" font-size="14">one child per active contest</text>
+<text x="440.0" y="506" text-anchor="middle" fill="#4f5d75" font-size="14">CLICS events + scoreboard</text>
+<rect x="680" y="266" width="260" height="148" rx="8" fill="#fce9e0" stroke="#eb6c36"/>
+<text x="810.0" y="300" text-anchor="middle" font-size="18" font-weight="600">Shared Go application</text>
+<text x="810.0" y="328" text-anchor="middle" fill="#4f5d75" font-size="14">sessions · revisions · recovery</text>
+<text x="810.0" y="351" text-anchor="middle" fill="#4f5d75" font-size="14">friend views · backpressure</text>
+<text x="810.0" y="374" text-anchor="middle" fill="#4f5d75" font-size="14">HTTP · SSE · telemetry</text>
+<rect x="1000" y="290" width="240" height="116" rx="8" fill="#fff" stroke="#bfc0c0"/>
+<text x="1120.0" y="324" text-anchor="middle" font-size="18" font-weight="600">Browser subscriptions</text>
+<text x="1120.0" y="352" text-anchor="middle" fill="#4f5d75" font-size="14">different friend lists</text>
+<text x="1120.0" y="375" text-anchor="middle" fill="#4f5d75" font-size="14">same complete contest view</text>
+<rect x="680" y="520" width="260" height="116" rx="8" fill="#fce9e0" stroke="#eb6c36"/>
+<text x="810.0" y="554" text-anchor="middle" font-size="18" font-weight="600">Go SQLite</text>
+<text x="810.0" y="582" text-anchor="middle" fill="#4f5d75" font-size="14">source + contest scope</text>
+<text x="810.0" y="605" text-anchor="middle" fill="#4f5d75" font-size="14">entities + calculated standings</text>
+<text x="40" y="676" fill="#4f5d75" font-size="15">STANDINGS_SOURCE selects one source at startup. LIVE_V3_CONVERTER supplies the pinned standard distribution.</text>
+</g>
+</svg>
+</main>
+</body>
+</html>

@@ -163,8 +163,8 @@ The direct provider alone supplies the existing missing-row scoring fallback. Li
 See [the provider diagram](docs/architecture/live-v3-architecture.html) and [the shared Go application diagram](docs/architecture/go-backend-architecture.html). Run Go tests with `go test -race ./...` from `backend`; set `LIVE_V3_TEST_BINARY` to the converter executable to include the real-converter fixture test. CI also checks the pinned engine APIs, frontend SSE behavior, Compose configuration, and the combined deployment image.
 
 Optional real-contest scoring E2E tests for both Go providers live in
-[`backend/tests/e2e`](backend/tests/e2e/README.md). They replay saved Codeforces API
-snapshots for standard and educational rounds and require the built live-v3 converter.
+[`backend/tests/e2e`](backend/tests/e2e). They replay saved Codeforces API snapshots
+for standard and educational rounds and require the built live-v3 converter.
 
 For ICPC missing-row reconstruction, both Go sources learn a wrong-attempt penalty
 from consistent official standings evidence and retain it when later evidence is

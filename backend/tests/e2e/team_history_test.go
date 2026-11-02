@@ -43,7 +43,7 @@ func TestCapturedTeamHistoryThroughProvidersAndSSE(t *testing.T) {
 		t.Fatal("set LIVE_V3_TEST_BINARY to the real cds-converter executable")
 	}
 	for _, contestID := range []int{639, 640} {
-		raw, err := os.ReadFile(filepath.Join("..", "..", "..", "docs", "reviews", "evidence", "live-v3-commit-review", "team-replay", fmt.Sprintf("contest-%d.json", contestID)))
+		raw, err := os.ReadFile(filepath.Join("..", "..", "testdata", "team-replay", fmt.Sprintf("contest-%d.json", contestID)))
 		if err != nil {
 			t.Fatal(err)
 		}

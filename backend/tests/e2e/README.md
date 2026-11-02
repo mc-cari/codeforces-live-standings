@@ -89,9 +89,9 @@ member and through both members; the single-member team is selected through its 
 It checks one team row, unique submission IDs, per-problem results, total points, and
 penalties against the standings API. The Kotlin replay tests also check the selected
 teams' relative order. The source records are retained in
-`docs/reviews/evidence/live-v3-commit-review/team-replay/`; the test makes no live
-Codeforces requests. Contest 639's unofficial TLE #98 has no standings oracle and
-remains covered by the Kotlin engine replay for zero score and unofficial status.
+`backend/testdata/team-replay/`; the test makes no live Codeforces requests. Contest
+639's unofficial TLE #98 has no standings oracle and remains covered by the Kotlin
+engine replay for zero score and unofficial status.
 
 ```sh
 # From backend/, with LIVE_V3_TEST_BINARY set as above:

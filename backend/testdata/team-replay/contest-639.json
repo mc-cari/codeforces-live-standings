@@ -1,0 +1,863 @@
+{
+  "contest": {
+    "id": 639,
+    "name": "VK Cup 2016 - Round 1",
+    "type": "CF",
+    "phase": "FINISHED",
+    "frozen": false,
+    "durationSeconds": 7200,
+    "startTimeSeconds": 1459182900,
+    "relativeTimeSeconds": 334398550
+  },
+  "problems": [
+    {
+      "contestId": 639,
+      "index": "A",
+      "name": "Bear and Displayed Friends",
+      "type": "PROGRAMMING",
+      "points": 500.0,
+      "rating": 1200,
+      "tags": [
+        "implementation"
+      ]
+    },
+    {
+      "contestId": 639,
+      "index": "B",
+      "name": "Bear and Forgotten Tree 3",
+      "type": "PROGRAMMING",
+      "points": 750.0,
+      "rating": 1600,
+      "tags": [
+        "constructive algorithms",
+        "graphs",
+        "trees"
+      ]
+    },
+    {
+      "contestId": 639,
+      "index": "C",
+      "name": "Bear and Polynomials",
+      "type": "PROGRAMMING",
+      "points": 1000.0,
+      "rating": 2200,
+      "tags": [
+        "hashing",
+        "implementation",
+        "math"
+      ]
+    },
+    {
+      "contestId": 639,
+      "index": "D",
+      "name": "Bear and Contribution",
+      "type": "PROGRAMMING",
+      "points": 1500.0,
+      "rating": 2400,
+      "tags": [
+        "data structures",
+        "greedy",
+        "sortings",
+        "two pointers"
+      ]
+    },
+    {
+      "contestId": 639,
+      "index": "E",
+      "name": "Bear and Paradox",
+      "type": "PROGRAMMING",
+      "points": 2000.0,
+      "rating": 2800,
+      "tags": [
+        "binary search",
+        "greedy",
+        "math",
+        "sortings"
+      ]
+    },
+    {
+      "contestId": 639,
+      "index": "F",
+      "name": "Bear and Chemistry",
+      "type": "PROGRAMMING",
+      "points": 3000.0,
+      "rating": 3300,
+      "tags": [
+        "data structures",
+        "dfs and similar",
+        "graphs",
+        "trees"
+      ]
+    }
+  ],
+  "selectedOfficialRows": [
+    {
+      "party": {
+        "contestId": 639,
+        "participantId": 7553995,
+        "members": [
+          {
+            "handle": "sivukhin"
+          },
+          {
+            "handle": "Um_nik"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "teamId": 17181,
+        "teamName": "Dandelion",
+        "ghost": false,
+        "room": 28,
+        "startTimeSeconds": 1459182900
+      },
+      "rank": 4,
+      "points": 4314.0,
+      "penalty": 0,
+      "successfulHackCount": 0,
+      "unsuccessfulHackCount": 0,
+      "problemResults": [
+        {
+          "points": 490.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 310
+        },
+        {
+          "points": 616.0,
+          "rejectedAttemptCount": 1,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 1703
+        },
+        {
+          "points": 912.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 1342
+        },
+        {
+          "points": 1104.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 4011
+        },
+        {
+          "points": 1192.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 6115
+        },
+        {
+          "points": 0.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        }
+      ]
+    },
+    {
+      "party": {
+        "contestId": 639,
+        "participantId": 7552733,
+        "members": [
+          {
+            "handle": "Alex_2oo8"
+          }
+        ],
+        "participantType": "CONTESTANT",
+        "teamId": 17449,
+        "teamName": "ZK",
+        "ghost": false,
+        "room": 9,
+        "startTimeSeconds": 1459182900
+      },
+      "rank": 6,
+      "points": 4219.0,
+      "penalty": 0,
+      "successfulHackCount": 0,
+      "unsuccessfulHackCount": 0,
+      "problemResults": [
+        {
+          "points": 490.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 350
+        },
+        {
+          "points": 649.0,
+          "rejectedAttemptCount": 1,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 1035
+        },
+        {
+          "points": 840.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 2417
+        },
+        {
+          "points": 1104.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 4012
+        },
+        {
+          "points": 1136.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL",
+          "bestSubmissionTimeSeconds": 6508
+        },
+        {
+          "points": 0.0,
+          "rejectedAttemptCount": 0,
+          "type": "FINAL"
+        }
+      ]
+    }
+  ],
+  "selectedTeams": {
+    "17181": {
+      "name": "Dandelion",
+      "submissions": [
+        {
+          "id": 17004801,
+          "contestId": 639,
+          "creationTimeSeconds": 1459189015,
+          "relativeTimeSeconds": 6115,
+          "problem": {
+            "contestId": 639,
+            "index": "E",
+            "name": "Bear and Paradox",
+            "type": "PROGRAMMING",
+            "points": 2000.0,
+            "rating": 2800,
+            "tags": [
+              "binary search",
+              "greedy",
+              "math",
+              "sortings"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 45,
+          "timeConsumedMillis": 171,
+          "memoryConsumedBytes": 12697600
+        },
+        {
+          "id": 17000468,
+          "contestId": 639,
+          "creationTimeSeconds": 1459186911,
+          "relativeTimeSeconds": 4011,
+          "problem": {
+            "contestId": 639,
+            "index": "D",
+            "name": "Bear and Contribution",
+            "type": "PROGRAMMING",
+            "points": 1500.0,
+            "rating": 2400,
+            "tags": [
+              "data structures",
+              "greedy",
+              "sortings",
+              "two pointers"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 111,
+          "timeConsumedMillis": 265,
+          "memoryConsumedBytes": 12902400
+        },
+        {
+          "id": 16994797,
+          "contestId": 639,
+          "creationTimeSeconds": 1459184603,
+          "relativeTimeSeconds": 1703,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 72,
+          "timeConsumedMillis": 46,
+          "memoryConsumedBytes": 2355200
+        },
+        {
+          "id": 16993783,
+          "contestId": 639,
+          "creationTimeSeconds": 1459184242,
+          "relativeTimeSeconds": 1342,
+          "problem": {
+            "contestId": 639,
+            "index": "C",
+            "name": "Bear and Polynomials",
+            "type": "PROGRAMMING",
+            "points": 1000.0,
+            "rating": 2200,
+            "tags": [
+              "hashing",
+              "implementation",
+              "math"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 63,
+          "timeConsumedMillis": 62,
+          "memoryConsumedBytes": 3891200
+        },
+        {
+          "id": 16992581,
+          "contestId": 639,
+          "creationTimeSeconds": 1459183847,
+          "relativeTimeSeconds": 947,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "WRONG_ANSWER",
+          "testset": "PRETESTS",
+          "passedTestCount": 4,
+          "timeConsumedMillis": 15,
+          "memoryConsumedBytes": 2048000
+        },
+        {
+          "id": 16990415,
+          "contestId": 639,
+          "creationTimeSeconds": 1459183210,
+          "relativeTimeSeconds": 310,
+          "problem": {
+            "contestId": 639,
+            "index": "A",
+            "name": "Bear and Displayed Friends",
+            "type": "PROGRAMMING",
+            "points": 500.0,
+            "rating": 1200,
+            "tags": [
+              "implementation"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553995,
+            "members": [
+              {
+                "handle": "sivukhin"
+              },
+              {
+                "handle": "Um_nik"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17181,
+            "teamName": "Dandelion",
+            "ghost": false,
+            "room": 28,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 44,
+          "timeConsumedMillis": 93,
+          "memoryConsumedBytes": 3891200
+        }
+      ]
+    },
+    "17449": {
+      "name": "ZK",
+      "submissions": [
+        {
+          "id": 17005562,
+          "contestId": 639,
+          "creationTimeSeconds": 1459189408,
+          "relativeTimeSeconds": 6508,
+          "problem": {
+            "contestId": 639,
+            "index": "E",
+            "name": "Bear and Paradox",
+            "type": "PROGRAMMING",
+            "points": 2000.0,
+            "rating": 2800,
+            "tags": [
+              "binary search",
+              "greedy",
+              "math",
+              "sortings"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 45,
+          "timeConsumedMillis": 467,
+          "memoryConsumedBytes": 11878400
+        },
+        {
+          "id": 17000470,
+          "contestId": 639,
+          "creationTimeSeconds": 1459186912,
+          "relativeTimeSeconds": 4012,
+          "problem": {
+            "contestId": 639,
+            "index": "D",
+            "name": "Bear and Contribution",
+            "type": "PROGRAMMING",
+            "points": 1500.0,
+            "rating": 2400,
+            "tags": [
+              "data structures",
+              "greedy",
+              "sortings",
+              "two pointers"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 111,
+          "timeConsumedMillis": 280,
+          "memoryConsumedBytes": 9932800
+        },
+        {
+          "id": 16996656,
+          "contestId": 639,
+          "creationTimeSeconds": 1459185318,
+          "relativeTimeSeconds": 2417,
+          "problem": {
+            "contestId": 639,
+            "index": "C",
+            "name": "Bear and Polynomials",
+            "type": "PROGRAMMING",
+            "points": 1000.0,
+            "rating": 2200,
+            "tags": [
+              "hashing",
+              "implementation",
+              "math"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 63,
+          "timeConsumedMillis": 62,
+          "memoryConsumedBytes": 7168000
+        },
+        {
+          "id": 16992906,
+          "contestId": 639,
+          "creationTimeSeconds": 1459183935,
+          "relativeTimeSeconds": 1035,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 72,
+          "timeConsumedMillis": 62,
+          "memoryConsumedBytes": 2355200
+        },
+        {
+          "id": 16991980,
+          "contestId": 639,
+          "creationTimeSeconds": 1459183660,
+          "relativeTimeSeconds": 760,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "WRONG_ANSWER",
+          "testset": "PRETESTS",
+          "passedTestCount": 4,
+          "timeConsumedMillis": 15,
+          "memoryConsumedBytes": 2048000
+        },
+        {
+          "id": 16990511,
+          "contestId": 639,
+          "creationTimeSeconds": 1459183250,
+          "relativeTimeSeconds": 350,
+          "problem": {
+            "contestId": 639,
+            "index": "A",
+            "name": "Bear and Displayed Friends",
+            "type": "PROGRAMMING",
+            "points": 500.0,
+            "rating": 1200,
+            "tags": [
+              "implementation"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7552733,
+            "members": [
+              {
+                "handle": "Alex_2oo8"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "teamId": 17449,
+            "teamName": "ZK",
+            "ghost": false,
+            "room": 9,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "OK",
+          "testset": "TESTS",
+          "passedTestCount": 44,
+          "timeConsumedMillis": 93,
+          "memoryConsumedBytes": 3891200
+        }
+      ]
+    },
+    "18211": {
+      "name": "TLE #98",
+      "submissions": [
+        {
+          "id": 17004311,
+          "contestId": 639,
+          "creationTimeSeconds": 1459188748,
+          "relativeTimeSeconds": 5848,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553357,
+            "members": [
+              {
+                "handle": "CUBERLEON"
+              },
+              {
+                "handle": "shym98"
+              }
+            ],
+            "participantType": "OUT_OF_COMPETITION",
+            "teamId": 18211,
+            "teamName": "TLE #98",
+            "ghost": false,
+            "room": 20,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "SKIPPED",
+          "testset": "TESTS",
+          "passedTestCount": 72,
+          "timeConsumedMillis": 46,
+          "memoryConsumedBytes": 3686400
+        },
+        {
+          "id": 16998670,
+          "contestId": 639,
+          "creationTimeSeconds": 1459186139,
+          "relativeTimeSeconds": 3239,
+          "problem": {
+            "contestId": 639,
+            "index": "B",
+            "name": "Bear and Forgotten Tree 3",
+            "type": "PROGRAMMING",
+            "points": 750.0,
+            "rating": 1600,
+            "tags": [
+              "constructive algorithms",
+              "graphs",
+              "trees"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553357,
+            "members": [
+              {
+                "handle": "CUBERLEON"
+              },
+              {
+                "handle": "shym98"
+              }
+            ],
+            "participantType": "OUT_OF_COMPETITION",
+            "teamId": 18211,
+            "teamName": "TLE #98",
+            "ghost": false,
+            "room": 20,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "GNU C++11",
+          "verdict": "SKIPPED",
+          "testset": "CHALLENGES",
+          "passedTestCount": 9,
+          "timeConsumedMillis": 31,
+          "memoryConsumedBytes": 3584000
+        },
+        {
+          "id": 16994101,
+          "contestId": 639,
+          "creationTimeSeconds": 1459184357,
+          "relativeTimeSeconds": 1457,
+          "problem": {
+            "contestId": 639,
+            "index": "A",
+            "name": "Bear and Displayed Friends",
+            "type": "PROGRAMMING",
+            "points": 500.0,
+            "rating": 1200,
+            "tags": [
+              "implementation"
+            ]
+          },
+          "author": {
+            "contestId": 639,
+            "participantId": 7553357,
+            "members": [
+              {
+                "handle": "CUBERLEON"
+              },
+              {
+                "handle": "shym98"
+              }
+            ],
+            "participantType": "OUT_OF_COMPETITION",
+            "teamId": 18211,
+            "teamName": "TLE #98",
+            "ghost": false,
+            "room": 20,
+            "startTimeSeconds": 1459182900
+          },
+          "programmingLanguage": "MS C++",
+          "verdict": "SKIPPED",
+          "testset": "TESTS",
+          "passedTestCount": 44,
+          "timeConsumedMillis": 561,
+          "memoryConsumedBytes": 3481600
+        }
+      ]
+    }
+  },
+  "apiSubmissionCount": 32846,
+  "capture": {
+    "standings": "contest.standings?contestId=639",
+    "submissions": "contest.status?contestId=639"
+  }
+}

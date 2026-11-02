@@ -46,7 +46,7 @@ func TestCapturedTeamHistoriesPreserveDirectProviderOracleForEitherMember(t *tes
 		} `json:"selectedTeams"`
 	}
 	for _, contestID := range []int{639, 640} {
-		raw, err := os.ReadFile("../../../../docs/reviews/evidence/live-v3-commit-review/team-replay/contest-" + strconv.Itoa(contestID) + ".json")
+		raw, err := os.ReadFile("../../../testdata/team-replay/contest-" + strconv.Itoa(contestID) + ".json")
 		if err != nil {
 			t.Fatal(err)
 		}

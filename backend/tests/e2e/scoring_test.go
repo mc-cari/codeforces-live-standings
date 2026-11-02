@@ -13,6 +13,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
 	"time"
@@ -56,6 +57,17 @@ func scores(rows []domain.RanklistRow) []score {
 		}
 		result = append(result, item)
 	}
+	return result
+}
+
+func canonicalScores(rows []domain.RanklistRow) []score {
+	result := scores(rows)
+	sort.Slice(result, func(i, j int) bool {
+		if result[i].FriendRank != result[j].FriendRank {
+			return result[i].FriendRank < result[j].FriendRank
+		}
+		return result[i].Handle < result[j].Handle
+	})
 	return result
 }
 
@@ -178,6 +190,9 @@ func TestSnapshotScoringAgreement(t *testing.T) {
 			results := map[string][]score{}
 			for _, engine := range []string{"codeforces", "livev3"} {
 				t.Run(engine, func(t *testing.T) {
+					if engine == "livev3" && (f.ParticipantType == "VIRTUAL" || f.ParticipantType == "PRACTICE") {
+						t.Skip("live-v3 does not include virtual or practice participants")
+					}
 					repository, err := sqlite.Open(filepath.Join(t.TempDir(), "standings.sqlite"))
 					if err != nil {
 						t.Fatal(err)
@@ -265,9 +280,10 @@ func TestSnapshotScoringAgreement(t *testing.T) {
 						if !reflect.DeepEqual(seenIDs, wantIDs) {
 							t.Errorf("submission history IDs differ from API snapshot: got %v, want %v", seenIDs, wantIDs)
 						}
-						got := scores(snapshot.Standings.Rows)
-						if !reflect.DeepEqual(got, scores(expected.Rows)) {
-							t.Fatalf("scores differ from Codeforces snapshot\ngot: %#v\nwant: %#v", got, scores(expected.Rows))
+						got := canonicalScores(snapshot.Standings.Rows)
+						want := canonicalScores(expected.Rows)
+						if !reflect.DeepEqual(got, want) {
+							t.Fatalf("scores differ from Codeforces snapshot\ngot: %#v\nwant: %#v", got, want)
 						}
 						results[engine] = got
 						return

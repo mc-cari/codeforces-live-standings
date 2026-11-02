@@ -55,7 +55,9 @@ func friendPositions(standings Standings) map[string]int {
 	for index, row := range standings.Rows {
 		position := index + 1
 		tied := row.Rank > 0 && previousRank > 0 && row.Rank == previousRank
-		if !standings.Authoritative && (row.Rank == 0 || previousRank == 0) {
+		if standings.Contest.Type == "ICPC" {
+			tied = row.Points == previousPoints && row.Penalty == previousPenalty
+		} else if !standings.Authoritative && (row.Rank == 0 || previousRank == 0) {
 			tied = row.Points == previousPoints && row.Penalty == previousPenalty
 		}
 		if tied {

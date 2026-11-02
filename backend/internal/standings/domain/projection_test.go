@@ -120,6 +120,24 @@ func TestAuthoritativeProjectionPreservesEngineTiesAndDoesNotInventRows(t *testi
 	}
 }
 
+func TestAuthoritativeICPCProjectionGroupsEqualSolvedAndPenalty(t *testing.T) {
+	party := func(handle string) Party { return Party{Members: []Member{{Handle: handle}}} }
+	contest := Contest{ID: 1742, Type: "ICPC"}
+	standings := &Standings{Contest: contest, Authoritative: true, Rows: []RanklistRow{
+		{Party: party("first"), Rank: 1, Points: 3, Penalty: 7},
+		{Party: party("second"), Rank: 2, Points: 3, Penalty: 9},
+		{Party: party("third"), Rank: 3, Points: 3, Penalty: 9},
+		{Party: party("fourth"), Rank: 4, Points: 3, Penalty: 10},
+	}}
+	view, _ := Project(contest, standings, nil, NewHandleSet([]string{"first", "second", "third", "fourth"}))
+	want := []int{1, 2, 2, 4}
+	for index, row := range view.Rows {
+		if row.Party.Rank != want[index] {
+			t.Fatalf("row %s got friend rank %d, want %d", row.Party.Members[0].Handle, row.Party.Rank, want[index])
+		}
+	}
+}
+
 // Expected scores come from contest.standings, including its rejectedAttemptCount.
 func TestMissingRowsMatchCodeforcesDurationScoring(t *testing.T) {
 	cases := []struct {

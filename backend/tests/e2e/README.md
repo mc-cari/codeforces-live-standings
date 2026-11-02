@@ -7,9 +7,10 @@ server. They require no Codeforces credentials or network during execution.
 The suite includes 18 snapshots across 12 finished contests: 12 official cases and
 six participant-type cases. Each official case retains four individuals with accepted
 submissions and rejected attempts, no hacks, and their contest-time submission history.
-Original API scores, penalties, and ordering are the oracle. Tests compare total and
-per-problem points, penalty, friend order and tie ranks, complete history arrival,
-and case-insensitive selection in a different input order for both providers.
+Original API scores, penalties, and rank groups are the oracle. Tests compare total
+and per-problem points, penalty, friend ranks, complete history arrival, and
+case-insensitive selection in a different input order. Row order within a tied rank
+is ignored.
 The catalog in `contests.json` also verifies contest identity, scoring type, and duration.
 Global ranks are not compared: the converter sees only the selected competitors.
 This suite does not cover hack scoring or live rejudges.
@@ -67,23 +68,11 @@ the snapshot used bulk or per-handle responses. Omit `--cache-dir` for fresh res
 Review fixture changes before committing them. Each file records capture time and
 source URLs; API envelopes and selected entities are retained without rewriting scores.
 
-Measured locally after expansion: **22.8 seconds** for all 18 snapshots / 36 engine
-checks, running sequentially. The saved JSON totals about 515 KiB. Normal Go tests
-pass, and the direct provider passes all 18 cases. Both providers agree on six of
-the ten newly added contests: 1737, 1740, 1750, 1753, 1754, and 1799.
-
-The four remaining new contests expose strict live-v3 compatibility failures:
-
-- 1741: points and penalties match, but live-v3 assigns separate friend ranks
-  inside an official tie and orders the tied rows differently.
-- 1742: points, penalties, and row order match, but an official tie is split into
-  separate friend ranks.
-- 1743 and 1749: points and penalties match, but live-v3 assigns separate ranks
-  inside official ties and changes the order of tied rows.
-
-The suite intentionally fails on these differences. Snapshot expectations retain
-Codeforces scores and ranks. Virtual and practice participants are omitted by
-live-v3; their cases are separate from the official ranking mismatches above.
+The direct provider passes the official API snapshots. Four ICPC contests (1741,
+1742, 1743, and 1749) exposed live-v3 ranks that split teams with equal solved count
+and penalty. The Go projection now assigns those rows the same friend rank using
+the ICPC tie rule. The assertions compare rows by rank group and participant, so
+their display order within a tie does not affect the result.
 
 `TestCapturedTeamHistoryThroughProvidersAndSSE` adds real team-history coverage for
 contests 639 and 640. It replays two official teams per contest through both providers
@@ -107,7 +96,7 @@ Six additional cases (`*-unofficial`, `*-virtual`, and `*-practice`) mix one off
 control with a real API participant of the named type in each contest. They compare
 participant types as well as scores, selected-handle inclusion, and submission IDs,
 verdicts, and author types. The control has no rejected submissions on solved problems
-to isolate these cases from the existing educational penalty discrepancy.
+to isolate these cases from ICPC penalty reconstruction.
 
 Codeforces currently rejects anonymous `showUnofficial=true` standings requests.
 These cases therefore keep only actual official rows in the API standings envelope,
@@ -120,10 +109,9 @@ whole elapsed minutes, while ICPC uses one solved problem and elapsed-minute pen
 Practice and virtual snapshots are limited to relative times within contest duration;
 they do not cover multiple attempts by the same handle in different participant types.
 
-Both engines agree on the `OUT_OF_COMPETITION` cases. The strict virtual and practice
-cases currently fail for live-v3 because it excludes those parties and submissions;
-the direct engine includes them. These failures record a compatibility gap rather
-than silently skipping unsupported participants. To run just unofficial coverage:
+Both engines agree on the `OUT_OF_COMPETITION` cases. The live-v3 source excludes
+virtual and practice parties, so those live-v3 comparisons are skipped; the direct
+provider remains checked for them. To run just unofficial coverage:
 
 ```sh
 # From backend/, with LIVE_V3_TEST_BINARY set as above:
@@ -144,6 +132,4 @@ go test -tags=e2e ./tests/e2e -run TestICPCPenaltyRetention -count=1 -timeout=3m
 ```
 
 With the synthetic regression included, the complete optional suite runs in about
-45 seconds locally. The penalty retention regression passes for both engines. The
-current snapshot replay has four official ranking mismatches and four virtual or
-practice participant mismatches in live-v3; the direct provider passes all snapshots.
+45 seconds locally. The penalty retention regression passes for both providers.

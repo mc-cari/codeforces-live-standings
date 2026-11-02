@@ -74,13 +74,16 @@ the ten newly added contests: 1737, 1740, 1750, 1753, 1754, and 1799.
 
 The four remaining new contests expose strict live-v3 compatibility failures:
 
-- 1741: different penalties and tied friend ranks.
-- 1742: equal Codeforces ranks become separate friend ranks.
-- 1743 and 1749: tied ranks and row ordering differ from Codeforces.
+- 1741: points and penalties match, but live-v3 assigns separate friend ranks
+  inside an official tie and orders the tied rows differently.
+- 1742: points, penalties, and row order match, but an official tie is split into
+  separate friend ranks.
+- 1743 and 1749: points and penalties match, but live-v3 assigns separate ranks
+  inside official ties and changes the order of tied rows.
 
 The suite intentionally fails on these differences. Snapshot expectations retain
-Codeforces scores and ranks. Existing failures also remain: virtual/practice
-participants are omitted by live-v3, and the educational 1739 penalty discrepancy.
+Codeforces scores and ranks. Virtual and practice participants are omitted by
+live-v3; their cases are separate from the official ranking mismatches above.
 
 `TestCapturedTeamHistoryThroughProvidersAndSSE` adds real team-history coverage for
 contests 639 and 640. It replays two official teams per contest through both providers
@@ -98,12 +101,7 @@ engine replay for zero score and unofficial status.
 go test -tags=e2e ./tests/e2e -run TestCapturedTeamHistoryThroughProvidersAndSSE -count=1 -timeout=5m
 ```
 
-Both engines pass contest 1735. The
-1739 fixture exposes an educational scoring disagreement: Codeforces reports
-ScarletS at 23 penalty and Kawaii at 25; live-v3 reconstructs 33 and 55 respectively,
-changing their order. These API rows report zero rejected attempts on solved
-problems despite earlier wrong submissions in the API history. The strict E2E test
-currently fails for that case; it intentionally keeps the API oracle unchanged.
+Both engines pass the official 1735 and 1739 fixtures in the current local replay.
 
 Six additional cases (`*-unofficial`, `*-virtual`, and `*-practice`) mix one official
 control with a real API participant of the named type in each contest. They compare
@@ -146,5 +144,6 @@ go test -tags=e2e ./tests/e2e -run TestICPCPenaltyRetention -count=1 -timeout=3m
 ```
 
 With the synthetic regression included, the complete optional suite runs in about
-45 seconds locally. The new penalty regression passes for both engines; the nine
-previously documented snapshot failures remain.
+45 seconds locally. The penalty retention regression passes for both engines. The
+current snapshot replay has four official ranking mismatches and four virtual or
+practice participant mismatches in live-v3; the direct provider passes all snapshots.

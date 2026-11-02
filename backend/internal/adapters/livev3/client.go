@@ -23,15 +23,14 @@ import (
 )
 
 type Config struct {
-	ICPCPenaltyOverrides map[int]int
-	Binary               string
-	APIBaseURL           string
-	APIKey               string
-	APISecret            string
-	ManagerMode          bool
-	MaxWorkers           int
-	ReadyTimeout         time.Duration
-	Store                application.ViewRepository
+	Binary       string
+	APIBaseURL   string
+	APIKey       string
+	APISecret    string
+	ManagerMode  bool
+	MaxWorkers   int
+	ReadyTimeout time.Duration
+	Store        application.ViewRepository
 }
 type result struct {
 	view application.ContestUpdate
@@ -207,9 +206,6 @@ func (c *Client) convert(ctx context.Context, id int, publish func(application.C
 	if c.config.ManagerMode {
 		settings["apiKey"] = c.config.APIKey
 		settings["apiSecret"] = c.config.APISecret
-	}
-	if minutes, ok := c.config.ICPCPenaltyOverrides[id]; ok {
-		settings["penaltyPerWrongAttemptMinutes"] = minutes
 	}
 	data, err := json.Marshal(settings)
 	if err != nil {

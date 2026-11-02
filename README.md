@@ -168,8 +168,6 @@ snapshots for standard and educational rounds and require the built live-v3 conv
 
 For ICPC missing-row reconstruction, both Go sources learn a wrong-attempt penalty
 from consistent official standings evidence and retain it when later evidence is
-missing or conflicting. Set `CF_ICPC_PENALTY_OVERRIDES='{"100001":7}'` to override
-specific contests (minutes; zero is allowed). The live-v3 worker receives the same
-setting through its CF `penaltyPerWrongAttemptMinutes` configuration. Go persists
-its learned rule; live-v3 retains it for the worker lifetime. Defaults without
-usable evidence remain 10 minutes for public IDs and 20 for Gym IDs.
+missing or conflicting. Go persists its learned rule; live-v3 retains it for the
+worker lifetime. Defaults without usable evidence remain 10 minutes for public IDs
+and 20 for Gym IDs.

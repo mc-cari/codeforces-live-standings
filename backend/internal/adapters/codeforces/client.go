@@ -36,18 +36,13 @@ func WithRequestObserver(observer RequestObserver) ClientOption {
 	return func(client *Client) { client.observer = observer }
 }
 
-func WithPenaltyOverrides(overrides map[int]int) ClientOption {
-	return func(client *Client) { client.penaltyOverrides = overrides }
-}
-
 type Client struct {
-	penaltyOverrides map[int]int
-	observer         RequestObserver
-	baseURL          string
-	httpClient       *http.Client
-	minimumInterval  time.Duration
-	mu               sync.Mutex
-	nextRequest      time.Time
+	observer        RequestObserver
+	baseURL         string
+	httpClient      *http.Client
+	minimumInterval time.Duration
+	mu              sync.Mutex
+	nextRequest     time.Time
 }
 
 func NewFreshConnectionHTTPClient(timeout time.Duration) *http.Client {
@@ -72,9 +67,6 @@ func (client *Client) FetchSubmissions(ctx context.Context, contestID int) ([]do
 func (client *Client) FetchStandings(ctx context.Context, contestID int) (domain.Standings, error) {
 	var result domain.Standings
 	err := client.fetch(ctx, "contest.standings", contestID, &result)
-	if minutes, ok := client.penaltyOverrides[contestID]; ok {
-		result.ICPCPenaltyRule = &domain.PenaltyRule{Minutes: minutes, Source: "override"}
-	}
 	return result, err
 }
 

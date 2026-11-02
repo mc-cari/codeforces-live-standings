@@ -1,0 +1,629 @@
+{
+  "note": "Synthetic regression, not a real API snapshot: learn seven minutes from row total, omit evidence, then supply conflicting nine-minute evidence. Per-problem penalty fields deliberately absent.",
+  "stages": [
+    {
+      "standings": {
+        "status": "OK",
+        "result": {
+          "contest": {
+            "id": 100001,
+            "name": "Synthetic seven-minute penalty regression",
+            "type": "ICPC",
+            "phase": "CODING",
+            "durationSeconds": 7200,
+            "startTimeSeconds": 1700000000,
+            "relativeTimeSeconds": 1000,
+            "frozen": false
+          },
+          "problems": [
+            {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "B",
+              "name": "B",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "C",
+              "name": "C",
+              "type": "PROGRAMMING"
+            }
+          ],
+          "rows": [
+            {
+              "party": {
+                "contestId": 100001,
+                "members": [
+                  {
+                    "handle": "official"
+                  }
+                ],
+                "participantType": "CONTESTANT",
+                "ghost": false
+              },
+              "rank": 1,
+              "points": 1,
+              "penalty": 10,
+              "successfulHackCount": 0,
+              "unsuccessfulHackCount": 0,
+              "problemResults": [
+                {
+                  "points": 1,
+                  "rejectedAttemptCount": 1,
+                  "type": "FINAL",
+                  "bestSubmissionTimeSeconds": 180
+                },
+                {
+                  "points": 0,
+                  "rejectedAttemptCount": 0,
+                  "type": "FINAL"
+                },
+                {
+                  "points": 0,
+                  "rejectedAttemptCount": 0,
+                  "type": "FINAL"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "submissions": {
+        "status": "OK",
+        "result": [
+          {
+            "id": 1,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 2,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 3,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 4,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          }
+        ]
+      },
+      "expectedPenalty": 10
+    },
+    {
+      "standings": {
+        "status": "OK",
+        "result": {
+          "contest": {
+            "id": 100001,
+            "name": "Synthetic seven-minute penalty regression",
+            "type": "ICPC",
+            "phase": "CODING",
+            "durationSeconds": 7200,
+            "startTimeSeconds": 1700000000,
+            "relativeTimeSeconds": 1000,
+            "frozen": false
+          },
+          "problems": [
+            {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "B",
+              "name": "B",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "C",
+              "name": "C",
+              "type": "PROGRAMMING"
+            }
+          ],
+          "rows": []
+        }
+      },
+      "submissions": {
+        "status": "OK",
+        "result": [
+          {
+            "id": 1,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 2,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 3,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 4,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 5,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000360,
+            "relativeTimeSeconds": 360,
+            "problem": {
+              "contestId": 100001,
+              "index": "B",
+              "name": "B",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          }
+        ]
+      },
+      "expectedPenalty": 16
+    },
+    {
+      "standings": {
+        "status": "OK",
+        "result": {
+          "contest": {
+            "id": 100001,
+            "name": "Synthetic seven-minute penalty regression",
+            "type": "ICPC",
+            "phase": "CODING",
+            "durationSeconds": 7200,
+            "startTimeSeconds": 1700000000,
+            "relativeTimeSeconds": 1000,
+            "frozen": false
+          },
+          "problems": [
+            {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "B",
+              "name": "B",
+              "type": "PROGRAMMING"
+            },
+            {
+              "contestId": 100001,
+              "index": "C",
+              "name": "C",
+              "type": "PROGRAMMING"
+            }
+          ],
+          "rows": [
+            {
+              "party": {
+                "contestId": 100001,
+                "members": [
+                  {
+                    "handle": "official"
+                  }
+                ],
+                "participantType": "CONTESTANT",
+                "ghost": false
+              },
+              "rank": 1,
+              "points": 1,
+              "penalty": 12,
+              "successfulHackCount": 0,
+              "unsuccessfulHackCount": 0,
+              "problemResults": [
+                {
+                  "points": 1,
+                  "rejectedAttemptCount": 1,
+                  "type": "FINAL",
+                  "bestSubmissionTimeSeconds": 180
+                },
+                {
+                  "points": 0,
+                  "rejectedAttemptCount": 0,
+                  "type": "FINAL"
+                },
+                {
+                  "points": 0,
+                  "rejectedAttemptCount": 0,
+                  "type": "FINAL"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "submissions": {
+        "status": "OK",
+        "result": [
+          {
+            "id": 1,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 2,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "official"
+                }
+              ],
+              "participantType": "CONTESTANT",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 3,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000060,
+            "relativeTimeSeconds": 60,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "WRONG_ANSWER",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 4,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000180,
+            "relativeTimeSeconds": 180,
+            "problem": {
+              "contestId": 100001,
+              "index": "A",
+              "name": "A",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 5,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000360,
+            "relativeTimeSeconds": 360,
+            "problem": {
+              "contestId": 100001,
+              "index": "B",
+              "name": "B",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          },
+          {
+            "id": 6,
+            "contestId": 100001,
+            "creationTimeSeconds": 1700000540,
+            "relativeTimeSeconds": 540,
+            "problem": {
+              "contestId": 100001,
+              "index": "C",
+              "name": "C",
+              "type": "PROGRAMMING"
+            },
+            "author": {
+              "contestId": 100001,
+              "members": [
+                {
+                  "handle": "guest"
+                }
+              ],
+              "participantType": "OUT_OF_COMPETITION",
+              "ghost": false
+            },
+            "programmingLanguage": "GNU C++17",
+            "verdict": "OK",
+            "testset": "TESTS",
+            "passedTestCount": 1,
+            "timeConsumedMillis": 15,
+            "memoryConsumedBytes": 1024
+          }
+        ]
+      },
+      "expectedPenalty": 25
+    }
+  ]
+}

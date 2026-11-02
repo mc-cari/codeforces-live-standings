@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/audit"
 	"github.com/mc-cari/codeforces-live-standings/backend/internal/standings/domain"
 )
 
@@ -48,6 +49,7 @@ type Subscription struct {
 }
 
 type Session struct {
+	anomalyReporter   *audit.Reporter
 	historyObserver   SubmissionHistoryObserver
 	historyIncomplete bool
 	repository        Repository
@@ -70,7 +72,7 @@ type Session struct {
 }
 
 func newSession(repository Repository, gateway ContestGateway, pollInterval time.Duration, contest domain.Contest, standings *domain.Standings, revision int64, stored map[int]domain.Submission, observer SubmissionHistoryObserver) *Session {
-	return &Session{historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
+	return &Session{anomalyReporter: audit.NewReporter(), historyObserver: observer, repository: repository, gateway: gateway, pollInterval: pollInterval, contest: contest, standings: standings, revision: revision, submissions: stored, subscribers: make(map[*Subscription]struct{}), stop: make(chan struct{}), stopped: make(chan struct{})}
 }
 
 func (session *Session) Contest() domain.Contest {
@@ -127,9 +129,12 @@ func (session *Session) healthStateLocked() string {
 }
 
 func (session *Session) patchLocked(subscription *Subscription, upserts []domain.Submission) Event {
-	standings, _ := domain.Project(session.contest, session.standings, session.submissions, subscription.Handles)
+	standings, projected := domain.Project(session.contest, session.standings, session.submissions, subscription.Handles)
+	if len(projected) >= 10000 {
+		return session.snapshotLocked(subscription)
+	}
 	selected := make([]domain.Submission, 0, len(upserts))
-	for _, submission := range upserts {
+	for _, submission := range projected {
 		if subscription.Handles.Selects(submission.Author) {
 			selected = append(selected, submission)
 		}
@@ -138,7 +143,21 @@ func (session *Session) patchLocked(subscription *Subscription, upserts []domain
 }
 
 func (session *Session) Run(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		select {
+		case <-session.stop:
+			cancel()
+		case <-ctx.Done():
+		}
+	}()
 	defer close(session.stopped)
+	if source, ok := session.gateway.(StreamingGateway); ok {
+		defer source.StopContest(session.Contest().ID)
+		session.runSource(ctx, source)
+		return
+	}
 	contest := session.Contest()
 	if wait := time.Until(time.Unix(contest.StartTimeSeconds, 0)); contest.Phase == "BEFORE" && wait > 0 {
 		timer := time.NewTimer(wait)
@@ -170,7 +189,17 @@ func (session *Session) Run(ctx context.Context) {
 	}
 }
 
-func (session *Session) Stop()                    { session.stopOnce.Do(func() { close(session.stop) }) }
+func (session *Session) Stop() {
+	session.stopOnce.Do(func() {
+		close(session.stop)
+		session.mu.Lock()
+		defer session.mu.Unlock()
+		for subscriber := range session.subscribers {
+			delete(session.subscribers, subscriber)
+			close(subscriber.Done)
+		}
+	})
+}
 func (session *Session) Stopped() <-chan struct{} { return session.stopped }
 
 func (session *Session) poll(ctx context.Context) bool {
@@ -201,6 +230,7 @@ func (session *Session) poll(ctx context.Context) bool {
 	}
 	standings, standingsErr := session.gateway.FetchStandings(ctx, contestID)
 	if standingsErr == nil {
+		standings.ResolveICPCPenalty(previousStandings)
 		session.mu.Lock()
 		session.standings = &standings
 		session.contest = standings.Contest
@@ -208,6 +238,9 @@ func (session *Session) poll(ctx context.Context) bool {
 		if err := session.repository.SaveContest(standings.Contest, time.Now()); err != nil {
 			standingsErr = err
 		}
+	}
+	if statusErr == nil && standingsErr == nil {
+		session.anomalyReporter.ObserveSubmissions(standings, status)
 	}
 	if statusErr != nil || standingsErr != nil {
 		slog.Warn("contest poll incomplete", "contest", contestID, "status_error", statusErr, "standings_error", standingsErr)
@@ -228,6 +261,16 @@ func (session *Session) poll(ctx context.Context) bool {
 	if err != nil {
 		slog.Error("revision update failed", "error", err)
 		return true
+	}
+	if store, ok := session.repository.(ViewRepository); ok {
+		session.mu.RLock()
+		update := ContestUpdate{Standings: standings, Submissions: session.submissions, Finished: finished && session.finishedPolls >= 2}
+		err := store.SaveView(contestID, update, revision)
+		session.mu.RUnlock()
+		if err != nil {
+			session.broadcastState("stale")
+			return true
+		}
 	}
 	session.mu.Lock()
 	wasStale := session.stale
@@ -291,7 +334,7 @@ func (session *Session) broadcastState(state string) {
 	defer session.mu.Unlock()
 	event := Event{Kind: "state", Revision: session.revision, Payload: State{State: state, Contest: session.contest}}
 	for subscriber := range session.subscribers {
-		session.offer(subscriber, event, false)
+		session.offer(subscriber, event, true)
 	}
 }
 
@@ -304,12 +347,64 @@ func (session *Session) offer(subscriber *Subscription, event Event, replace boo
 	if !replace {
 		return
 	}
-	select {
-	case <-subscriber.Events:
-	default:
+	for {
+		select {
+		case <-subscriber.Events:
+			continue
+		default:
+		}
+		break
 	}
-	select {
-	case subscriber.Events <- event:
-	default:
+	subscriber.Events <- session.snapshotLocked(subscriber)
+}
+
+func (session *Session) runSource(ctx context.Context, source StreamingGateway) {
+	backoff := time.Second
+	for ctx.Err() == nil {
+		err := source.Stream(ctx, session.Contest().ID, func(update ContestUpdate) error {
+			session.mu.Lock()
+			defer session.mu.Unlock()
+			update.Standings.Authoritative = true
+			next := session.revision + 1
+			if store, ok := session.repository.(ViewRepository); ok {
+				if err := store.SaveView(session.contest.ID, update, next); err != nil {
+					return err
+				}
+			}
+			session.standings = &update.Standings
+			session.contest = update.Standings.Contest
+			session.submissions = update.Submissions
+			session.revision = next
+			session.stale = false
+			session.finished = update.Finished
+			if update.Finished {
+				session.finishedAt = time.Now()
+			}
+			// Replacement snapshots also express explicit deletions and replay recovery.
+			for subscriber := range session.subscribers {
+				session.offer(subscriber, session.snapshotLocked(subscriber), true)
+			}
+			backoff = time.Second
+			return nil
+		})
+		if ctx.Err() != nil {
+			return
+		}
+		if finished, _ := session.Status(); finished {
+			return
+		}
+		if err != nil {
+			slog.Warn("contest source disconnected", "contest", session.Contest().ID, "error", err)
+		}
+		session.mu.Lock()
+		session.stale = true
+		session.mu.Unlock()
+		session.broadcastState("stale")
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(backoff):
+		}
+		backoff = min(30*time.Second, backoff*2)
 	}
 }

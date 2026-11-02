@@ -1,0 +1,29 @@
+services:
+  live-backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.live-v3
+    restart: unless-stopped
+    ports:
+      - "${LIVE_V3_PORT:-8091}:8080"
+      - "127.0.0.1:${LIVE_V3_METRICS_PORT:-9091}:9090"
+    environment:
+      DATA_DIR: /data
+      LISTEN_ADDR: :8080
+      METRICS_LISTEN_ADDR: :9090
+      MAX_SSE_CONNECTIONS: ${MAX_SSE_CONNECTIONS:-128}
+      STANDINGS_SOURCE: livev3
+      LIVE_V3_CONVERTER: /opt/live-v3/bin/cds-converter
+      CF_ICPC_PENALTY_OVERRIDES: ${CF_ICPC_PENALTY_OVERRIDES:-}
+      CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
+      CF_MANAGER_MODE: ${CF_MANAGER_MODE:-false}
+      CF_API_KEY: ${CF_API_KEY:-}
+      CF_API_SECRET: ${CF_API_SECRET:-}
+      JAVA_OPTS: ${LIVE_V3_JAVA_OPTS:--Xmx512m}
+      TELEMETRY_TOKEN: ${TELEMETRY_TOKEN:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://codeforces-live-standings.mccari.us,https://codeforces-live-standings-*-mccaris-projects.vercel.app}
+    volumes:
+      - live-v3-api-data:/data
+
+volumes:
+  live-v3-api-data:

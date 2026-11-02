@@ -36,9 +36,19 @@ export default function LiveStandingsWorkspace({
   isUpdateStale,
 }: LiveStandingsWorkspaceProps) {
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>('standings');
+  const contestPhase = (globalStandings?.contest ?? contest)?.phase;
+  const isJudgingPending = contestPhase === 'PENDING_SYSTEM_TEST';
+  const isSystemTesting = contestPhase === 'SYSTEM_TEST';
+  const isJudging = isJudgingPending || isSystemTesting;
   const liveStatus = isContestFinished
     ? 'Contest finished'
-    : isPaused ? 'Synchronizing' : 'Connected';
+    : isJudgingPending ? 'Judging pending'
+      : isSystemTesting ? 'System testing'
+        : isPaused ? 'Synchronizing' : 'Connected';
+  const statusTone = isContestFinished
+    ? 'finished'
+    : isJudging ? 'judging'
+      : isPaused ? 'paused' : 'live';
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-[#07111f] text-white">
@@ -47,7 +57,7 @@ export default function LiveStandingsWorkspace({
         contestId={contestId}
         mode="LIVE"
         status={liveStatus}
-        statusTone={isContestFinished ? 'finished' : 'live'}
+        statusTone={statusTone}
       />
       {isUpdateStale && (
         <div className="border-b border-[#7a5b19] bg-[#3b2c0d] px-4 py-2 text-center text-sm text-[#ffe8a3]" role="status">

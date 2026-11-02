@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"math"
 	"sort"
 	"strings"
 )
@@ -28,30 +29,48 @@ func Project(contest Contest, source *Standings, all map[int]Submission, handles
 	standings := Standings{Contest: contest}
 	if source != nil {
 		standings = *source
+		standings.ResolveICPCPenalty(nil)
 		standings.Rows = nil
 		for _, row := range source.Rows {
 			if handles.Selects(row.Party) {
 				standings.Rows = append(standings.Rows, row)
 			}
 		}
-		addMissingRows(&standings, all, handles)
+		if !source.Authoritative {
+			addMissingRows(&standings, all, handles)
+		}
+	}
+	positions := friendPositions(standings)
+	for i := range standings.Rows {
+		standings.Rows[i].Party.Rank = positions[PartyName(standings.Rows[i].Party)]
 	}
 	return standings, decorateSubmissions(all, handles, standings)
 }
 
-func decorateSubmissions(all map[int]Submission, handles HandleSet, standings Standings) []Submission {
+func friendPositions(standings Standings) map[string]int {
 	positions := make(map[string]int)
 	previousPoints, previousPosition := -1.0, 0
 	previousPenalty := -1
+	previousRank := -1
 	for index, row := range standings.Rows {
 		position := index + 1
-		if row.Points == previousPoints && row.Penalty == previousPenalty {
+		tied := row.Rank > 0 && previousRank > 0 && row.Rank == previousRank
+		if !standings.Authoritative && (row.Rank == 0 || previousRank == 0) {
+			tied = row.Points == previousPoints && row.Penalty == previousPenalty
+		}
+		if tied {
 			position = previousPosition
 		}
 		positions[PartyName(row.Party)] = position
 		previousPoints, previousPenalty, previousPosition = row.Points, row.Penalty, position
+		previousRank = row.Rank
 	}
 
+	return positions
+}
+
+func decorateSubmissions(all map[int]Submission, handles HandleSet, standings Standings) []Submission {
+	positions := friendPositions(standings)
 	result := make([]Submission, 0)
 	for _, submission := range all {
 		if handles.Selects(submission.Author) {
@@ -148,14 +167,17 @@ func addMissingRows(standings *Standings, all map[int]Submission, handles Handle
 				solved[name][submission.Problem.Index] = true
 				result.Points = 1
 				result.BestSubmissionTimeSecs = int(submission.RelativeTimeSeconds)
-				result.Penalty = int(submission.RelativeTimeSeconds/60) + result.RejectedAttemptCount*20
+				result.Penalty = int(submission.RelativeTimeSeconds/60) + result.RejectedAttemptCount*standings.WrongAttemptPenaltyMinutes()
 				row.Points++
 				row.Penalty += result.Penalty
 				continue
 			}
 			points := submission.Points
 			if points <= 0 {
-				points = max(0.3*standings.Problems[index].Points, standings.Problems[index].Points-(standings.Problems[index].Points*float64(submission.RelativeTimeSeconds/60)/250)-50*float64(result.RejectedAttemptCount))
+				maximum := standings.Problems[index].Points
+				roundedDuration := max(int64(1), standings.Contest.DurationSeconds/60/30) * 30
+				decayPerMinute := (maximum - 0.52*maximum) / float64(roundedDuration)
+				points = max(0.3*maximum, math.Ceil(maximum-float64(submission.RelativeTimeSeconds/60)*decayPerMinute-50*float64(result.RejectedAttemptCount)))
 			}
 			if points > result.Points {
 				row.Points += points - result.Points
@@ -165,6 +187,9 @@ func addMissingRows(standings *Standings, all map[int]Submission, handles Handle
 		} else if !solved[name][submission.Problem.Index] && penalized(submission.Verdict) {
 			result.RejectedAttemptCount++
 		}
+	}
+	if len(missing) == 0 {
+		return
 	}
 	for _, row := range missing {
 		standings.Rows = append(standings.Rows, *row)

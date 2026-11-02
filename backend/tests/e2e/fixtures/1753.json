@@ -1,0 +1,1315 @@
+{
+  "capturedAt": "2026-11-01T23:54:46.781312+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1753",
+    "https://codeforces.com/api/contest.status?contestId=1753"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1753,
+        "name": "Codeforces Round 829 (Div. 1)",
+        "type": "CF",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 7200,
+        "startTimeSeconds": 1666511400,
+        "relativeTimeSeconds": 127065735
+      },
+      "problems": [
+        {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "A2",
+          "name": "Make Nonzero Sum (hard version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "B",
+          "name": "Factorial Divisibility",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 1600,
+          "tags": [
+            "math",
+            "number theory"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "E",
+          "name": "N Machines",
+          "type": "PROGRAMMING",
+          "points": 2500.0,
+          "rating": 3300,
+          "tags": [
+            "binary search",
+            "brute force",
+            "greedy"
+          ]
+        },
+        {
+          "contestId": 1753,
+          "index": "F",
+          "name": "Minecraft Series",
+          "type": "PROGRAMMING",
+          "points": 3000.0,
+          "rating": 3500,
+          "tags": [
+            "brute force",
+            "two pointers"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1753,
+            "participantId": 142791343,
+            "members": [
+              {
+                "handle": "YoshikaMiyafuji"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 19,
+            "startTimeSeconds": 1666511400
+          },
+          "rank": 292,
+          "points": 3093.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 606.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2919
+            },
+            {
+              "points": 1351.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3428
+            },
+            {
+              "points": 1136.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 6510
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1753,
+            "participantId": 142803986,
+            "members": [
+              {
+                "handle": "Nanako"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 12,
+            "startTimeSeconds": 1666511400
+          },
+          "rank": 339,
+          "points": 2939.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 591.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3235
+            },
+            {
+              "points": 1400.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3010
+            },
+            {
+              "points": 948.0,
+              "rejectedAttemptCount": 2,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 7162
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1753,
+            "participantId": 142784367,
+            "members": [
+              {
+                "handle": "Licha06"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 30,
+            "startTimeSeconds": 1666511400
+          },
+          "rank": 504,
+          "points": 2605.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 4,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 663.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1754
+            },
+            {
+              "points": 1028.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5781
+            },
+            {
+              "points": 914.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 7050
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1753,
+            "participantId": 142683739,
+            "members": [
+              {
+                "handle": "pill"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 18,
+            "startTimeSeconds": 1666511400
+          },
+          "rank": 603,
+          "points": 2297.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 482.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 545
+            },
+            {
+              "points": 464.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 1127
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 1351.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3466
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 177604736,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518562,
+        "relativeTimeSeconds": 7162,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142803986,
+          "members": [
+            {
+              "handle": "Nanako"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 12,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 63,
+        "timeConsumedMillis": 779,
+        "memoryConsumedBytes": 42598400
+      },
+      {
+        "id": 177603769,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518465,
+        "relativeTimeSeconds": 7065,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142791343,
+          "members": [
+            {
+              "handle": "YoshikaMiyafuji"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 19,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 6758400
+      },
+      {
+        "id": 177603624,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518450,
+        "relativeTimeSeconds": 7050,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 63,
+        "timeConsumedMillis": 218,
+        "memoryConsumedBytes": 37785600
+      },
+      {
+        "id": 177602554,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518311,
+        "relativeTimeSeconds": 6911,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 93,
+        "memoryConsumedBytes": 23040000
+      },
+      {
+        "id": 177602251,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518272,
+        "relativeTimeSeconds": 6872,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 109,
+        "memoryConsumedBytes": 23040000
+      },
+      {
+        "id": 177601074,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666518101,
+        "relativeTimeSeconds": 6701,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 93,
+        "memoryConsumedBytes": 23040000
+      },
+      {
+        "id": 177599821,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666517910,
+        "relativeTimeSeconds": 6510,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142791343,
+          "members": [
+            {
+              "handle": "YoshikaMiyafuji"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 19,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 63,
+        "timeConsumedMillis": 171,
+        "memoryConsumedBytes": 25292800
+      },
+      {
+        "id": 177599058,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666517796,
+        "relativeTimeSeconds": 6396,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142803986,
+          "members": [
+            {
+              "handle": "Nanako"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 12,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 31,
+        "memoryConsumedBytes": 19251200
+      },
+      {
+        "id": 177596563,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666517427,
+        "relativeTimeSeconds": 6027,
+        "problem": {
+          "contestId": 1753,
+          "index": "D",
+          "name": "The Beach",
+          "type": "PROGRAMMING",
+          "points": 2000.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "dfs and similar",
+            "graphs",
+            "shortest paths"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142803986,
+          "members": [
+            {
+              "handle": "Nanako"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 12,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 30,
+        "memoryConsumedBytes": 19251200
+      },
+      {
+        "id": 177594896,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666517181,
+        "relativeTimeSeconds": 5781,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 93,
+        "memoryConsumedBytes": 3174400
+      },
+      {
+        "id": 177591548,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666516688,
+        "relativeTimeSeconds": 5288,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 93,
+        "memoryConsumedBytes": 3174400
+      },
+      {
+        "id": 177591462,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666516676,
+        "relativeTimeSeconds": 5276,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "MS C++ 2017",
+        "verdict": "COMPILATION_ERROR",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 177582211,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666515421,
+        "relativeTimeSeconds": 4021,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 177577571,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514866,
+        "relativeTimeSeconds": 3466,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142683739,
+          "members": [
+            {
+              "handle": "pill"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 18,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 124,
+        "memoryConsumedBytes": 4198400
+      },
+      {
+        "id": 177577210,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514828,
+        "relativeTimeSeconds": 3428,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142791343,
+          "members": [
+            {
+              "handle": "YoshikaMiyafuji"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 19,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 171,
+        "memoryConsumedBytes": 6451200
+      },
+      {
+        "id": 177575521,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514635,
+        "relativeTimeSeconds": 3235,
+        "problem": {
+          "contestId": 1753,
+          "index": "B",
+          "name": "Factorial Divisibility",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 1600,
+          "tags": [
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142803986,
+          "members": [
+            {
+              "handle": "Nanako"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 12,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 56,
+        "timeConsumedMillis": 342,
+        "memoryConsumedBytes": 15257600
+      },
+      {
+        "id": 177574736,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514551,
+        "relativeTimeSeconds": 3151,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "RUNTIME_ERROR",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 177573745,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514449,
+        "relativeTimeSeconds": 3049,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 177573388,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514410,
+        "relativeTimeSeconds": 3010,
+        "problem": {
+          "contestId": 1753,
+          "index": "C",
+          "name": "Wish I Knew How to Sort",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 2000,
+          "tags": [
+            "dp",
+            "math",
+            "probabilities"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142803986,
+          "members": [
+            {
+              "handle": "Nanako"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 12,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 9,
+        "timeConsumedMillis": 77,
+        "memoryConsumedBytes": 819200
+      },
+      {
+        "id": 177573024,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514368,
+        "relativeTimeSeconds": 2968,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 1638400
+      },
+      {
+        "id": 177572544,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666514319,
+        "relativeTimeSeconds": 2919,
+        "problem": {
+          "contestId": 1753,
+          "index": "B",
+          "name": "Factorial Divisibility",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 1600,
+          "tags": [
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142791343,
+          "members": [
+            {
+              "handle": "YoshikaMiyafuji"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 19,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 56,
+        "timeConsumedMillis": 202,
+        "memoryConsumedBytes": 9113600
+      },
+      {
+        "id": 177559856,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666513154,
+        "relativeTimeSeconds": 1754,
+        "problem": {
+          "contestId": 1753,
+          "index": "B",
+          "name": "Factorial Divisibility",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 1600,
+          "tags": [
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142784367,
+          "members": [
+            {
+              "handle": "Licha06"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 30,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++17 (GCC 9-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 56,
+        "timeConsumedMillis": 327,
+        "memoryConsumedBytes": 3993600
+      },
+      {
+        "id": 177559249,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666513107,
+        "relativeTimeSeconds": 1707,
+        "problem": {
+          "contestId": 1753,
+          "index": "B",
+          "name": "Factorial Divisibility",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 1600,
+          "tags": [
+            "math",
+            "number theory"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142683739,
+          "members": [
+            {
+              "handle": "pill"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 18,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "RUNTIME_ERROR",
+        "testset": "TESTS",
+        "passedTestCount": 31,
+        "timeConsumedMillis": 78,
+        "memoryConsumedBytes": 3993600
+      },
+      {
+        "id": 177551142,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666512527,
+        "relativeTimeSeconds": 1127,
+        "problem": {
+          "contestId": 1753,
+          "index": "A2",
+          "name": "Make Nonzero Sum (hard version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1500,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142683739,
+          "members": [
+            {
+              "handle": "pill"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 18,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 13,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 4812800
+      },
+      {
+        "id": 177540607,
+        "contestId": 1753,
+        "creationTimeSeconds": 1666511945,
+        "relativeTimeSeconds": 545,
+        "problem": {
+          "contestId": 1753,
+          "index": "A1",
+          "name": "Make Nonzero Sum (easy version)",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 1300,
+          "tags": [
+            "constructive algorithms",
+            "dp",
+            "greedy"
+          ]
+        },
+        "author": {
+          "contestId": 1753,
+          "participantId": 142683739,
+          "members": [
+            {
+              "handle": "pill"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 18,
+          "startTimeSeconds": 1666511400
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 12,
+        "timeConsumedMillis": 62,
+        "memoryConsumedBytes": 6860800
+      }
+    ]
+  }
+}

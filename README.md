@@ -145,3 +145,31 @@ Optional production telemetry records page views, completed setups, displayed sc
 countdowns, and basic loading reliability. Lifetime usage totals are persisted in SQLite;
 Alloy scrapes a private metrics listener and forwards to your existing Grafana destination.
 See [deployment, dashboard import, and metric definitions](monitoring/README.md).
+
+## Alternative live-v3 engine
+
+Go owns the shared sessions, persistence, friend filtering, activation routes, SSE, and telemetry for both sources. Select `STANDINGS_SOURCE=codeforces` (default) for direct polling or `STANDINGS_SOURCE=livev3` for authoritative live-v3 scoring. The selection is fixed at startup.
+
+Run `git submodule update --init vendor/live-v3`, then `docker compose -f docker-compose.live-v3.yml up --build -d`. The optional image contains Go, a JVM, and the standard CDS converter from the pinned fork. Go automatically starts one converter child process per active contest, shared by all viewers, with a private loopback listener. There is no application-specific Kotlin service or Docker-daemon dependency.
+
+For a local deployment, build `:cds-converter:installDist -Plive.dev.embedFrontend=false` in `vendor/live-v3`, then set `LIVE_V3_CONVERTER` to the absolute path of `src/cds-converter/build/install/cds-converter/bin/cds-converter`. `CF_API_BASE_URL`, `CF_MANAGER_MODE`, `CF_API_KEY`, and `CF_API_SECRET` configure ingestion. `JAVA_OPTS` bounds each worker's JVM memory. At most three contests can run concurrently.
+
+Go consumes individual CLICS events and coalesces scoreboard requests. The optional `x_live=true` extension carries native custom fields, judging progress, a feed-instance identifier, and a scoreboard event watermark. The adapter stages replay and publishes only a view reconciled with the matching calculated scoreboard. Duplicate content is ignored, existing IDs can change, explicit deletions remove records, and omitted replay entities remain retained. `include_unofficial=true` exposes supported unofficial calculated rows and engine tie ranks; default CLICS responses keep their standard shape and eligibility.
+
+SQLite scopes complete views and retained entities by source and contest. Restart restores active sessions with stale views and starts fresh workers; finished views remain available without a worker. Failed workers restart with bounded backoff. Live-v3's in-memory acquisition history is reloaded on restart; updates never observed by either process cannot be recovered. Go retains observed metadata and calculated standings, without adding an engine-history store.
+
+The direct provider alone supplies the existing missing-row scoring fallback. Live-v3 rows, scores, order, and tie information are authoritative. Browser friend lists are projected from one complete view without recalculating scores.
+
+See [the provider diagram](docs/architecture/live-v3-architecture.html) and [the shared Go application diagram](docs/architecture/go-backend-architecture.html). Run Go tests with `go test -race ./...` from `backend`; set `LIVE_V3_TEST_BINARY` to the converter executable to include the real-converter fixture test. CI also checks the pinned engine APIs, frontend SSE behavior, Compose configuration, and the combined deployment image.
+
+Optional real-contest scoring E2E tests for both Go providers live in
+[`backend/tests/e2e`](backend/tests/e2e/README.md). They replay saved Codeforces API
+snapshots for standard and educational rounds and require the built live-v3 converter.
+
+For ICPC missing-row reconstruction, both Go sources learn a wrong-attempt penalty
+from consistent official standings evidence and retain it when later evidence is
+missing or conflicting. Set `CF_ICPC_PENALTY_OVERRIDES='{"100001":7}'` to override
+specific contests (minutes; zero is allowed). The live-v3 worker receives the same
+setting through its CF `penaltyPerWrongAttemptMinutes` configuration. Go persists
+its learned rule; live-v3 retains it for the worker lifetime. Defaults without
+usable evidence remain 10 minutes for public IDs and 20 for Gym IDs.

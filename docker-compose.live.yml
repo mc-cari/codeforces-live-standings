@@ -11,6 +11,7 @@ services:
       METRICS_LISTEN_ADDR: :9090
       TELEMETRY_TOKEN: ${TELEMETRY_TOKEN:-}
       ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-https://codeforces-live-standings.mccari.us,https://codeforces-live-standings-*-mccaris-projects.vercel.app}
+      CF_ICPC_PENALTY_OVERRIDES: ${CF_ICPC_PENALTY_OVERRIDES:-}
       CF_API_BASE_URL: ${CF_API_BASE_URL:-https://codeforces.com/api/}
     volumes:
       - ${LIVE_DATA_DIR:-./.live-data}:/data

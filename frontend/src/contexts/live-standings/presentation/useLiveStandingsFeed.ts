@@ -5,10 +5,10 @@ import {
 import useInterval from '@/hooks/useInterval';
 import type { Contest, Standings, Submission } from '@/src/shared/domain/contest';
 import { LIVE_POLLING, LOADING_PROGRESS } from '@/src/shared/config/contestTiming';
-import { mapContestDto, mapStandingsDto, mapSubmissionDto } from '@/src/integrations/codeforces/mapper';
 import { projectLiveUpdate } from '../domain/projectLiveUpdate';
 import { codeforcesLiveContestGateway } from '../infrastructure/codeforcesLiveContestGateway';
-import { liveSseGateway, type LivePatch, type LiveSnapshot } from '../infrastructure/liveSseGateway';
+import { liveSseGateway } from '../infrastructure/liveSseGateway';
+import type { LivePatch, LiveSnapshot } from '../application/ports';
 
 type LiveStandingsFeedOptions = {
   contestId: string | undefined;
@@ -62,12 +62,14 @@ export const useLiveStandingsFeed = ({
     officialStandings: Standings,
     remoteSubmissions: Submission[],
     updateContestInfo = false,
+    authoritative = false,
   ) => {
     const projection = projectLiveUpdate(
       officialStandings,
       remoteSubmissions,
       submissionsRef.current,
       userHandles,
+      authoritative,
     );
     submissionsRef.current = projection.submissions;
     setNewSubmissionsCount(projection.newSubmissionCount);
@@ -171,26 +173,26 @@ export const useLiveStandingsFeed = ({
       return undefined;
     }
     const controller = new AbortController();
-    let source: EventSource | undefined;
+    let source: { close(): void } | undefined;
     streamedSubmissionsRef.current = [];
 
     const applySnapshot = (snapshot: LiveSnapshot) => {
-      const snapshotSubmissions = snapshot.submissions.map(mapSubmissionDto);
+      const snapshotSubmissions = snapshot.submissions;
       streamedSubmissionsRef.current = snapshotSubmissions;
-      applyProjection(mapStandingsDto(snapshot.standings), snapshotSubmissions, true);
+      applyProjection(snapshot.standings, snapshotSubmissions, true, true);
       setIsUpdateStale(snapshot.health?.state === 'stale');
       if (snapshot.health?.state === 'finished') setIsContestFinished(true);
       completeInitialLoad();
     };
     const applyPatch = (patch: LivePatch) => {
       const current = new Map(streamedSubmissionsRef.current.map((submission) => [submission.id, submission]));
-      patch.submissionUpserts.map(mapSubmissionDto).forEach((submission) => current.set(submission.id, submission));
+      patch.submissionUpserts.forEach((submission) => current.set(submission.id, submission));
       streamedSubmissionsRef.current = [...current.values()];
-      applyProjection(mapStandingsDto(patch.standings), streamedSubmissionsRef.current, true);
+      applyProjection(patch.standings, streamedSubmissionsRef.current, true, true);
       completeInitialLoad();
     };
     const handleState = (state: string, contest?: LiveSnapshot['contest']) => {
-      if (contest) setContestInfo((current) => current || mapContestDto(contest));
+      if (contest) setContestInfo((current) => current || contest);
       if (state === 'stale') setIsUpdateStale(true);
       if (state === 'finished') setIsContestFinished(true);
     };

@@ -1,0 +1,139 @@
+{
+  "generated_at_utc": "2026-11-01T15:56:39.827591+00:00",
+  "meaning_of_pass": "Observed behavior reproduced; known defects are explicitly asserted.",
+  "cases": [
+    {
+      "name": "original",
+      "commit": "4afb37ea2bece05f22e208a4a6476caede2fe8a2",
+      "environment": {
+        "AUDIT_PATCHED": "false",
+        "PHASE_MAPPING_FIXED": "false",
+        "DECAY_RESULT_EXPECTED": "489"
+      },
+      "suites": [
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFDecayPublishedStandingsAuditTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT published score=489.0 calculated=489.0 duration=150 minutes"
+          ]
+        },
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFExistingBehaviorAuditTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT omission patched=false score=480.0",
+            "AUDIT SUBMITTED patched=false result=SerializationException",
+            "AUDIT missing points patched=false result=NullPointerException",
+            "AUDIT verdict=SKIPPED patched=false score=480.0",
+            "AUDIT verdict=CHALLENGED patched=false score=480.0"
+          ]
+        },
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFFinishedColdStartAuditTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT original source: saved runs=1 delivered runs=1 when autoFinalize enabled"
+          ]
+        },
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFPhasePipelineAuditTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT autoFinalize: mappingFixed=false rejudgeReceived=false",
+            "AUDIT ordinary reload: later WRONG_ANSWER received"
+          ]
+        }
+      ],
+      "status": "reproduced"
+    },
+    {
+      "name": "phase_fix",
+      "commit": "706a03d076be659aca41a4d63798aa48dd0a1ca5",
+      "environment": {
+        "PHASE_MAPPING_FIXED": "true"
+      },
+      "suites": [
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFPhasePipelineAuditTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT autoFinalize: mappingFixed=true rejudgeReceived=true",
+            "AUDIT ordinary reload: later WRONG_ANSWER received"
+          ]
+        }
+      ],
+      "status": "reproduced"
+    },
+    {
+      "name": "decay_change",
+      "commit": "850d64ab2cbb091bdf024ce929eb263b922eb1b2",
+      "environment": {
+        "DECAY_RESULT_EXPECTED": "486"
+      },
+      "suites": [
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFDecayPublishedStandingsAuditTest",
+          "tests": 1,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT published score=489.0 calculated=486.0 duration=150 minutes"
+          ]
+        }
+      ],
+      "status": "reproduced"
+    },
+    {
+      "name": "current_fork",
+      "commit": "f310cc418f4c8f308186945783542bbd3eb7bdad",
+      "environment": {
+        "AUDIT_PATCHED": "true"
+      },
+      "suites": [
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFAdapterBoundaryAuditTest",
+          "tests": 2,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT penalty: observed 7 minutes resets to fallback 20 when next standings omit evidence",
+            "AUDIT new source: saved runs=1 delivered runs=0 when autoFinalize enabled"
+          ]
+        },
+        {
+          "name": "org.icpclive.cds.plugins.codeforces.CFExistingBehaviorAuditTest",
+          "tests": 4,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "observations": [
+            "AUDIT omission patched=true score=430.0",
+            "AUDIT SUBMITTED patched=true result=InProgress",
+            "AUDIT missing points patched=true result=480",
+            "AUDIT verdict=SKIPPED patched=true score=0.0",
+            "AUDIT verdict=CHALLENGED patched=true score=0.0"
+          ]
+        }
+      ],
+      "status": "reproduced"
+    }
+  ]
+}

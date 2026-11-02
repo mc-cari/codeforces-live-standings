@@ -1,0 +1,1155 @@
+{
+  "capturedAt": "2026-11-01T23:26:47.767339+00:00",
+  "sources": [
+    "https://codeforces.com/api/contest.standings?contestId=1735",
+    "https://codeforces.com/api/contest.status?contestId=1735"
+  ],
+  "standings": {
+    "status": "OK",
+    "result": {
+      "contest": {
+        "id": 1735,
+        "name": "Codeforces Round 824 (Div. 2)",
+        "type": "CF",
+        "phase": "FINISHED",
+        "frozen": false,
+        "durationSeconds": 8100,
+        "startTimeSeconds": 1664721300,
+        "relativeTimeSeconds": 128854249
+      },
+      "problems": [
+        {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1735,
+          "index": "B",
+          "name": "Tea with Tangerines",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        {
+          "contestId": 1735,
+          "index": "E",
+          "name": "House Planning",
+          "type": "PROGRAMMING",
+          "points": 2250.0,
+          "rating": 2400,
+          "tags": [
+            "constructive algorithms",
+            "data structures",
+            "graph matchings",
+            "greedy"
+          ]
+        },
+        {
+          "contestId": 1735,
+          "index": "F",
+          "name": "Pebbles and Beads",
+          "type": "PROGRAMMING",
+          "points": 3000.0,
+          "rating": 2900,
+          "tags": [
+            "data structures",
+            "geometry"
+          ]
+        }
+      ],
+      "rows": [
+        {
+          "party": {
+            "contestId": 1735,
+            "participantId": 141243858,
+            "members": [
+              {
+                "handle": "dabbler1"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 67,
+            "startTimeSeconds": 1664721300
+          },
+          "rank": 1320,
+          "points": 2577.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 494.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 211
+            },
+            {
+              "points": 726.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 483
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 1357.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2993
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1735,
+            "participantId": 141311035,
+            "members": [
+              {
+                "handle": "_Temeraire"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 471,
+            "startTimeSeconds": 1664721300
+          },
+          "rank": 1324,
+          "points": 2528.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 496.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 157
+            },
+            {
+              "points": 723.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 552
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 3,
+              "type": "FINAL"
+            },
+            {
+              "points": 1309.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3801
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1735,
+            "participantId": 141311995,
+            "members": [
+              {
+                "handle": "dull_subset"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 381,
+            "startTimeSeconds": 1664721300
+          },
+          "rank": 1330,
+          "points": 2505.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 417.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 6702
+            },
+            {
+              "points": 765.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 5841
+            },
+            {
+              "points": 1323.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 3678
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        },
+        {
+          "party": {
+            "contestId": 1735,
+            "participantId": 141187455,
+            "members": [
+              {
+                "handle": "Apachee"
+              }
+            ],
+            "participantType": "CONTESTANT",
+            "ghost": false,
+            "room": 362,
+            "startTimeSeconds": 1664721300
+          },
+          "rank": 1333,
+          "points": 2497.0,
+          "penalty": 0,
+          "successfulHackCount": 0,
+          "unsuccessfulHackCount": 0,
+          "problemResults": [
+            {
+              "points": 488.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 395
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 1,
+              "type": "FINAL"
+            },
+            {
+              "points": 1050.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 2414
+            },
+            {
+              "points": 959.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL",
+              "bestSubmissionTimeSeconds": 6780
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            },
+            {
+              "points": 0.0,
+              "rejectedAttemptCount": 0,
+              "type": "FINAL"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "submissions": {
+    "status": "OK",
+    "result": [
+      {
+        "id": 174428537,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664729389,
+        "relativeTimeSeconds": 8089,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174427215,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664729169,
+        "relativeTimeSeconds": 7869,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174426858,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664729099,
+        "relativeTimeSeconds": 7799,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 0,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174424648,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664728592,
+        "relativeTimeSeconds": 7292,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 670,
+        "memoryConsumedBytes": 10649600
+      },
+      {
+        "id": 174422440,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664728080,
+        "relativeTimeSeconds": 6780,
+        "problem": {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141187455,
+          "members": [
+            {
+              "handle": "Apachee"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 362,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 51,
+        "timeConsumedMillis": 62,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 174422114,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664728002,
+        "relativeTimeSeconds": 6702,
+        "problem": {
+          "contestId": 1735,
+          "index": "B",
+          "name": "Tea with Tangerines",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 15,
+        "memoryConsumedBytes": 102400
+      },
+      {
+        "id": 174419547,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664727410,
+        "relativeTimeSeconds": 6110,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 2,
+        "timeConsumedMillis": 670,
+        "memoryConsumedBytes": 11059200
+      },
+      {
+        "id": 174418410,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664727141,
+        "relativeTimeSeconds": 5841,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 202,
+        "memoryConsumedBytes": 614400
+      },
+      {
+        "id": 174416666,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664726763,
+        "relativeTimeSeconds": 5463,
+        "problem": {
+          "contestId": 1735,
+          "index": "B",
+          "name": "Tea with Tangerines",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141187455,
+          "members": [
+            {
+              "handle": "Apachee"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 362,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174408384,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664725101,
+        "relativeTimeSeconds": 3801,
+        "problem": {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 51,
+        "timeConsumedMillis": 857,
+        "memoryConsumedBytes": 12492800
+      },
+      {
+        "id": 174407686,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664724978,
+        "relativeTimeSeconds": 3678,
+        "problem": {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311995,
+          "members": [
+            {
+              "handle": "dull_subset"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 381,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++17 (GCC 7-32)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 51,
+        "timeConsumedMillis": 1481,
+        "memoryConsumedBytes": 108953600
+      },
+      {
+        "id": 174403843,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664724372,
+        "relativeTimeSeconds": 3072,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 654,
+        "memoryConsumedBytes": 9625600
+      },
+      {
+        "id": 174403292,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664724293,
+        "relativeTimeSeconds": 2993,
+        "problem": {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141243858,
+          "members": [
+            {
+              "handle": "dabbler1"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 67,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 51,
+        "timeConsumedMillis": 530,
+        "memoryConsumedBytes": 6041600
+      },
+      {
+        "id": 174402840,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664724229,
+        "relativeTimeSeconds": 2929,
+        "problem": {
+          "contestId": 1735,
+          "index": "D",
+          "name": "Meta-set",
+          "type": "PROGRAMMING",
+          "points": 1750.0,
+          "rating": 1700,
+          "tags": [
+            "brute force",
+            "combinatorics",
+            "data structures",
+            "hashing",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141243858,
+          "members": [
+            {
+              "handle": "dabbler1"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 67,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "Python 3",
+        "verdict": "TIME_LIMIT_EXCEEDED",
+        "testset": "PRETESTS",
+        "passedTestCount": 12,
+        "timeConsumedMillis": 4000,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174399011,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664723714,
+        "relativeTimeSeconds": 2414,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141187455,
+          "members": [
+            {
+              "handle": "Apachee"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 362,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 21,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 307200
+      },
+      {
+        "id": 174393998,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664723107,
+        "relativeTimeSeconds": 1807,
+        "problem": {
+          "contestId": 1735,
+          "index": "C",
+          "name": "Phase Shift",
+          "type": "PROGRAMMING",
+          "points": 1250.0,
+          "rating": 1400,
+          "tags": [
+            "dfs and similar",
+            "dsu",
+            "graphs",
+            "greedy",
+            "implementation",
+            "strings"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141243858,
+          "members": [
+            {
+              "handle": "dabbler1"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 67,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "Python 3",
+        "verdict": "WRONG_ANSWER",
+        "testset": "PRETESTS",
+        "passedTestCount": 1,
+        "timeConsumedMillis": 249,
+        "memoryConsumedBytes": 204800
+      },
+      {
+        "id": 174380852,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664721852,
+        "relativeTimeSeconds": 552,
+        "problem": {
+          "contestId": 1735,
+          "index": "B",
+          "name": "Tea with Tangerines",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 77,
+        "memoryConsumedBytes": 1740800
+      },
+      {
+        "id": 174380070,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664721783,
+        "relativeTimeSeconds": 483,
+        "problem": {
+          "contestId": 1735,
+          "index": "B",
+          "name": "Tea with Tangerines",
+          "type": "PROGRAMMING",
+          "points": 750.0,
+          "rating": 900,
+          "tags": [
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141243858,
+          "members": [
+            {
+              "handle": "dabbler1"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 67,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "Python 3",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174379140,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664721695,
+        "relativeTimeSeconds": 395,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141187455,
+          "members": [
+            {
+              "handle": "Apachee"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 362,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "C++20 (GCC 11-64)",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 0,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174377730,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664721511,
+        "relativeTimeSeconds": 211,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141243858,
+          "members": [
+            {
+              "handle": "dabbler1"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 67,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "Python 3",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 46,
+        "memoryConsumedBytes": 0
+      },
+      {
+        "id": 174377526,
+        "contestId": 1735,
+        "creationTimeSeconds": 1664721457,
+        "relativeTimeSeconds": 157,
+        "problem": {
+          "contestId": 1735,
+          "index": "A",
+          "name": "Working Week",
+          "type": "PROGRAMMING",
+          "points": 500.0,
+          "rating": 800,
+          "tags": [
+            "constructive algorithms",
+            "greedy",
+            "math"
+          ]
+        },
+        "author": {
+          "contestId": 1735,
+          "participantId": 141311035,
+          "members": [
+            {
+              "handle": "_Temeraire"
+            }
+          ],
+          "participantType": "CONTESTANT",
+          "ghost": false,
+          "room": 471,
+          "startTimeSeconds": 1664721300
+        },
+        "programmingLanguage": "PyPy 3-64",
+        "verdict": "OK",
+        "testset": "TESTS",
+        "passedTestCount": 6,
+        "timeConsumedMillis": 124,
+        "memoryConsumedBytes": 3788800
+      }
+    ]
+  }
+}

@@ -19,16 +19,21 @@ const hasSelectedMember = (party: Party, selected: Set<string>) => (
 const calculateLocalStandings = (
   standings: Standings,
   handles: string[],
+  authoritative: boolean,
 ) => {
   const positions = new Map(handles.map((handle) => [handle, handles.length]));
   let previousPoints = Number.NaN;
   let previousPenalty = Number.NaN;
   let previousPosition = 0;
+  let previousRank = -1;
   const positioned = new Set<string>();
 
   standings.rows.forEach((row, index) => {
-    const position = row.points === previousPoints && row.penalty === previousPenalty
-      ? previousPosition : index + 1;
+    const tied = authoritative
+      ? row.rank > 0 && row.rank === previousRank
+      : row.points === previousPoints && row.penalty === previousPenalty;
+    const derivedPosition = tied ? previousPosition : index + 1;
+    const position = authoritative && row.party.rank > 0 ? row.party.rank : derivedPosition;
     const name = getName(row.party);
     const identity = participantIdentity(name);
     if (!positioned.has(identity)) {
@@ -38,6 +43,7 @@ const calculateLocalStandings = (
     previousPoints = row.points;
     previousPenalty = row.penalty;
     previousPosition = position;
+    previousRank = row.rank;
   });
   return positions;
 };
@@ -47,6 +53,7 @@ export const projectLiveUpdate = (
   remoteSubmissions: Submission[],
   previousSubmissions: Submission[],
   selectedHandles: string[],
+  authoritative = false,
 ): LiveProjection => {
   const selected = new Set(selectedHandles.map(participantIdentity));
   const selectedRemote = remoteSubmissions.filter((submission) => (
@@ -56,12 +63,14 @@ export const projectLiveUpdate = (
     ...officialStandings,
     rows: officialStandings.rows.filter((row) => hasSelectedMember(row.party, selected)),
   };
-  const standings = addMissingParticipantRows(filteredStandings, selectedRemote, getName);
-  const localStandings = calculateLocalStandings(standings, selectedHandles);
+  const standings = authoritative
+    ? filteredStandings
+    : addMissingParticipantRows(filteredStandings, selectedRemote, getName);
+  const localStandings = calculateLocalStandings(standings, selectedHandles, authoritative);
   const previousIds = new Set(previousSubmissions.map((submission) => submission.id));
   const submissionsById = new Map<number, Submission>();
 
-  previousSubmissions.forEach((submission) => submissionsById.set(submission.id, submission));
+  if (!authoritative) previousSubmissions.forEach((submission) => submissionsById.set(submission.id, submission));
   selectedRemote.forEach((submission) => submissionsById.set(submission.id, submission));
 
   const solvedProblems = new Map<string, Set<string>>();
@@ -70,6 +79,10 @@ export const projectLiveUpdate = (
       first.relativeTimeSeconds - second.relativeTimeSeconds || first.id - second.id
     ))
     .map((submission) => {
+      if (authoritative) return {
+        ...submission,
+        author: { ...submission.author, members: [...submission.author.members] },
+      };
       const name = getName(submission.author);
       const solved = solvedProblems.get(name) || new Set<string>();
       if (submission.verdict === 'OK') solved.add(submission.problem.index);

@@ -23,6 +23,7 @@ export type CodeforcesPartyDto = {
   ghost?: boolean;
   room?: number;
   startTimeSeconds?: number;
+  rank?: number;
 };
 
 export type CodeforcesSubmissionDto = {
@@ -38,6 +39,7 @@ export type CodeforcesSubmissionDto = {
   passedTestCount: number;
   timeConsumedMillis: number;
   memoryConsumedBytes: number;
+  numberOfProblems?: number;
   points?: number;
 };
 
